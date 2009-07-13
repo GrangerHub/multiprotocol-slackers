@@ -301,7 +301,7 @@ static cvarTable_t   gameCvarTable[ ] =
   
   { &g_teamImbalanceWarnings, "g_teamImbalanceWarnings", "30", CVAR_ARCHIVE, 0, qfalse  },
   
-  { &g_unlagged, "g_unlagged", "1", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qfalse  },
+  { &g_unlagged, "g_unlagged", "1", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue  },
 
   { &g_disabledEquipment, "g_disabledEquipment", "", CVAR_ROM, 0, qfalse  },
   { &g_disabledClasses, "g_disabledClasses", "", CVAR_ROM, 0, qfalse  },
@@ -342,13 +342,13 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_decolourLogfiles, "g_decolourLogfiles", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_buildLogMaxLength, "g_buildLogMaxLength", "50", CVAR_ARCHIVE, 0, qfalse  },
   { &g_myStats, "g_myStats", "1", CVAR_ARCHIVE, 0, qtrue  },
-  { &g_teamStatus, "g_teamStatus", "0", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_teamStatus, "g_teamStatus", "0", CVAR_ARCHIVE, 0, qtrue },
   { &g_publicSayadmins, "g_publicSayadmins", "1", CVAR_ARCHIVE, 0, qfalse  },    
   { &g_minLevelToSpecMM1, "g_minLevelToSpecMM1", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_antiSpawnBlock, "g_antiSpawnBlock", "0", CVAR_ARCHIVE, 0, qfalse  },
   
   { &g_devmapKillerHP, "g_devmapKillerHP", "0", CVAR_ARCHIVE, 0, qtrue  },
-  { &g_killerHP, "g_killerHP", "0", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_killerHP, "g_killerHP", "0", CVAR_ARCHIVE, 0, qtrue  },
   
   { &g_tag, "g_tag", "main", CVAR_INIT, 0, qfalse },
   
