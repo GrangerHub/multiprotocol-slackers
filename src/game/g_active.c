@@ -852,6 +852,7 @@ void ClientTimerActions( gentity_t *ent, int msec )
       }
 
       if( ent->health > 0 && ent->health < client->ps.stats[ STAT_MAX_HEALTH ] &&
+          !level.paused &&
           ( ent->lastDamageTime + ALIEN_REGEN_DAMAGE_TIME ) < level.time )
       {
         ent->health += BG_FindRegenRateForClass( client->ps.stats[ STAT_PCLASS ] ) * modifier;
@@ -1384,6 +1385,7 @@ void ClientThink_real( gentity_t *ent )
   int       oldEventSequence;
   int       msec;
   usercmd_t *ucmd;
+  int       real_pm_type;
 
   client = ent->client;
 
@@ -1393,6 +1395,9 @@ void ClientThink_real( gentity_t *ent )
 
   // mark the time, so the connection sprite can be removed
   ucmd = &ent->client->pers.cmd;
+
+  if( client->pers.paused )
+    ucmd->forwardmove = ucmd->rightmove = ucmd->upmove = ucmd->buttons = 0;
 
   // sanity check the command time to prevent speedup cheating
   if( ucmd->serverTime > level.time + 200 )
@@ -1487,6 +1492,10 @@ void ClientThink_real( gentity_t *ent )
   else
     client->ps.pm_type = PM_NORMAL;
 
+  // paused
+  real_pm_type = client->ps.pm_type;
+  if ( level.paused ) client->ps.pm_type = PM_SPECTATOR;
+
   if( client->ps.stats[ STAT_STATE ] & SS_GRABBED &&
       client->grabExpiryTime < level.time )
     client->ps.stats[ STAT_STATE ] &= ~SS_GRABBED;
@@ -1525,7 +1534,7 @@ void ClientThink_real( gentity_t *ent )
     {
       BG_DeactivateUpgrade( UP_MEDKIT, client->ps.stats );
     }
-    else if( client->ps.stats[ STAT_HEALTH ] > 0 )
+    else if( client->ps.stats[ STAT_HEALTH ] > 0 && !level.paused )
     {
       //remove anti toxin
       BG_DeactivateUpgrade( UP_MEDKIT, client->ps.stats );
@@ -1562,6 +1571,9 @@ void ClientThink_real( gentity_t *ent )
 
   // set speed
   client->ps.speed = g_speed.value * BG_FindSpeedForClass( client->ps.stats[ STAT_PCLASS ] );
+
+  if( client->pers.paused )
+    client->ps.speed = 0;
 
   if( client->lastCreepSlowTime + CREEP_TIMEOUT < level.time )
     client->ps.stats[ STAT_STATE ] &= ~SS_CREEPSLOWED;
@@ -1652,6 +1664,8 @@ void ClientThink_real( gentity_t *ent )
   // save results of pmove
   if( ent->client->ps.eventSequence != oldEventSequence )
     ent->eventTime = level.time;
+
+  if ( level.paused ) client->ps.pm_type = real_pm_type;
 
   if( g_smoothClients.integer )
     BG_PlayerStateToEntityStateExtraPolate( &ent->client->ps, &ent->s, ent->client->ps.commandTime, qtrue );

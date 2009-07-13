@@ -411,6 +411,7 @@ typedef struct
   vec3_t              lastDeathLocation;
   char                guid[ 33 ];
   char                ip[ 16 ];
+  qboolean            paused;
   qboolean            muted;
   qboolean            ignoreAdminWarnings;
   qboolean            denyBuild;
@@ -749,8 +750,13 @@ typedef struct
   qboolean          uncondHumanWin;
   qboolean          alienTeamLocked;
   qboolean          humanTeamLocked;
-  qboolean paused;
-  int pausedTime;
+  qboolean          paused;
+  int               pauseTime;
+  float             pause_speed;
+  float             pause_gravity;
+  float             pause_knockback;
+  int               pause_ff;
+  int               pause_ffb;
 
   int unlaggedIndex;
   int unlaggedTimes[ MAX_UNLAGGED_MARKERS ];

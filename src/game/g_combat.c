@@ -1177,6 +1177,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
   if( !attacker )
     attacker = &g_entities[ ENTITYNUM_WORLD ];
 
+  if( attacker->client && attacker->client->pers.paused )
+    return;
+
   // shootable doors / buttons don't actually have any health
   if( targ->s.eType == ET_MOVER )
   {
@@ -1192,6 +1195,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
   if( client )
   {
     if( client->noclip && !g_devmapNoGod.integer)
+      return;
+    if( client->pers.paused )
       return;
   }
 
@@ -1325,6 +1330,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
     // check for godmode
     if ( targ->flags & FL_GODMODE && !g_devmapNoGod.integer)
+      return;
+
+    if( level.paused )
       return;
     
     if(targ->s.eType == ET_BUILDABLE && g_cheats.integer && g_devmapNoStructDmg.integer)

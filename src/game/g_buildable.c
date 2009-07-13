@@ -1098,6 +1098,8 @@ void AAcidTube_Think( gentity_t *self )
 
       if( enemy->client && enemy->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS )
       {
+        if( level.paused || enemy->client->pers.paused )
+          continue;
         self->timestamp = level.time;
         self->think = AAcidTube_Damage;
         self->nextthink = level.time + 100;
@@ -1172,6 +1174,8 @@ void AHive_Think( gentity_t *self )
 
       if( enemy->client && enemy->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS )
       {
+        if( level.paused || enemy->client->pers.paused )
+          continue;
         self->active = qtrue;
         self->target_ent = enemy;
         self->timestamp = level.time + HIVE_REPEAT;
@@ -1785,6 +1789,8 @@ void HReactor_Think( gentity_t *self )
 
       if( enemy->client && enemy->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS )
       {
+        if( level.paused || enemy->client->pers.paused )
+          continue;
         self->timestamp = level.time;
         G_SelectiveRadiusDamage( self->s.pos.trBase, self, REACTOR_ATTACK_DAMAGE,
           REACTOR_ATTACK_RANGE, self, MOD_REACTOR, PTE_HUMANS );
@@ -2118,6 +2124,9 @@ qboolean HMGTurret_CheckTarget( gentity_t *self, gentity_t *target, qboolean ign
   if( !target->client )
     return qfalse;
 
+  if( level.paused || target->client->pers.paused )
+    return qfalse;
+
   if( target->client->ps.stats[ STAT_STATE ] & SS_HOVELING )
     return qfalse;
 
@@ -2319,6 +2328,7 @@ void HTeslaGen_Think( gentity_t *self )
 
       if( enemy->client && enemy->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS &&
           enemy->health > 0 &&
+          !level.paused && !enemy->client->pers.paused &&
           Distance( enemy->s.pos.trBase, self->s.pos.trBase ) <= TESLAGEN_RANGE )
       {
         VectorSubtract( enemy->s.pos.trBase, self->s.pos.trBase, dir );
@@ -2646,7 +2656,7 @@ void G_BuildableThink( gentity_t *ent, int msec )
   //pack health, power and dcc
 
   //toggle spawned flag for buildables
-  if( !ent->spawned && ent->health > 0 && !level.pausedTime )
+  if( !ent->spawned && ent->health > 0 )
   {
     if( ent->buildTime + bTime < level.time )
       ent->spawned = qtrue;

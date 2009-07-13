@@ -361,9 +361,6 @@ qboolean G_Flood_Limited( gentity_t *ent )
   if( !g_floodMinTime.integer )
     return qfalse;
   
-  if( level.paused ) //Doesn't work when game is paused, so disable
-    return qfalse;
-  
   // Do not limit admins with no censor/flood flag
   if( G_admin_permission( ent, ADMF_NOCENSORFLOOD ) )
    return qfalse;
@@ -3145,6 +3142,12 @@ void Cmd_Buy_f( gentity_t *ent )
     if( !Q_stricmp( s, "retrigger" ) )
       ent->client->retriggerArmouryMenu = level.framenum + RAM_FRAMES;
   }
+  if( ent->client->pers.paused )
+  {
+    trap_SendServerCommand( ent-g_entities,
+      "print \"You may not deconstruct while paused\n\"" );
+    return;
+  }
 
   //update ClientInfo
   ClientUserinfoChanged( ent->client->ps.clientNum, qfalse );
@@ -3315,6 +3318,12 @@ void Cmd_Build_f( gentity_t *ent )
   {
     trap_SendServerCommand( ent-g_entities,
       "print \"Your building rights have been revoked\n\"" );
+    return;
+  }
+  if( ent->client->pers.paused )
+  {
+    trap_SendServerCommand( ent-g_entities,
+      "print \"You may not mark while paused\n\"" );
     return;
   }
 
@@ -3917,6 +3926,12 @@ void Cmd_Follow_f( gentity_t *ent )
   if( ent->client->sess.sessionTeam != TEAM_SPECTATOR )
   {
     trap_SendServerCommand( ent - g_entities, "print \"follow: You cannot follow unless you are dead or on the spectators.\n\"" );
+    return;
+  }
+  if( ent->client->pers.paused )
+  {
+    trap_SendServerCommand( ent-g_entities,
+      "print \"You may not build while paused\n\"" );
     return;
   }
 

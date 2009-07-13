@@ -1558,6 +1558,8 @@ FireWeapon
 */
 void FireWeapon( gentity_t *ent )
 {
+  if( level.paused ) return;
+
   if( ent->client )
   {
     // set aiming directions
