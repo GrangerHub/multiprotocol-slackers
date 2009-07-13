@@ -190,6 +190,8 @@ vmCvar_t  g_votableMaps;
 
 vmCvar_t  g_msg;
 vmCvar_t  g_msgTime;
+vmCvar_t  g_welcomeMsg;
+vmCvar_t  g_welcomeMsgTime;
 
 
 vmCvar_t  mod_jetpackFuel;
@@ -368,6 +370,8 @@ static cvarTable_t   gameCvarTable[ ] =
   
   { &g_msg, "g_msg", "", CVAR_ARCHIVE, 0, qfalse  },
   { &g_msgTime, "g_msgTime", "0", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_welcomeMsg, "g_welcomeMsg", "", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_welcomeMsgTime, "g_welcomeMsgTime", "0", CVAR_ARCHIVE, 0, qfalse  },
   
   { &g_rankings, "g_rankings", "0", 0, 0, qfalse },
   { &g_allowShare, "g_allowShare", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
@@ -2472,6 +2476,38 @@ CheckMsgTimer
 */
 void CheckMsgTimer( void )
 {
+  static int LastTime = 0;
+
+  if( level.time - LastTime < 1000 )
+    return;
+
+  LastTime = level.time;
+
+  if( g_welcomeMsgTime.integer && g_welcomeMsg.string[ 0 ] )
+  {
+    char buffer[ MAX_STRING_CHARS ];
+    int wt;
+    int i;
+
+    buffer[ 0 ] = '\0';
+    wt = g_welcomeMsgTime.integer * 1000;
+    for( i = 0; i < level.maxclients; i++ )
+    {
+      if( level.clients[ i ].pers.connected != CON_CONNECTED )
+        continue;
+
+      if( level.time - level.clients[ i ].pers.enterTime < wt )
+      {
+        if( buffer[ 0 ] == '\0' )
+        {
+          Q_strncpyz( buffer, g_welcomeMsg.string, sizeof( buffer ) );
+          G_ParseEscapedString( buffer );
+        }
+      trap_SendServerCommand( i, va( "cp \"%s\"", buffer ) );
+      }
+    }
+  }
+
   if( !g_msgTime.integer )
     return;
 

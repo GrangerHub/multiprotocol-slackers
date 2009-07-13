@@ -1405,6 +1405,8 @@ extern  vmCvar_t  g_votableMaps;
 
 extern  vmCvar_t  g_msg;
 extern  vmCvar_t  g_msgTime;
+extern  vmCvar_t  g_welcomeMsg;
+extern  vmCvar_t  g_welcomeMsgTime;
 
 extern  vmCvar_t  g_buildLogMaxLength;
 
