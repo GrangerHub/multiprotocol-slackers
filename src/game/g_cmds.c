@@ -1431,6 +1431,13 @@ void Cmd_CallVote_f( gentity_t *ent )
       trap_SendServerCommand( ent-g_entities, "print \"Your /callvote attempt is flood-limited; wait before chatting again\n\"" );
       return;
     }
+    
+  //see if they can vote
+  if( !G_admin_permission( ent, ADMF_VOTE_ALLOW ) )
+  {
+    trap_SendServerCommand( ent-g_entities, va("print \"You dont have the admin rights to make votes\n\"" ) );
+    return;
+  }
 
   if( g_voteMinTime.integer
     && ent->client->pers.firstConnect 
@@ -1933,6 +1940,13 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
   if( level.teamVoteTime[ cs_offset ] )
   {
     trap_SendServerCommand( ent-g_entities, "print \"A team vote is already in progress\n\"" );
+    return;
+  }
+
+  //see if they can vote
+  if( !G_admin_permission( ent, ADMF_VOTE_ALLOW ) )
+  {
+    trap_SendServerCommand( ent-g_entities, va("print \"You dont have the admin rights to make votes\n\"" ) );
     return;
   }
 
