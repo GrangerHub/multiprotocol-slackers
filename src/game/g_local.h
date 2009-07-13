@@ -403,6 +403,8 @@ typedef struct
   int                 credit;
   int                 ping;
 
+  int                 lastTeamStatus;
+
   int                 lastFloodTime;         // level.time of last flood-limited command
   int                 floodDemerits;         // number of flood demerits accumulated
 
@@ -1346,11 +1348,13 @@ extern  vmCvar_t  g_minLevelToSpecMM1;
 extern  vmCvar_t  g_banNotice;
 
 extern  vmCvar_t  g_devmapKillerHP;
+extern  vmCvar_t  g_killerHP;
 
 extern  vmCvar_t  g_privateMessages;
 extern  vmCvar_t  g_decolourLogfiles;
 extern  vmCvar_t  g_publicSayadmins;
 extern  vmCvar_t  g_myStats;
+extern  vmCvar_t  g_teamStatus;
 extern  vmCvar_t  g_antiSpawnBlock;
 
 extern  vmCvar_t  g_dretchPunt;

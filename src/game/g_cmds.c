@@ -1025,15 +1025,15 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
     {
       default:
       case PTE_NONE:
-        prefix = "[S] ";
+        prefix = "[^3S^7] ";
         break;
 
       case PTE_ALIENS:
-        prefix = "[A] ";
+        prefix = "[^1A^7] ";
         break;
 
       case PTE_HUMANS:
-        prefix = "[H] ";
+        prefix = "[^4H^7] ";
     }
   }
   else
@@ -1184,15 +1184,15 @@ static void Cmd_SayArea_f( gentity_t *ent )
     {
       default:
       case PTE_NONE:
-        prefix = "[S] ";
+        prefix = "[^3S^7] ";
         break;
 
       case PTE_ALIENS:
-        prefix = "[A] ";
+        prefix = "[^1A^7] ";
         break;
 
       case PTE_HUMANS:
-        prefix = "[H] ";
+        prefix = "[^4H^7] ";
     }
   }
   else
@@ -3626,6 +3626,119 @@ char *G_statsString( statsCounters_t *sc, pTeam_t *pt )
 }
 
 
+/*
+=================
+Cmd_TeamStatus_f
+=================
+*/
+void Cmd_TeamStatus_f( gentity_t *ent )
+{
+  char multiple[ 12 ];
+  int builders = 0;
+  int arm = 0, mediboost = 0;
+  int omrccount = 0, omrchealth = 0;
+  qboolean omrcbuild = qfalse;
+  gentity_t *tmp;
+  int i;
+
+  if( !g_teamStatus.integer )
+  {
+    trap_SendServerCommand( ent - g_entities,
+      "print \"teamstatus is disabled.\n\"" );
+    return;
+  }
+
+  if( ent->client->pers.muted )
+  {
+    trap_SendServerCommand( ent - g_entities,
+      "print \"You are muted and cannot use message commands.\n\"" );
+    return;
+  }
+
+  if( ent->client->pers.lastTeamStatus && 
+      ( level.time - ent->client->pers.lastTeamStatus) < g_teamStatus.integer * 1000 )
+  {
+    ADMP( va("You may only check your team's status once every %i seconds.\n",
+          g_teamStatus.integer  ));
+    return;
+  }
+
+  ent->client->pers.lastTeamStatus = level.time;
+
+  tmp = &g_entities[ 0 ];
+  for ( i = 0; i < level.num_entities; i++, tmp++ )
+  {
+    if( i < MAX_CLIENTS )
+    {
+      if( tmp->client &&
+          tmp->client->pers.connected == CON_CONNECTED &&
+          tmp->client->pers.teamSelection == ent->client->pers.teamSelection &&
+          tmp->health > 0 &&
+          ( tmp->client->ps.stats[ STAT_PCLASS ] == PCL_ALIEN_BUILDER0 ||
+            tmp->client->ps.stats[ STAT_PCLASS ] == PCL_ALIEN_BUILDER0_UPG ||
+            BG_InventoryContainsWeapon( WP_HBUILD, tmp->client->ps.stats ) ||
+            BG_InventoryContainsWeapon( WP_HBUILD2, tmp->client->ps.stats ) ) )
+        builders++;
+      continue;
+    }
+
+    if( tmp->s.eType == ET_BUILDABLE )
+    {
+      if( tmp->biteam != ent->client->pers.teamSelection ||
+          tmp->health <= 0 )
+        continue;
+
+      switch( tmp->s.modelindex )
+      {
+        case BA_H_REACTOR:
+        case BA_A_OVERMIND:
+          omrccount++;
+          if( tmp->health > omrchealth )
+            omrchealth = tmp->health;
+          if( !omrcbuild )
+            omrcbuild = tmp->spawned;
+          break;
+        case BA_H_ARMOURY:
+          arm++;
+          break;
+        case BA_H_MEDISTAT:
+        case BA_A_BOOSTER:
+          mediboost++;
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  if( omrccount > 1 )
+    Com_sprintf( multiple, sizeof( multiple ), "^7[x%d]", omrccount );
+  else
+    multiple[ 0 ] = '\0';
+
+  if( ent->client->pers.teamSelection == PTE_ALIENS )
+  {
+    G_Say( ent, NULL, SAY_TEAM,
+      va( "^3OM: %s(%d)%s ^3Spawns: ^5%d ^3Builders: ^5%d ^3Boosters: ^5%d^7" ,
+      ( !omrccount ) ? "^1Down" : ( omrcbuild ) ? "^2Up" : "^5Building",
+      omrchealth * 100 / OVERMIND_HEALTH,
+      multiple,
+      level.numAlienSpawns,
+      builders,
+      mediboost ) );
+  }
+  else
+  {
+    G_Say( ent, NULL, SAY_TEAM,
+      va( "^3RC: %s(%d)%s ^3Spawns: ^5%d ^3Builders: ^5%d ^3Armouries: ^5%d ^3Medistations: ^5%d^7" ,
+      ( !omrccount ) ? "^1Down" : ( omrcbuild ) ? "^2Up" : "^5Building",
+      omrchealth * 100 / REACTOR_HEALTH,
+      multiple,
+      level.numHumanSpawns,
+      builders,
+      arm, mediboost ) );
+  }
+}
 
 /*
 =================
@@ -4380,6 +4493,7 @@ commands_t cmds[ ] = {
 
   { "score", CMD_INTERMISSION, ScoreboardMessage },
   { "mystats", CMD_TEAM|CMD_INTERMISSION, Cmd_MyStats_f },
+  { "teamstatus", CMD_TEAM, Cmd_TeamStatus_f },
 
   // cheats
   { "give", CMD_CHEAT|CMD_TEAM|CMD_LIVING, Cmd_Give_f },
@@ -4941,17 +5055,17 @@ void G_CP( gentity_t *ent )
         if( !sendAliens && ( *ptr == 'a' || *ptr == 'A' ) )
         {
           sendAliens = qtrue;
-          Q_strcat( prefixes, sizeof( prefixes ), "[A]" );
+          Q_strcat( prefixes, sizeof( prefixes ), "[^1A^7]" );
         }
         if( !sendHumans && ( *ptr == 'h' || *ptr == 'H' ) )
         {
           sendHumans = qtrue;
-          Q_strcat( prefixes, sizeof( prefixes ), "[H]" );
+          Q_strcat( prefixes, sizeof( prefixes ), "[^4H^7]" );
         }
         if( !sendSpecs && ( *ptr == 's' || *ptr == 'S' ) )
         {
           sendSpecs = qtrue;
-          Q_strcat( prefixes, sizeof( prefixes ), "[S]" );
+          Q_strcat( prefixes, sizeof( prefixes ), "[^3S^7]" );
         }
         ptr++;
       }
