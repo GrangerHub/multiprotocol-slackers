@@ -1701,6 +1701,10 @@ void ClientSpawn( gentity_t *ent, gentity_t *spawn, vec3_t origin, vec3_t angles
 
   client->ps.stats[ STAT_STAMINA ] = MAX_STAMINA;
 
+  if( mod_jetpackFuel.value >= 10.0f ) {
+    client->jetpackfuel = mod_jetpackFuel.value;
+  }
+
   G_SetOrigin( ent, spawn_origin );
   VectorCopy( spawn_origin, client->ps.origin );
 

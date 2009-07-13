@@ -922,6 +922,32 @@ void ClientTimerActions( gentity_t *ent, int msec )
     {
       G_Damage( ent, NULL, NULL, NULL, NULL, 5, DAMAGE_NO_ARMOR, MOD_SUICIDE );
     }
+
+    //my new jetpack code
+    if( mod_jetpackFuel.value >= 10.0f ) {
+      //if we have jetpack and its on
+      if( BG_InventoryContainsUpgrade( UP_JETPACK, client->ps.stats ) && BG_UpgradeIsActive( UP_JETPACK, client->ps.stats ) ) {
+        //check if fuels 0 if so deactivate it if not give a 10 second fuel low warning and take JETPACK_USE_RATE from fuel
+        if( client->jetpackfuel <= 0.0f ) {
+          BG_DeactivateUpgrade( UP_JETPACK, client->ps.stats );
+        } else if( client->jetpackfuel < 10.0f && client->jetpackfuel > 0.0f) {
+          client->jetpackfuel = client->jetpackfuel - mod_jetpackConsume.value;
+          trap_SendServerCommand( client - level.clients, "cp \"^3Fuel ^1Low!!!!!^7\nLand now.\"" );
+        } else {
+          client->jetpackfuel = client->jetpackfuel - mod_jetpackConsume.value;
+        }
+
+        //if jetpack isnt active regenerate fuel and give a message when its full
+      } else if( BG_InventoryContainsUpgrade( UP_JETPACK, client->ps.stats ) && !BG_UpgradeIsActive( UP_JETPACK, client->ps.stats ) ) {
+        if( client->jetpackfuel > ( mod_jetpackFuel.value - 10.0f ) && client->jetpackfuel <= mod_jetpackFuel.value  ) {
+          client->jetpackfuel = client->jetpackfuel + mod_jetpackRegen.value;
+          trap_SendServerCommand( client - level.clients, "cp \"^3Fuel Status: ^2Full!^7\n\"" );
+        } else if( client->jetpackfuel < mod_jetpackFuel.value ) {
+          //regenerate some fuel
+          client->jetpackfuel = client->jetpackfuel + mod_jetpackRegen.value;
+        }
+      }
+    }
   }
 
   while( client->time10000 >= 10000 )

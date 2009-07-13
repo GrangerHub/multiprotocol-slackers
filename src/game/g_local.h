@@ -533,6 +533,8 @@ struct gclient_s
 
   qboolean            charging;
 
+  float               jetpackfuel;
+
   vec3_t              hovelOrigin;          // player origin before entering hovel
 
   int                 lastFlameBall;        // s.number of the last flame ball fired
@@ -1408,6 +1410,10 @@ extern  vmCvar_t  g_buildLogMaxLength;
 
 extern vmCvar_t  g_AllStats;
 extern vmCvar_t  g_AllStatsTime;
+
+extern  vmCvar_t  mod_jetpackFuel;
+extern  vmCvar_t  mod_jetpackConsume;
+extern  vmCvar_t  mod_jetpackRegen;
 
 void      trap_Printf( const char *fmt );
 void      trap_Error( const char *fmt );
