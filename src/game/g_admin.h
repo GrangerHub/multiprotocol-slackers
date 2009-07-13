@@ -124,6 +124,7 @@ typedef struct g_admin_admin
   char name[ MAX_NAME_LENGTH ];
   int level;
   char flags[ MAX_ADMIN_FLAGS ];
+  int seen;
 }
 g_admin_admin_t;
 
@@ -180,6 +181,9 @@ void G_admin_maplog_result( char *flag );
 int G_admin_level( gentity_t *ent );
 void G_admin_set_adminname( gentity_t *ent );
 char* G_admin_adminPrintName( gentity_t *ent );
+
+qboolean G_admin_seen(gentity_t *ent, int skiparg );
+void G_admin_seen_update( char *guid );
 
 // ! command functions
 qboolean G_admin_time( gentity_t *ent, int skiparg );

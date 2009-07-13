@@ -1415,6 +1415,8 @@ extern  vmCvar_t  mod_jetpackFuel;
 extern  vmCvar_t  mod_jetpackConsume;
 extern  vmCvar_t  mod_jetpackRegen;
 
+extern  vmCvar_t  g_adminExpireTime;
+
 void      trap_Printf( const char *fmt );
 void      trap_Error( const char *fmt );
 int       trap_Milliseconds( void );

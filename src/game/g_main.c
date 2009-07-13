@@ -196,6 +196,8 @@ vmCvar_t  mod_jetpackFuel;
 vmCvar_t  mod_jetpackConsume;
 vmCvar_t  mod_jetpackRegen;
 
+vmCvar_t  g_adminExpireTime;
+
 static cvarTable_t   gameCvarTable[ ] =
 {
   // don't override the cheat state set by the system
@@ -344,6 +346,7 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_adminMapLog, "g_adminMapLog", "", CVAR_ROM, 0, qfalse  },
   { &g_minLevelToJoinTeam, "g_minLevelToJoinTeam", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_forceAutoSelect, "g_forceAutoSelect", "0", CVAR_ARCHIVE, 0, qtrue }, 
+  { &g_adminExpireTime, "g_adminExpireTime", "0", CVAR_ARCHIVE, 0, qfalse  },
   
   { &g_privateMessages, "g_privateMessages", "1", CVAR_ARCHIVE, 0, qfalse  },
   { &g_decolourLogfiles, "g_decolourLogfiles", "0", CVAR_ARCHIVE, 0, qfalse  },
@@ -827,6 +830,9 @@ void G_ShutdownGame( int restart )
     G_LogPrintf( "------------------------------------------------------------\n" );
     trap_FS_FCloseFile( level.logFile );
   }
+
+  // write admin.dat for !seen data
+  admin_writeconfig();
 
   // write all the client session data so we can get it back
   G_WriteSessionData( );
