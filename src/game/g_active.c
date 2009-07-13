@@ -393,6 +393,17 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd )
    attack3 = ( ( client->buttons & BUTTON_USE_HOLDABLE ) &&
                !( client->oldbuttons & BUTTON_USE_HOLDABLE ) );
 
+  if( level.mapRotationVoteTime )
+  {
+    if( attack1 )
+    {
+      G_IntermissionMapVoteCommand( ent, qtrue, qfalse );
+      attack1 = qfalse;
+    }
+    if( ( client->buttons & BUTTON_ATTACK2 ) && !( client->oldbuttons & BUTTON_ATTACK2 ) )
+      G_IntermissionMapVoteCommand( ent, qfalse, qfalse );
+  }
+
   if( client->sess.spectatorState == SPECTATOR_LOCKED || client->sess.spectatorState == SPECTATOR_FOLLOW )
     client->ps.pm_type = PM_FREEZE;
   else
@@ -1479,6 +1490,12 @@ void ClientThink_real( gentity_t *ent )
   //
   if( level.intermissiontime )
   {
+    if( level.mapRotationVoteTime )
+    {
+      SpectatorThink( ent, ucmd );
+      return;
+    }
+
     ClientIntermissionThink( client );
     return;
   }

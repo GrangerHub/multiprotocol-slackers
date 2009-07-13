@@ -1847,6 +1847,18 @@ void Cmd_Vote_f( gentity_t *ent )
 {
   char msg[ 64 ];
 
+  if ( level.intermissiontime || level.paused )
+  {
+    if( level.mapRotationVoteTime )
+    {
+      trap_Argv( 1, msg, sizeof( msg ) );
+      if( msg[ 0 ] == 'y' || msg[ 1 ] == 'Y' || msg[ 1 ] == '1' )
+        G_IntermissionMapVoteCommand( ent, qfalse, qtrue );
+    }
+
+    return;
+  }
+
   if( !level.voteTime )
   { 
     if( ent->client->pers.teamSelection != PTE_NONE )
@@ -4036,6 +4048,12 @@ G_ToggleFollow
 */
 void G_ToggleFollow( gentity_t *ent )
 {
+  if( level.mapRotationVoteTime )
+  {
+    G_IntermissionMapVoteCommand( ent, qfalse, qtrue );
+    return;
+  }
+
   if( ent->client->sess.spectatorState == SPECTATOR_FOLLOW )
     G_StopFollowing( ent );
   else
@@ -4617,7 +4635,7 @@ static void Cmd_Ignore_f( gentity_t *ent )
 commands_t cmds[ ] = {
   // normal commands
   { "team", 0, Cmd_Team_f },
-  { "vote", 0, Cmd_Vote_f },
+  { "vote", CMD_INTERMISSION, Cmd_Vote_f },
   { "ignore", 0, Cmd_Ignore_f },
   { "unignore", 0, Cmd_Ignore_f },
 

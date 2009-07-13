@@ -4254,6 +4254,7 @@ qboolean G_admin_listmaps( gentity_t *ent, int skiparg )
 qboolean G_admin_listrotation( gentity_t *ent, int skiparg )
 {
   int i, j, statusColor;
+  char mapnames[ MAX_STRING_CHARS ];
   char *status = '\0';
 
   extern mapRotations_t mapRotations;
@@ -4271,12 +4272,63 @@ qboolean G_admin_listrotation( gentity_t *ent, int skiparg )
   {
     if ( i == g_currentMapRotation.integer )
     {
+      int currentMap = G_GetCurrentMap( i );
+
       ADMBP_begin();
       ADMBP( va( "^3!rotation: ^7%s\n", mapRotations.rotations[ i ].name ) );
 
       for( j = 0; j < mapRotations.rotations[ i ].numMaps; j++ )
       {
-        if ( G_GetCurrentMap( i ) == j )
+        Q_strncpyz( mapnames, mapRotations.rotations[ i ].maps[ j ].name, sizeof( mapnames ) );
+
+        if( !Q_stricmp( mapRotations.rotations[ i ].maps[ j ].name, "*VOTE*" ) )
+        {
+          char slotMap[ 64 ];
+          int lineLen = 0;
+          int k;
+
+          trap_Cvar_VariableStringBuffer( "mapname", slotMap, sizeof( slotMap ) );
+          mapnames[ 0 ] = '\0';
+          for( k = 0; k < mapRotations.rotations[ i ].maps[ j ].numConditions; k++ )
+          {
+            char *thisMap;
+            int mc = 7;
+
+            if( mapRotations.rotations[ i ].maps[ j ].conditions[ k ].lhs != MCV_VOTE )
+              continue;
+
+            thisMap = mapRotations.rotations[ i ].maps[ j ].conditions[ k ].dest;
+            lineLen += strlen( thisMap ) + 1;
+
+            if( currentMap == j && !Q_stricmp( thisMap, slotMap ) )
+              mc = 3;
+            Q_strcat( mapnames, sizeof( mapnames ), va( "^7%s%s^%i%s",
+              ( k ) ? ", " : "",
+              ( lineLen > 50 ) ? "\n                  " : "",
+              mc, thisMap ) );
+            if( lineLen > 50 )
+              lineLen = strlen( thisMap ) + 2;
+            else
+              lineLen++;
+          }
+
+          if( currentMap == j )
+          {
+            statusColor = 3;
+            status = "current slot";
+          }
+          else if( !k )
+          {
+            statusColor = 1;
+            status = "empty vote";
+          }
+          else
+          {
+            statusColor = 7;
+            status = "vote";
+          }
+        }
+        else if ( currentMap == j )
         {
           statusColor = 3;
           status = "current slot";
@@ -4291,7 +4343,7 @@ qboolean G_admin_listrotation( gentity_t *ent, int skiparg )
           statusColor = 7;
           status = "";
         }
-        ADMBP( va( "^%i%3i %-20s ^%i%s\n", statusColor, j + 1, mapRotations.rotations[ i ].maps[ j ].name, statusColor, status ) );
+        ADMBP( va( " ^%i%-12s %3i %s\n", statusColor, status, j + 1, mapnames ) );
       }
 
       ADMBP_end();

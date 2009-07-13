@@ -788,6 +788,7 @@ typedef struct
   int               lastTeamUnbalancedTime;
   int               numTeamWarnings;  
   int               lastMsgTime;
+  int               mapRotationVoteTime;
   
   statsCounters_level alienStatsCounters;
   statsCounters_level humanStatsCounters;
@@ -1175,7 +1176,7 @@ void G_WriteSessionData( void );
 #define MAX_MAP_ROTATIONS       16
 #define MAX_MAP_ROTATION_MAPS   64
 #define MAX_MAP_COMMANDS        16
-#define MAX_MAP_ROTATION_CONDS  4
+#define MAX_MAP_ROTATION_CONDS  8
 
 #define NOT_ROTATING          -1
 
@@ -1184,7 +1185,8 @@ typedef enum
   MCV_ERR,
   MCV_RANDOM,
   MCV_NUMCLIENTS,
-  MCV_LASTWIN
+  MCV_LASTWIN,
+  MCV_VOTE
 } mapConditionVariable_t;
 
 typedef enum
@@ -1250,6 +1252,12 @@ void      G_InitMapRotations( void );
 qboolean  G_MapExists( char *name );
 int       G_GetCurrentMap( int rotation );
 
+qboolean G_CheckMapRotationVote( void );
+qboolean G_IntermissionMapVoteWinner( void );
+void G_IntermissionMapVoteMessage( gentity_t *ent );
+void G_IntermissionMapVoteMessageAll( void );
+void G_IntermissionMapVoteCommand( gentity_t *ent, qboolean next, qboolean choose );
+
 //
 // g_ptr.c
 //
@@ -1313,6 +1321,8 @@ extern  vmCvar_t  g_voteLimit;
 extern  vmCvar_t  g_suddenDeathVotePercent;
 extern  vmCvar_t  g_suddenDeathVoteDelay;
 extern  vmCvar_t  g_mapVotesPercent;
+extern  vmCvar_t  g_mapRotationVote;
+extern  vmCvar_t  g_readyPercent;
 extern  vmCvar_t  g_designateVotes;
 extern  vmCvar_t  g_teamAutoJoin;
 extern  vmCvar_t  g_teamForceBalance;

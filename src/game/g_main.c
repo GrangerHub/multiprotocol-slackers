@@ -88,6 +88,8 @@ vmCvar_t  g_voteLimit;
 vmCvar_t  g_suddenDeathVotePercent;
 vmCvar_t  g_suddenDeathVoteDelay;
 vmCvar_t  g_mapVotesPercent;
+vmCvar_t  g_mapRotationVote;
+vmCvar_t  g_readyPercent;
 vmCvar_t  g_designateVotes;
 vmCvar_t  g_teamAutoJoin;
 vmCvar_t  g_teamForceBalance;
@@ -283,6 +285,8 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_suddenDeathVotePercent, "g_suddenDeathVotePercent", "74", CVAR_ARCHIVE, 0, qfalse },
   { &g_suddenDeathVoteDelay, "g_suddenDeathVoteDelay", "180", CVAR_ARCHIVE, 0, qfalse },
   { &g_mapVotesPercent, "g_mapVotesPercent", "50", CVAR_ARCHIVE, 0, qfalse },
+  { &g_mapRotationVote, "g_mapRotationVote", "15", CVAR_ARCHIVE, 0, qfalse },
+  { &g_readyPercent, "g_readyPercent", "0", CVAR_ARCHIVE, 0, qfalse },
   { &g_designateVotes, "g_designateVotes", "0", CVAR_ARCHIVE, 0, qfalse },
   
   { &g_listEntity, "g_listEntity", "0", 0, 0, qfalse },
@@ -1606,7 +1610,7 @@ void CalculateRanks( void )
   CheckExitRules( );
 
   // if we are at the intermission, send the new info to everyone
-  if( level.intermissiontime )
+  if( level.intermissiontime && !level.mapRotationVoteTime )
     SendScoreboardMessageToAllClients( );
 }
 
@@ -1746,8 +1750,42 @@ void BeginIntermission( void )
 
   // send the current scoring to all clients
   SendScoreboardMessageToAllClients( );
+
+  if( g_nextMap.string[ 0 ] )
+  {
+    trap_SendServerCommand( -1,
+      va( "print \"next map has been set to %s^7%s\n\"",
+      g_nextMap.string,
+      ( G_CheckMapRotationVote() ) ? ", voting will be skipped" : "" ) );
+  }
 }
 
+void BeginMapRotationVote( void )
+{
+  gentity_t *ent;
+  int length;
+  int i;
+
+  if( level.mapRotationVoteTime )
+    return;
+
+  length = g_mapRotationVote.integer;
+  if( length > 60 )
+    length = 60;
+  level.mapRotationVoteTime = level.time + ( length * 1000 );
+
+  for( i = 0; i < level.maxclients; i++ )
+  {
+    ent = g_entities + i;
+
+    if( !ent->inuse )
+      continue;
+
+    ent->client->ps.pm_type = PM_SPECTATOR;
+    ent->client->sess.sessionTeam = TEAM_SPECTATOR;
+    ent->client->sess.spectatorState = SPECTATOR_LOCKED;
+  }
+}
 
 /*
 =============
@@ -1762,6 +1800,20 @@ void ExitLevel( void )
   int       i;
   gclient_t *cl;
   buildHistory_t *tmp, *mark;
+
+  if( level.mapRotationVoteTime )
+  {
+    if( level.time < level.mapRotationVoteTime &&
+        !G_IntermissionMapVoteWinner( ) )
+      return;
+  }
+  else if( g_mapRotationVote.integer > 0 &&
+           G_CheckMapRotationVote() &&
+           !g_nextMap.string[ 0 ] )
+  {
+    BeginMapRotationVote( );
+    return;
+  }
 
   while( ( tmp = level.buildHistory ) )
   {
@@ -2127,6 +2179,13 @@ void CheckIntermissionExit( void )
     return;
   }
 
+  // map vote started
+  if( level.mapRotationVoteTime )
+  {
+    ExitLevel( );
+    return;
+  }
+
   // see which players are ready
   ready = 0;
   notReady = 0;
@@ -2175,6 +2234,14 @@ void CheckIntermissionExit( void )
 
   // if everyone wants to go, go now
   if( !notReady )
+  {
+    ExitLevel( );
+    return;
+  }
+
+  // if only a percent is needed to ready, check for it
+  if( g_readyPercent.integer && numPlayers &&
+      ready * 100 / numPlayers >= g_readyPercent.integer )
   {
     ExitLevel( );
     return;
@@ -2482,6 +2549,12 @@ void CheckMsgTimer( void )
     return;
 
   LastTime = level.time;
+
+  if( level.mapRotationVoteTime )
+  {
+    G_IntermissionMapVoteMessageAll( );
+    return;
+  }
 
   if( g_welcomeMsgTime.integer && g_welcomeMsg.string[ 0 ] )
   {
