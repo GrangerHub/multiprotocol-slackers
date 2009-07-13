@@ -4103,8 +4103,12 @@ qboolean G_admin_listplayers( gentity_t *ent, int skiparg )
       }
     }
 
-    if( p->pers.paused )
+    misc[ 0 ] = '\0';
+    if( G_admin_permission( &g_entities[ i ], ADMF_BAN_IMMUNITY ) )
     {
+      // use Misc slot for Immunity player status
+      Q_strncpyz( misc, "I", sizeof( misc ) );
+    } else if( p->pers.paused ) {
       // use Misc slot for paused player status
       Q_strncpyz( misc, "P", sizeof( misc ) );
     }
