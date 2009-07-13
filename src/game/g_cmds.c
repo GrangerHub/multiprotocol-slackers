@@ -1787,11 +1787,41 @@ void Cmd_CallVote_f( gentity_t *ent )
 
      }
    }
+   else if( !Q_stricmp( arg1, "extend" ) )
+   {
+     if( !g_extendVotesPercent.integer )
+     {
+       trap_SendServerCommand( ent-g_entities, "print \"Extend votes have been disabled\n\"" );
+       return;
+     }
+     if( g_extendVotesCount.integer
+         && level.extend_vote_count >= g_extendVotesCount.integer )
+     {
+       trap_SendServerCommand( ent-g_entities,
+                               va( "print \"callvote: Maximum number of %d extend votes has been reached\n\"",
+                                   g_extendVotesCount.integer ) );
+       return;
+     }
+     if( level.time - level.startTime <
+         ( g_timelimit.integer - g_extendVotesTime.integer / 2 ) * 60000 )
+     {
+       trap_SendServerCommand( ent-g_entities,
+                               va( "print \"callvote: Extend votes only allowed with less than %d minutes remaining\n\"",
+                                   g_extendVotesTime.integer / 2 ) );
+       return;
+     }
+     level.extend_vote_count++;
+     level.votePassThreshold = g_extendVotesPercent.integer; 
+     Com_sprintf( level.voteString, sizeof( level.voteString ),
+                  "timelimit %i", g_timelimit.integer + g_extendVotesTime.integer );
+     Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ),
+                  "Extend the timelimit by %d minutes", g_extendVotesTime.integer );
+   }
   else
   {
     trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string\n\"" );
     trap_SendServerCommand( ent-g_entities, "print \"Valid vote commands are: "
-      "map, map_restart, draw, nextmap, kick, mute, unmute, poll, and sudden_death\n" );
+      "map, map_restart, draw, extend, nextmap, kick, mute, unmute, poll, and sudden_death\n" );
     return;
   }
   

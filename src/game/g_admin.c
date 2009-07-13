@@ -107,6 +107,16 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "give the player designated builder privileges",
       "[^3name|slot#^7]"
     },
+    
+    {"devmap", G_admin_devmap, "devmap",
+      "load a map with cheats (and optionally force layout)",
+      "[^3mapname^7] (^5layout^7)"
+    },
+    
+    {"drop", G_admin_drop, "drop",
+      "kick a client from the server without log",
+      "[^3name|slot#^7] [^3message^7]"
+    },
 
     {"flag", G_admin_flag, "flag",
       "add an admin flag to a player, prefix flag with '-' to disallow the flag. "
@@ -118,17 +128,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "list all flags understood by this server",
       ""
     },
-    
-    {"devmap", G_admin_devmap, "devmap",
-      "load a map with cheats (and optionally force layout)",
-      "[^3mapname^7] (^5layout^7)"
-    },
-    
-    {"drop", G_admin_drop, "drop",
-      "kick a client from the server without log",
-      "[^3name|slot#^7] [^3message^7]"
-    },
-    
+
     {"help", G_admin_help, "help",
       "display commands available to you or help on a specific command",
       "(^5command^7)"
@@ -3186,6 +3186,7 @@ void G_admin_adminlog_log( gentity_t *ent, char *command, char *args, int skipar
       !Q_stricmp( command, "listplayers" ) ||
       !Q_stricmp( command, "namelog" ) ||
       !Q_stricmp( command, "showbans" ) ||
+      !Q_stricmp( command, "seen" ) ||
       !Q_stricmp( command, "time" ) )
     return;
 
