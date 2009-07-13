@@ -21,11 +21,8 @@ else
   COMPILE_ARCH=$(shell uname -m | sed -e s/i.86/x86/)
 endif
 
-BUILD_CLIENT     =
-BUILD_CLIENT_SMP =
-BUILD_SERVER     =
-BUILD_GAME_SO    =
-BUILD_GAME_QVM   =
+BUILD_GAME_SO    = 0
+BUILD_GAME_QVM   = 1
 
 #############################################################################
 #
@@ -699,30 +696,15 @@ endif #SunOS
 
 TARGETS =
 
-ifneq ($(BUILD_SERVER),0)
-  TARGETS += $(B)/tremded.$(ARCH)$(BINEXT)
-endif
-
-ifneq ($(BUILD_CLIENT),0)
-  TARGETS += $(B)/tremulous.$(ARCH)$(BINEXT)
-  ifneq ($(BUILD_CLIENT_SMP),0)
-    TARGETS += $(B)/tremulous-smp.$(ARCH)$(BINEXT)
-  endif
-endif
-
 ifneq ($(BUILD_GAME_SO),0)
   TARGETS += \
-    $(B)/base/cgame$(ARCH).$(SHLIBEXT) \
-    $(B)/base/game$(ARCH).$(SHLIBEXT) \
-    $(B)/base/ui$(ARCH).$(SHLIBEXT)
+    $(B)/base/game$(ARCH).$(SHLIBEXT) 
 endif
 
 ifneq ($(BUILD_GAME_QVM),0)
   ifneq ($(CROSS_COMPILING),1)
     TARGETS += \
-      $(B)/base/vm/cgame.qvm \
-      $(B)/base/vm/game.qvm \
-      $(B)/base/vm/ui.qvm
+      $(B)/base/vm/game.qvm
   endif
 endif
 
@@ -796,15 +778,9 @@ all: debug release
 
 debug:
 	@$(MAKE) targets B=$(BD) CFLAGS="$(CFLAGS) $(DEBUG_CFLAGS)"
-ifeq ($(BUILD_MASTER_SERVER),1)
-	$(MAKE) -C $(MASTERDIR) debug
-endif
 
 release:
 	@$(MAKE) targets B=$(BR) CFLAGS="$(CFLAGS) $(RELEASE_CFLAGS)"
-ifeq ($(BUILD_MASTER_SERVER),1)
-	$(MAKE) -C $(MASTERDIR) release
-endif
 
 # Create the build directories and tools, print out
 # an informational message, then start building
@@ -830,10 +806,7 @@ targets: makedirs tools
 makedirs:
 	@if [ ! -d $(BUILD_DIR) ];then $(MKDIR) $(BUILD_DIR);fi
 	@if [ ! -d $(B) ];then $(MKDIR) $(B);fi
-	@if [ ! -d $(B)/client ];then $(MKDIR) $(B)/client;fi
-	@if [ ! -d $(B)/clientsmp ];then $(MKDIR) $(B)/clientsmp;fi
-	@if [ ! -d $(B)/ded ];then $(MKDIR) $(B)/ded;fi
-	@if [ ! -d $(B)/base ];then $(MKDIR) $(B)/base;fi
+	@if [ ! -d $(B)/base/ ];then $(MKDIR) $(B)/base/;fi
 	@if [ ! -d $(B)/base/cgame ];then $(MKDIR) $(B)/base/cgame;fi
 	@if [ ! -d $(B)/base/game ];then $(MKDIR) $(B)/base/game;fi
 	@if [ ! -d $(B)/base/ui ];then $(MKDIR) $(B)/base/ui;fi
@@ -860,333 +833,6 @@ define DO_Q3LCC
 @echo "Q3LCC $<"
 @$(Q3LCC) -o $@ $<
 endef
-
-#############################################################################
-# CLIENT/SERVER
-#############################################################################
-
-Q3OBJ = \
-  $(B)/client/cl_cgame.o \
-  $(B)/client/cl_cin.o \
-  $(B)/client/cl_console.o \
-  $(B)/client/cl_input.o \
-  $(B)/client/cl_keys.o \
-  $(B)/client/cl_main.o \
-  $(B)/client/cl_net_chan.o \
-  $(B)/client/cl_parse.o \
-  $(B)/client/cl_scrn.o \
-  $(B)/client/cl_ui.o \
-  $(B)/client/cl_avi.o \
-  \
-  $(B)/client/cm_load.o \
-  $(B)/client/cm_patch.o \
-  $(B)/client/cm_polylib.o \
-  $(B)/client/cm_test.o \
-  $(B)/client/cm_trace.o \
-  \
-  $(B)/client/cmd.o \
-  $(B)/client/common.o \
-  $(B)/client/cvar.o \
-  $(B)/client/files.o \
-  $(B)/client/md4.o \
-  $(B)/client/md5.o \
-  $(B)/client/msg.o \
-  $(B)/client/net_chan.o \
-  $(B)/client/huffman.o \
-  $(B)/client/parse.o \
-  \
-  $(B)/client/snd_adpcm.o \
-  $(B)/client/snd_dma.o \
-  $(B)/client/snd_mem.o \
-  $(B)/client/snd_mix.o \
-  $(B)/client/snd_wavelet.o \
-  \
-  $(B)/client/snd_main.o \
-  $(B)/client/snd_codec.o \
-  $(B)/client/snd_codec_wav.o \
-  $(B)/client/snd_codec_ogg.o \
-  \
-  $(B)/client/qal.o \
-  $(B)/client/snd_openal.o \
-  \
-  $(B)/client/cl_curl.o \
-  \
-  $(B)/client/sv_ccmds.o \
-  $(B)/client/sv_client.o \
-  $(B)/client/sv_game.o \
-  $(B)/client/sv_init.o \
-  $(B)/client/sv_main.o \
-  $(B)/client/sv_net_chan.o \
-  $(B)/client/sv_snapshot.o \
-  $(B)/client/sv_world.o \
-  \
-  $(B)/client/q_math.o \
-  $(B)/client/q_shared.o \
-  \
-  $(B)/client/unzip.o \
-  $(B)/client/vm.o \
-  $(B)/client/vm_interpreted.o \
-  \
-  $(B)/client/jcapimin.o \
-  $(B)/client/jchuff.o   \
-  $(B)/client/jcinit.o \
-  $(B)/client/jccoefct.o  \
-  $(B)/client/jccolor.o \
-  $(B)/client/jfdctflt.o \
-  $(B)/client/jcdctmgr.o \
-  $(B)/client/jcphuff.o \
-  $(B)/client/jcmainct.o \
-  $(B)/client/jcmarker.o \
-  $(B)/client/jcmaster.o \
-  $(B)/client/jcomapi.o \
-  $(B)/client/jcparam.o \
-  $(B)/client/jcprepct.o \
-  $(B)/client/jcsample.o \
-  $(B)/client/jdapimin.o \
-  $(B)/client/jdapistd.o \
-  $(B)/client/jdatasrc.o \
-  $(B)/client/jdcoefct.o \
-  $(B)/client/jdcolor.o \
-  $(B)/client/jddctmgr.o \
-  $(B)/client/jdhuff.o \
-  $(B)/client/jdinput.o \
-  $(B)/client/jdmainct.o \
-  $(B)/client/jdmarker.o \
-  $(B)/client/jdmaster.o \
-  $(B)/client/jdpostct.o \
-  $(B)/client/jdsample.o \
-  $(B)/client/jdtrans.o \
-  $(B)/client/jerror.o \
-  $(B)/client/jidctflt.o \
-  $(B)/client/jmemmgr.o \
-  $(B)/client/jmemnobs.o \
-  $(B)/client/jutils.o \
-  \
-  $(B)/client/tr_animation.o \
-  $(B)/client/tr_backend.o \
-  $(B)/client/tr_bsp.o \
-  $(B)/client/tr_cmds.o \
-  $(B)/client/tr_curve.o \
-  $(B)/client/tr_flares.o \
-  $(B)/client/tr_font.o \
-  $(B)/client/tr_image.o \
-  $(B)/client/tr_init.o \
-  $(B)/client/tr_light.o \
-  $(B)/client/tr_main.o \
-  $(B)/client/tr_marks.o \
-  $(B)/client/tr_mesh.o \
-  $(B)/client/tr_model.o \
-  $(B)/client/tr_noise.o \
-  $(B)/client/tr_scene.o \
-  $(B)/client/tr_shade.o \
-  $(B)/client/tr_shade_calc.o \
-  $(B)/client/tr_shader.o \
-  $(B)/client/tr_shadows.o \
-  $(B)/client/tr_sky.o \
-  $(B)/client/tr_surface.o \
-  $(B)/client/tr_world.o \
-
-ifeq ($(ARCH),x86)
-  Q3OBJ += \
-    $(B)/client/snd_mixa.o \
-    $(B)/client/matha.o \
-    $(B)/client/ftola.o \
-    $(B)/client/snapvectora.o
-endif
-
-ifeq ($(HAVE_VM_COMPILED),true)
-  ifeq ($(ARCH),x86)
-    Q3OBJ += $(B)/client/vm_x86.o
-  endif
-  ifeq ($(ARCH),x86_64)
-    Q3OBJ += $(B)/client/vm_x86_64.o
-  endif
-  ifeq ($(ARCH),ppc)
-    Q3OBJ += $(B)/client/vm_ppc.o
-  endif
-endif
-
-ifeq ($(PLATFORM),mingw32)
-  Q3OBJ += \
-    $(B)/client/win_gamma.o \
-    $(B)/client/win_glimp.o \
-    $(B)/client/win_input.o \
-    $(B)/client/win_main.o \
-    $(B)/client/win_net.o \
-    $(B)/client/win_qgl.o \
-    $(B)/client/win_shared.o \
-    $(B)/client/win_snd.o \
-    $(B)/client/win_syscon.o \
-    $(B)/client/win_wndproc.o \
-    $(B)/client/win_resource.o
-else
-  Q3OBJ += \
-    $(B)/client/unix_main.o \
-    $(B)/client/unix_net.o \
-    $(B)/client/unix_shared.o \
-    $(B)/client/linux_signals.o \
-    $(B)/client/linux_qgl.o \
-    $(B)/client/linux_snd.o \
-    $(B)/client/sdl_snd.o
-
-  ifeq ($(PLATFORM),linux)
-    Q3OBJ += $(B)/client/linux_joystick.o
-  endif
-
-  ifeq ($(USE_SDL),1)
-    ifneq ($(PLATFORM),darwin)
-      BUILD_CLIENT_SMP = 0
-    endif
-  endif
-
-  Q3POBJ = \
-    $(B)/client/linux_glimp.o \
-    $(B)/client/sdl_glimp.o
-
-  Q3POBJ_SMP = \
-    $(B)/clientsmp/linux_glimp.o \
-    $(B)/clientsmp/sdl_glimp.o
-endif
-
-$(B)/tremulous.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
-	@echo "LD $@"
-	@$(CC) -o $@ $(Q3OBJ) $(Q3POBJ) $(CLIENT_LDFLAGS) \
-		$(LDFLAGS) $(LIBSDLMAIN)
-
-$(B)/tremulous-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
-	@echo "LD $@"
-	@$(CC) -o $@ $(Q3OBJ) $(Q3POBJ_SMP) $(CLIENT_LDFLAGS) \
-		$(THREAD_LDFLAGS) $(LDFLAGS) $(LIBSDLMAIN)
-
-ifneq ($(strip $(LIBSDLMAIN)),)
-ifneq ($(strip $(LIBSDLMAINSRC)),)
-$(LIBSDLMAIN) : $(LIBSDLMAINSRC)
-	cp $< $@
-	ranlib $@
-endif
-endif
-
-
-
-#############################################################################
-# DEDICATED SERVER
-#############################################################################
-
-Q3DOBJ = \
-  $(B)/ded/sv_client.o \
-  $(B)/ded/sv_ccmds.o \
-  $(B)/ded/sv_game.o \
-  $(B)/ded/sv_init.o \
-  $(B)/ded/sv_main.o \
-  $(B)/ded/sv_net_chan.o \
-  $(B)/ded/sv_snapshot.o \
-  $(B)/ded/sv_world.o \
-  \
-  $(B)/ded/cm_load.o \
-  $(B)/ded/cm_patch.o \
-  $(B)/ded/cm_polylib.o \
-  $(B)/ded/cm_test.o \
-  $(B)/ded/cm_trace.o \
-  $(B)/ded/cmd.o \
-  $(B)/ded/common.o \
-  $(B)/ded/cvar.o \
-  $(B)/ded/files.o \
-  $(B)/ded/md4.o \
-  $(B)/ded/msg.o \
-  $(B)/ded/net_chan.o \
-  $(B)/ded/huffman.o \
-  $(B)/ded/parse.o \
-  \
-  $(B)/ded/q_math.o \
-  $(B)/ded/q_shared.o \
-  \
-  $(B)/ded/unzip.o \
-  $(B)/ded/vm.o \
-  $(B)/ded/vm_interpreted.o \
-  \
-  $(B)/ded/linux_signals.o \
-  $(B)/ded/unix_main.o \
-  $(B)/ded/unix_net.o \
-  $(B)/ded/unix_shared.o \
-  \
-  $(B)/ded/null_client.o \
-  $(B)/ded/null_input.o \
-  $(B)/ded/null_snddma.o
-
-ifeq ($(ARCH),x86)
-  Q3DOBJ += \
-      $(B)/ded/ftola.o \
-      $(B)/ded/snapvectora.o \
-      $(B)/ded/matha.o
-endif
-
-ifeq ($(HAVE_VM_COMPILED),true)
-  ifeq ($(ARCH),x86)
-    Q3DOBJ += $(B)/ded/vm_x86.o
-  endif
-  ifeq ($(ARCH),x86_64)
-    Q3DOBJ += $(B)/ded/vm_x86_64.o
-  endif
-  ifeq ($(ARCH),ppc)
-    Q3DOBJ += $(B)/ded/vm_ppc.o
-  endif
-endif
-
-$(B)/tremded.$(ARCH)$(BINEXT): $(Q3DOBJ)
-	@echo "LD $@"
-	@$(CC) -o $@ $(Q3DOBJ) $(LDFLAGS)
-
-
-
-#############################################################################
-## TREMULOUS CGAME
-#############################################################################
-
-CGOBJ_ = \
-  $(B)/base/cgame/cg_main.o \
-  $(B)/base/game/bg_misc.o \
-  $(B)/base/game/bg_pmove.o \
-  $(B)/base/game/bg_slidemove.o \
-  $(B)/base/cgame/cg_consolecmds.o \
-  $(B)/base/cgame/cg_buildable.o \
-  $(B)/base/cgame/cg_animation.o \
-  $(B)/base/cgame/cg_animmapobj.o \
-  $(B)/base/cgame/cg_draw.o \
-  $(B)/base/cgame/cg_drawtools.o \
-  $(B)/base/cgame/cg_ents.o \
-  $(B)/base/cgame/cg_event.o \
-  $(B)/base/cgame/cg_marks.o \
-  $(B)/base/cgame/cg_players.o \
-  $(B)/base/cgame/cg_playerstate.o \
-  $(B)/base/cgame/cg_predict.o \
-  $(B)/base/cgame/cg_servercmds.o \
-  $(B)/base/cgame/cg_snapshot.o \
-  $(B)/base/cgame/cg_view.o \
-  $(B)/base/cgame/cg_weapons.o \
-  $(B)/base/cgame/cg_mem.o \
-  $(B)/base/cgame/cg_scanner.o \
-  $(B)/base/cgame/cg_attachment.o \
-  $(B)/base/cgame/cg_trails.o \
-  $(B)/base/cgame/cg_particles.o \
-  $(B)/base/cgame/cg_ptr.o \
-  $(B)/base/cgame/cg_tutorial.o \
-  $(B)/base/ui/ui_shared.o \
-  \
-  $(B)/base/qcommon/q_math.o \
-  $(B)/base/qcommon/q_shared.o
-
-CGOBJ = $(CGOBJ_) $(B)/base/cgame/cg_syscalls.o
-CGVMOBJ = $(CGOBJ_:%.o=%.asm) $(B)/base/game/bg_lib.asm
-
-$(B)/base/cgame$(ARCH).$(SHLIBEXT) : $(CGOBJ)
-	@echo "LD $@"
-	@$(CC) $(SHLIBLDFLAGS) -o $@ $(CGOBJ)
-
-$(B)/base/vm/cgame.qvm: $(CGVMOBJ) $(CGDIR)/cg_syscalls.asm
-	@echo "Q3ASM $@"
-	@$(Q3ASM) -o $@ $(CGVMOBJ) $(CGDIR)/cg_syscalls.asm
-
-
 
 #############################################################################
 ## TREMULOUS GAME
@@ -1234,123 +880,15 @@ $(B)/base/vm/game.qvm: $(GVMOBJ) $(GDIR)/g_syscalls.asm
 	@$(Q3ASM) -o $@ $(GVMOBJ) $(GDIR)/g_syscalls.asm
 
 
-
-#############################################################################
-## TREMULOUS UI
-#############################################################################
-
-UIOBJ_ = \
-  $(B)/base/ui/ui_main.o \
-  $(B)/base/ui/ui_atoms.o \
-  $(B)/base/ui/ui_players.o \
-  $(B)/base/ui/ui_shared.o \
-  $(B)/base/ui/ui_gameinfo.o \
-  \
-  $(B)/base/game/bg_misc.o \
-  $(B)/base/qcommon/q_math.o \
-  $(B)/base/qcommon/q_shared.o
-
-UIOBJ = $(UIOBJ_) $(B)/base/ui/ui_syscalls.o
-UIVMOBJ = $(UIOBJ_:%.o=%.asm) $(B)/base/game/bg_lib.asm
-
-$(B)/base/ui$(ARCH).$(SHLIBEXT) : $(UIOBJ)
-	@echo "LD $@"
-	@$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(UIOBJ)
-
-$(B)/base/vm/ui.qvm: $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm
-	@echo "Q3ASM $@"
-	@$(Q3ASM) -o $@ $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm
-
-
-
-#############################################################################
-## CLIENT/SERVER RULES
-#############################################################################
-
-$(B)/client/%.o: $(UDIR)/%.s
-	$(DO_AS)
-
-$(B)/client/%.o: $(CDIR)/%.c
-	$(DO_CC)
-
-$(B)/client/%.o: $(SDIR)/%.c
-	$(DO_CC)
-
-$(B)/client/%.o: $(CMDIR)/%.c
-	$(DO_CC)
-
-$(B)/client/%.o: $(BLIBDIR)/%.c
-	$(DO_BOT_CC)
-
-$(B)/client/%.o: $(JPDIR)/%.c
-	$(DO_CC)
-
-$(B)/client/%.o: $(RDIR)/%.c
-	$(DO_CC)
-
-$(B)/client/%.o: $(UDIR)/%.c
-	$(DO_CC)
-
-$(B)/clientsmp/%.o: $(UDIR)/%.c
-	$(DO_SMP_CC)
-
-$(B)/client/%.o: $(W32DIR)/%.c
-	$(DO_CC)
-
-$(B)/client/%.o: $(W32DIR)/%.rc
-	$(DO_WINDRES)
-
-
-$(B)/ded/%.o: $(UDIR)/%.s
-	$(DO_AS)
-
-$(B)/ded/%.o: $(SDIR)/%.c
-	$(DO_DED_CC)
-
-$(B)/ded/%.o: $(CMDIR)/%.c
-	$(DO_DED_CC)
-
-$(B)/ded/%.o: $(BLIBDIR)/%.c
-	$(DO_BOT_CC)
-
-$(B)/ded/%.o: $(UDIR)/%.c
-	$(DO_DED_CC)
-
-$(B)/ded/%.o: $(NDIR)/%.c
-	$(DO_DED_CC)
-
-# Extra dependencies to ensure the SVN version is incorporated
-ifeq ($(USE_SVN),1)
-  $(B)/client/cl_console.o : .svn/entries
-  $(B)/client/common.o : .svn/entries
-  $(B)/ded/common.o : .svn/entries
-endif
-
-
 #############################################################################
 ## GAME MODULE RULES
 #############################################################################
-
-$(B)/base/cgame/%.o: $(CGDIR)/%.c
-	$(DO_SHLIB_CC)
-
-$(B)/base/cgame/%.asm: $(CGDIR)/%.c
-	$(DO_Q3LCC)
-
 
 $(B)/base/game/%.o: $(GDIR)/%.c
 	$(DO_SHLIB_CC)
 
 $(B)/base/game/%.asm: $(GDIR)/%.c
 	$(DO_Q3LCC)
-
-
-$(B)/base/ui/%.o: $(UIDIR)/%.c
-	$(DO_SHLIB_CC)
-
-$(B)/base/ui/%.asm: $(UIDIR)/%.c
-	$(DO_Q3LCC)
-
 
 $(B)/base/qcommon/%.o: $(CMDIR)/%.c
 	$(DO_SHLIB_CC)
@@ -1364,13 +902,12 @@ $(B)/base/qcommon/%.asm: $(CMDIR)/%.c
 #############################################################################
 
 clean: clean-debug clean-release
-	@$(MAKE) -C $(MASTERDIR) clean
+	@$(MAKE) clean2
 
 clean2:
 	@echo "CLEAN $(B)"
 	@if [ -d $(B) ];then (find $(B) -name '*.d' -exec rm {} \;)fi
-	@rm -f $(Q3OBJ) $(Q3POBJ) $(Q3POBJ_SMP) $(Q3DOBJ) \
-		$(GOBJ) $(CGOBJ) $(UIOBJ) \
+	@rm -f $(GOBJ) $(CGOBJ) $(UIOBJ) \
 		$(GVMOBJ) $(CGVMOBJ) $(UIVMOBJ)
 	@rm -f $(TARGETS)
 
