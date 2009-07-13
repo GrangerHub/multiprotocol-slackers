@@ -2790,7 +2790,7 @@ void Cmd_Destroy_f( gentity_t *ent )
           ( ent->client->ps.weapon <= WP_HBUILD ) ) )
     {
       // Cancel deconstruction
-      if( g_markDeconstruct.integer && traceEnt->deconstruct )
+      if( g_markDeconstruct.integer == 1 && traceEnt->deconstruct )
       {
         traceEnt->deconstruct = qfalse;
         return;
@@ -2808,7 +2808,7 @@ void Cmd_Destroy_f( gentity_t *ent )
  
 
       // Prevent destruction of the last spawn
-      if( !g_markDeconstruct.integer && !g_cheats.integer )
+      if( g_markDeconstruct.integer != 1 && !g_cheats.integer )
       {
         if( ent->client->pers.teamSelection == PTE_ALIENS &&
             traceEnt->s.modelindex == BA_A_SPAWN )
@@ -2850,7 +2850,7 @@ void Cmd_Destroy_f( gentity_t *ent )
 
       if( traceEnt->health > 0 || g_deconDead.integer )
       {
-        if( g_markDeconstruct.integer )
+        if( g_markDeconstruct.integer == 1 )
         {
           traceEnt->deconstruct     = qtrue; // Mark buildable for deconstruction
           traceEnt->deconstructTime = level.time;
@@ -2897,6 +2897,90 @@ void Cmd_Destroy_f( gentity_t *ent )
             ent->client->ps.stats[ STAT_MISC ] +=
               BG_FindBuildDelayForWeapon( ent->s.weapon ) >> 2;
         }
+      }
+    }
+  }
+}
+
+void Cmd_Mark_f( gentity_t *ent )
+{
+  vec3_t      forward, end;
+  trace_t     tr;
+  gentity_t   *traceEnt;
+
+  if( g_markDeconstruct.integer != 2 )
+  {
+    trap_SendServerCommand( ent-g_entities,
+      "print \"Mark is disabled\n\"" );
+    return;
+  }
+
+  if( ent->client->pers.denyBuild )
+  {
+    trap_SendServerCommand( ent-g_entities,
+      "print \"Your building rights have been revoked\n\"" );
+    return;
+  }
+
+  // can't mark when in hovel
+  if( ent->client->ps.stats[ STAT_STATE ] & SS_HOVELING )
+    return;
+
+  if( !( ent->client->ps.stats[ STAT_STATE ] & SS_INFESTING ) )
+  {
+    AngleVectors( ent->client->ps.viewangles, forward, NULL, NULL );
+    VectorMA( ent->client->ps.origin, 100, forward, end );
+
+    trap_Trace( &tr, ent->client->ps.origin, NULL, NULL, end, ent->s.number, MASK_PLAYERSOLID );
+    traceEnt = &g_entities[ tr.entityNum ];
+
+    if( tr.fraction < 1.0f &&
+        ( traceEnt->s.eType == ET_BUILDABLE ) &&
+        ( traceEnt->biteam == ent->client->pers.teamSelection ) &&
+        ( ( ent->client->ps.weapon >= WP_ABUILD ) &&
+          ( ent->client->ps.weapon <= WP_HBUILD ) ) )
+    {
+      if( ( traceEnt->s.eFlags & EF_DBUILDER ) &&
+        !ent->client->pers.designatedBuilder )
+      {
+        trap_SendServerCommand( ent-g_entities,
+          "print \"this structure is protected by a designated builder\n\"" );
+        return;
+      }
+
+      // Cancel deconstruction
+      if( traceEnt->deconstruct )
+      {
+        traceEnt->deconstruct = qfalse;
+
+        trap_SendServerCommand( ent-g_entities,
+          va( "print \"%s no longer marked for deconstruction\n\"",
+          BG_FindHumanNameForBuildable( traceEnt->s.modelindex ) ) );
+        return;
+      }
+
+      // Don't allow marking of buildables that cannot be rebuilt
+      if(g_suddenDeath.integer && traceEnt->health > 0 &&
+          ( ( g_suddenDeathMode.integer == SDMODE_SELECTIVE &&
+              !BG_FindReplaceableTestForBuildable( traceEnt->s.modelindex ) ) ||
+            ( g_suddenDeathMode.integer == SDMODE_BP &&
+              BG_FindBuildPointsForBuildable( traceEnt->s.modelindex ) ) ||
+            g_suddenDeathMode.integer == SDMODE_NO_BUILD ) )
+      {
+        trap_SendServerCommand( ent-g_entities,
+          "print \"During Sudden Death you can only mark buildings that "
+          "can be rebuilt\n\"" );
+        return;
+      }
+
+      if( traceEnt->health > 0 )
+      {
+        traceEnt->deconstruct     = qtrue; // Mark buildable for deconstruction
+        traceEnt->deconstructTime = level.time;
+
+        trap_SendServerCommand( ent-g_entities,
+          va( "print \"%s marked for deconstruction\n\"",
+          BG_FindHumanNameForBuildable( traceEnt->s.modelindex ) ) );
       }
     }
   }
@@ -3547,6 +3631,9 @@ void Cmd_Protect_f( gentity_t *ent )
       trap_SendServerCommand( ent-g_entities, 
         "print \"Structure protection applied\n\"" );
       traceEnt->s.eFlags |= EF_DBUILDER;
+
+      // adding protection turns off deconstruction mark
+      traceEnt->deconstruct = qfalse;
     }
   }
 }
@@ -3584,7 +3671,10 @@ void Cmd_Reload_f( gentity_t *ent )
   if( ( ent->client->ps.weapon >= WP_ABUILD ) &&
     ( ent->client->ps.weapon <= WP_HBUILD ) )
   {
-    Cmd_Protect_f( ent );
+    if( ent->client->pers.designatedBuilder )
+      Cmd_Protect_f( ent );
+    else
+      Cmd_Mark_f( ent );
   }
   else if( ent->client->ps.weaponstate != WEAPON_RELOADING )
     ent->client->ps.pm_flags |= PMF_WEAPON_RELOAD;
@@ -4714,13 +4804,14 @@ commands_t cmds[ ] = {
 
   { "build", CMD_TEAM|CMD_LIVING, Cmd_Build_f },
   { "deconstruct", CMD_TEAM|CMD_LIVING, Cmd_Destroy_f },
+  { "mark", CMD_TEAM|CMD_LIVING, Cmd_Mark_f },
 
   { "buy", CMD_HUMAN|CMD_LIVING, Cmd_Buy_f },
   { "sell", CMD_HUMAN|CMD_LIVING, Cmd_Sell_f },
   { "itemact", CMD_HUMAN|CMD_LIVING, Cmd_ActivateItem_f },
   { "itemdeact", CMD_HUMAN|CMD_LIVING, Cmd_DeActivateItem_f },
   { "itemtoggle", CMD_HUMAN|CMD_LIVING, Cmd_ToggleItem_f },
-  { "reload", CMD_HUMAN|CMD_LIVING, Cmd_Reload_f },
+  { "reload", CMD_TEAM|CMD_LIVING, Cmd_Reload_f },
   { "boost", 0, Cmd_Boost_f },
   { "share", CMD_TEAM, Cmd_Share_f },
   { "donate", CMD_TEAM, Cmd_Donate_f },
