@@ -1996,6 +1996,13 @@ void HMedistat_Think( gentity_t *self )
       if( self->enemy->health >= self->enemy->client->ps.stats[ STAT_MAX_HEALTH ] &&
           !BG_InventoryContainsUpgrade( UP_MEDKIT, self->enemy->client->ps.stats ) )
         BG_AddUpgradeToInventory( UP_MEDKIT, self->enemy->client->ps.stats );
+
+      // if completely healed, cancel retribution
+      if( self->enemy->health >= self->enemy->client->ps.stats[ STAT_MAX_HEALTH ] )
+      {
+        for( i = 0; i < MAX_CLIENTS; i++ )
+          self->enemy->client->tkcredits[ i ] = 0;
+      }
     }
   }
 }
