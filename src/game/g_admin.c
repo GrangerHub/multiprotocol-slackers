@@ -485,12 +485,18 @@ static qboolean admin_higher_guid( char *admin_guid, char *victim_guid )
 {
   int i;
   int alevel = 0;
+  int alevel2 = 0;
 
   for( i = 0; i < MAX_ADMIN_ADMINS && g_admin_admins[ i ]; i++ )
   {
     if( !Q_stricmp( admin_guid, g_admin_admins[ i ]->guid ) )
     {
       alevel = g_admin_admins[ i ]->level;
+
+      // Novelty Levels should be equivelant to level 1
+      if( alevel > 9 )
+        alevel = 1;
+
       break;
     }
   }
@@ -498,8 +504,15 @@ static qboolean admin_higher_guid( char *admin_guid, char *victim_guid )
   {
     if( !Q_stricmp( victim_guid, g_admin_admins[ i ]->guid ) )
     {
-      if( alevel < g_admin_admins[ i ]->level )
+      alevel2 = g_admin_admins[ i ]->level;
+
+      // Novelty Levels should be equivelant to level 1
+      if( alevel2 > 9 )
+        alevel2 = 1;
+
+      if( alevel < alevel2 )
         return qfalse;
+
       if( strstr( g_admin_admins[ i ]->flags, va( "%s", ADMF_IMMUTABLE ) ) )
         return qfalse;
     }
