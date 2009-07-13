@@ -1597,6 +1597,7 @@ void Cmd_CallVote_f( gentity_t *ent )
       trap_SendServerCommand( ent-g_entities,
         "print \"callvote: admin is immune from vote kick\n\"" );
       G_AdminsPrintf("%s\n",message);
+      G_admin_adminlog_log( ent, "vote", NULL, 0, qfalse );
       return;
     }
 
@@ -1623,6 +1624,7 @@ void Cmd_CallVote_f( gentity_t *ent )
       trap_SendServerCommand( ent-g_entities,
         "print \"callvote: admin is immune from vote mute\n\"" );
       G_AdminsPrintf("%s\n",message);
+      G_admin_adminlog_log( ent, "vote", NULL, 0, qfalse );
       return;
     }
     Com_sprintf( level.voteString, sizeof( level.voteString ),
@@ -1653,6 +1655,7 @@ void Cmd_CallVote_f( gentity_t *ent )
        trap_SendServerCommand( ent-g_entities, va(
          "print \"You cannot call for a restart after %d seconds\n\"",
          g_mapvoteMaxTime.integer ) );
+       G_admin_adminlog_log( ent, "vote", NULL, 0, qfalse );
        return;
     }
     Com_sprintf( level.voteString, sizeof( level.voteString ), "%s", arg1 );
@@ -1670,6 +1673,7 @@ void Cmd_CallVote_f( gentity_t *ent )
        trap_SendServerCommand( ent-g_entities, va(
          "print \"You cannot call for a mapchange after %d seconds\n\"",
          g_mapvoteMaxTime.integer ) );
+       G_admin_adminlog_log( ent, "vote", NULL, 0, qfalse );
        return;
     }
   
@@ -1792,6 +1796,7 @@ void Cmd_CallVote_f( gentity_t *ent )
   if ( reason[0]!='\0' )
     Q_strcat( level.voteDisplayString, sizeof( level.voteDisplayString ), va( " Reason: '%s^7'", reason ) );
   
+  G_admin_adminlog_log( ent, "vote", NULL, 0, qtrue );
 
   trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE
          " called a vote: %s" S_COLOR_WHITE "\n\"", ent->client->pers.netname, level.voteDisplayString ) );
@@ -2081,6 +2086,7 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
       trap_SendServerCommand( ent-g_entities,
         "print \"callteamvote: admin is immune from vote kick\n\"" );
       G_AdminsPrintf("%s\n",message);
+      G_admin_adminlog_log( ent, "teamvote", NULL, 0, qfalse );
       return;
     }
 
@@ -2108,6 +2114,7 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
       trap_SendServerCommand( ent-g_entities,
         "print \"callteamvote: admin is immune from denybuild\n\"" );
       G_AdminsPrintf("%s\n",message);
+      G_admin_adminlog_log( ent, "teamvote", NULL, 0, qfalse );
       return;
     }
 
@@ -2210,6 +2217,8 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
     return;
   }
   ent->client->pers.voteCount++;
+
+  G_admin_adminlog_log( ent, "teamvote", arg1, 0, qtrue );
   
   if ( reason[0]!='\0' )
     Q_strcat( level.teamVoteDisplayString[ cs_offset ], sizeof( level.teamVoteDisplayString[ cs_offset ] ), va( " Reason: '%s'^7", reason ) );

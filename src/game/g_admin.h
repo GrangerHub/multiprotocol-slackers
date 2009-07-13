@@ -36,6 +36,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_ADMIN_BANS 1024
 #define MAX_ADMIN_NAMELOGS 128
 #define MAX_ADMIN_NAMELOG_NAMES 5
+#define MAX_ADMIN_ADMINLOGS 128
+#define MAX_ADMIN_ADMINLOG_ARGS 50
 #define MAX_ADMIN_FLAG_LEN 20
 #define MAX_ADMIN_FLAGS 1024
 #define MAX_ADMIN_COMMANDS 64
@@ -155,6 +157,18 @@ typedef struct g_admin_namelog
 }
 g_admin_namelog_t;
 
+typedef struct g_admin_adminlog
+{
+  char      name[ MAX_NAME_LENGTH ];
+  char      command[ MAX_ADMIN_CMD_LEN ];
+  char      args[ MAX_ADMIN_ADMINLOG_ARGS ];
+  int       id;
+  int       time;
+  int       level;
+  qboolean  success;
+}
+g_admin_adminlog_t;
+
 qboolean G_admin_ban_check( char *userinfo, char *reason, int rlen );
 qboolean G_admin_cmd_check( gentity_t *ent, qboolean say );
 qboolean G_admin_readconfig( gentity_t *ent, int skiparg );
@@ -175,6 +189,9 @@ qboolean G_admin_subnetban( gentity_t *ent, int skiparg );
 qboolean G_admin_ban( gentity_t *ent, int skiparg );
 qboolean G_admin_unban( gentity_t *ent, int skiparg );
 qboolean G_admin_putteam( gentity_t *ent, int skiparg );
+qboolean G_admin_adminlog( gentity_t *ent, int skiparg );
+void G_admin_adminlog_cleanup( void );
+void G_admin_adminlog_log( gentity_t *ent, char *command, char *args, int skiparg, qboolean success );
 qboolean G_admin_listadmins( gentity_t *ent, int skiparg );
 qboolean G_admin_listlayouts( gentity_t *ent, int skiparg );
 qboolean G_admin_listplayers( gentity_t *ent, int skiparg );
