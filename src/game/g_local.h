@@ -343,6 +343,7 @@ typedef struct
   int dretchbasytime;
   int jetpackusewallwalkusetime;
   int timeLastViewed;
+  int AllstatstimeLastViewed;
 } statsCounters_t;
 
 typedef struct
@@ -1380,6 +1381,9 @@ extern  vmCvar_t  g_msg;
 extern  vmCvar_t  g_msgTime;
 
 extern  vmCvar_t  g_buildLogMaxLength;
+
+extern vmCvar_t  g_AllStats;
+extern vmCvar_t  g_AllStatsTime;
 
 void      trap_Printf( const char *fmt );
 void      trap_Error( const char *fmt );

@@ -161,6 +161,8 @@ vmCvar_t  g_decolourLogfiles;
 vmCvar_t  g_minLevelToSpecMM1;
 vmCvar_t  g_publicSayadmins;
 vmCvar_t  g_myStats;
+vmCvar_t  g_AllStats;
+vmCvar_t  g_AllStatsTime;
 vmCvar_t  g_teamStatus;
 vmCvar_t  g_antiSpawnBlock;
 vmCvar_t  g_banNotice;
@@ -188,6 +190,7 @@ vmCvar_t  g_votableMaps;
 
 vmCvar_t  g_msg;
 vmCvar_t  g_msgTime;
+
 
 static cvarTable_t   gameCvarTable[ ] =
 {
@@ -342,6 +345,8 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_decolourLogfiles, "g_decolourLogfiles", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_buildLogMaxLength, "g_buildLogMaxLength", "50", CVAR_ARCHIVE, 0, qfalse  },
   { &g_myStats, "g_myStats", "1", CVAR_ARCHIVE, 0, qtrue  },
+  { &g_AllStats, "g_AllStats", "0", CVAR_ARCHIVE, 0, qtrue  },
+  { &g_AllStatsTime, "g_AllStatsTime", "60", CVAR_ARCHIVE, 0, qfalse  },
   { &g_teamStatus, "g_teamStatus", "0", CVAR_ARCHIVE, 0, qtrue },
   { &g_publicSayadmins, "g_publicSayadmins", "1", CVAR_ARCHIVE, 0, qfalse  },    
   { &g_minLevelToSpecMM1, "g_minLevelToSpecMM1", "0", CVAR_ARCHIVE, 0, qfalse  },
