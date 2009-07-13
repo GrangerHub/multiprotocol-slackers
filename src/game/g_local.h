@@ -53,6 +53,19 @@ typedef struct gclient_s gclient_t;
 #define FL_NO_HUMANS      0x00004000  // spawn point just for bots
 #define FL_FORCE_GESTURE  0x00008000  // spawn point just for bots
 
+typedef struct
+{
+  qboolean	isNB;
+  float		Area;
+  float		Height;
+} noBuild_t;
+
+typedef struct
+{
+  gentity_t	*Marker;
+  vec3_t	Origin;
+} nbMarkers_t;
+
 // movers are things like doors, plats, buttons, etc
 typedef enum
 {
@@ -243,6 +256,9 @@ struct gentity_s
   int               lastDamageTime;
   
   int               bdnumb;     // buildlog entry ID
+  
+  // For nobuild!
+  noBuild_t	    noBuild;
 };
 
 typedef enum
@@ -773,6 +789,12 @@ typedef struct
   
   statsCounters_level alienStatsCounters;
   statsCounters_level humanStatsCounters;
+  
+  qboolean	    noBuilding;
+  float		    nbArea;
+  float		    nbHeight;
+  
+  nbMarkers_t	    nbMarkers[ MAX_GENTITIES ];
 } level_locals_t;
 
 #define CMD_CHEAT         0x01
@@ -898,6 +920,8 @@ qboolean          G_RevertCanFit( buildHistory_t *bh );
 int               G_LogBuild( buildHistory_t *new );
 int               G_CountBuildLog( void );
 char             *G_FindBuildLogName( int id );
+void		  G_NobuildSave( void );
+void 		  G_NobuildLoad( void );
 
 //
 // g_utils.c

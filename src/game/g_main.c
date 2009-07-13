@@ -734,6 +734,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart )
 
   // load up a custom building layout if there is one
   G_LayoutLoad( );
+  
+  // load any nobuild markers that have been saved
+  G_NobuildLoad( );
 
   // the map might disable some things
   BG_InitAllowedGameElements( );
