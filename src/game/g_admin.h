@@ -179,6 +179,7 @@ qboolean G_admin_devmap( gentity_t *ent, int skiparg );
 void G_admin_maplog_update( void );
 qboolean G_admin_maplog( gentity_t *ent, int skiparg );
 qboolean G_admin_layoutsave( gentity_t *ent, int skiparg );
+qboolean G_admin_demo( gentity_t *ent, int skiparg );
 qboolean G_admin_mute( gentity_t *ent, int skiparg );
 qboolean G_admin_denybuild( gentity_t *ent, int skiparg );
 qboolean G_admin_showbans( gentity_t *ent, int skiparg );

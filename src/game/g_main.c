@@ -1791,7 +1791,8 @@ void QDECL G_AdminsPrintf( const char *fmt, ... )
   for( j = 0; j < level.maxclients; j++ )
   {
     tempent = &g_entities[ j ];
-    if( G_admin_permission( tempent, ADMF_ADMINCHAT) ) 
+    if( G_admin_permission( tempent, ADMF_ADMINCHAT ) &&
+        !tempent->client->pers.ignoreAdminWarnings ) 
     {
        trap_SendServerCommand(tempent-g_entities,va( "print \"^6[Admins]^7 %s\"", string) ); 
     }

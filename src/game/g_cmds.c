@@ -980,7 +980,8 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
     // specs with ADMF_SPEC_ALLCHAT flag can see team chat
   }
   
-  if( mode == SAY_ADMINS && !G_admin_permission( other, ADMF_ADMINCHAT) )
+  if( mode == SAY_ADMINS &&
+     (!G_admin_permission( other, ADMF_ADMINCHAT ) || other->client->pers.ignoreAdminWarnings ) )
      return;
 
   if( BG_ClientListTest( &other->client->sess.ignoreList, ent-g_entities ) )

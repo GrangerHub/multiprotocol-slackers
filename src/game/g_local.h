@@ -410,6 +410,7 @@ typedef struct
   char                guid[ 33 ];
   char                ip[ 16 ];
   qboolean            muted;
+  qboolean            ignoreAdminWarnings;
   qboolean            denyBuild;
   int                 adminLevel;
   char                adminName[ MAX_NETNAME ];

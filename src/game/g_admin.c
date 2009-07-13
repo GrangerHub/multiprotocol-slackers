@@ -87,6 +87,12 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "(-AHS) [^3message^7]"
     },
 
+    {"demo", G_admin_demo, "demo",
+      "turn admin chat off for the caller so it does not appear in demos. "
+      "this is a toggle use !demo again to turn warnings back on",
+      ""
+    },
+
     {"denybuild", G_admin_denybuild, "denybuild",
       "take away a player's ability to build",
       "[^3name|slot#^7]"
@@ -2776,6 +2782,22 @@ qboolean G_admin_layoutsave( gentity_t *ent, int skiparg )
   trap_SendConsoleCommand( EXEC_APPEND, va( "layoutsave %s", layout ) );
   AP( va( "print \"^3!layoutsave: ^7layout saved as '%s' by %s\n\"", layout,
           ( ent ) ? G_admin_adminPrintName( ent ) : "console" ) );
+  return qtrue;
+}
+
+qboolean G_admin_demo( gentity_t *ent, int skiparg )
+{
+  if( !ent )
+  {
+    ADMP( "!demo: console can not use demo.\n" );
+    return qfalse;
+  }
+
+  ent->client->pers.ignoreAdminWarnings = !( ent->client->pers.ignoreAdminWarnings );
+
+  ADMP( va( "^3!demo: ^7your visibility of admin chat is now %s\n",
+    ( ent->client->pers.ignoreAdminWarnings ) ? "^1disabled" : "^2enabled" ) );
+
   return qtrue;
 }
 
