@@ -2492,6 +2492,7 @@ void Cmd_Class_f( gentity_t *ent )
   vec3_t    mins, maxs;
   int       num;
   gentity_t *other;
+  qboolean  humanNear = qfalse;
 
 
   clientNum = ent->client - level.clients;
@@ -2614,9 +2615,19 @@ void Cmd_Class_f( gentity_t *ent )
         if( ( other->client && other->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ||
             ( other->s.eType == ET_BUILDABLE && other->biteam == BIT_HUMANS ) )
         {
-          G_TriggerMenu( clientNum, MN_A_TOOCLOSE );
-          return;
+          humanNear = qtrue;
         }
+        //If its the OM, then ignore all humans.
+        if(other->s.eType == ET_BUILDABLE && other->s.modelindex == BA_A_OVERMIND)
+        {
+          humanNear = qfalse;
+          break;
+        }
+      }
+
+      if(humanNear == qtrue) {
+        G_TriggerMenu( clientNum, MN_A_TOOCLOSE );
+        return;
       }
 
       if( !level.overmindPresent )
