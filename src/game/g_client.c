@@ -807,7 +807,7 @@ team_t TeamCount( int ignoreClientNum, int team )
 ClientCleanName
 ============
 */
-static void ClientCleanName( const char *in, char *out, int outSize )
+static void ClientCleanName( const char *in, char *out, int outSize, qboolean special )
 {
   int   len, colorlessLen;
   char  ch;
@@ -854,8 +854,8 @@ static void ClientCleanName( const char *in, char *out, int outSize )
         break;
       }
 
-      // don't allow black in a name, period
-      if( ColorIndex( *in ) == 0 )
+      // don't allow black in a name, unless if special
+      if( ColorIndex( *in ) == 0 && !special )
         *out++ = COLOR_WHITE;
       else
         *out++ = *in;
@@ -1051,7 +1051,11 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName )
   // set name
   Q_strncpyz( oldname, client->pers.netname, sizeof( oldname ) );
   s = Info_ValueForKey( userinfo, "name" );
-  ClientCleanName( s, newname, sizeof( newname ) );
+
+  if ( !G_admin_permission( ent, ADMF_SPECIALNAME ) )
+    ClientCleanName( s, newname, sizeof( newname ), qfalse );
+  else
+    ClientCleanName( s, newname, sizeof( newname ), qtrue );
 
   if( strcmp( oldname, newname ) )
   {
@@ -1059,7 +1063,10 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName )
       showRenameMsg = qfalse;
 
     // in case we need to revert and there's no oldname
-    ClientCleanName( va( "%s", client->pers.netname ), oldname, sizeof( oldname ) );
+    if ( !G_admin_permission( ent, ADMF_SPECIALNAME ) )
+      ClientCleanName( va( "%s", client->pers.netname ), oldname, sizeof( oldname ), qfalse );
+    else
+      ClientCleanName( va( "%s", client->pers.netname ), oldname, sizeof( oldname ), qtrue );
  
     if( g_newbieNumbering.integer )
     {
@@ -1088,7 +1095,8 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName )
         revertName = qtrue;
       }
       else if( g_maxNameChanges.integer > 0
-      && client->pers.nameChanges >= g_maxNameChanges.integer  )
+        && client->pers.nameChanges >= g_maxNameChanges.integer
+        && !G_admin_permission( ent, ADMF_SPECIAL ) )
       {
         trap_SendServerCommand( ent - g_entities, va(
             "print \"Maximum name changes reached (g_maxNameChanges = %d)\n\"",
