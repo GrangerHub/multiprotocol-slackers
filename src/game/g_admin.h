@@ -43,6 +43,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_ADMIN_COMMANDS 64
 #define MAX_ADMIN_CMD_LEN 20
 #define MAX_ADMIN_BAN_REASON 50
+#define MAX_ADMIN_BANSUSPEND_DAYS 14
 
 /*
  * IMMUNITY - cannot be vote kicked, vote muted
@@ -136,6 +137,7 @@ typedef struct g_admin_ban
   char reason[ MAX_ADMIN_BAN_REASON ];
   char made[ 18 ]; // big enough for strftime() %c
   int expires;
+  int suspend;
   char banner[ MAX_NAME_LENGTH ];
 }
 g_admin_ban_t;
@@ -193,6 +195,7 @@ qboolean G_admin_flag( gentity_t *ent, int skiparg );
 qboolean G_admin_kick( gentity_t *ent, int skiparg );
 qboolean G_admin_adjustban( gentity_t *ent, int skiparg );
 qboolean G_admin_subnetban( gentity_t *ent, int skiparg );
+qboolean G_admin_suspendban( gentity_t *ent, int skiparg );
 qboolean G_admin_ban( gentity_t *ent, int skiparg );
 qboolean G_admin_unban( gentity_t *ent, int skiparg );
 qboolean G_admin_putteam( gentity_t *ent, int skiparg );
