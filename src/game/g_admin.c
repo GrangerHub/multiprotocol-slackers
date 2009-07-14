@@ -686,11 +686,11 @@ static void admin_writeconfig( void )
     trap_FS_Write( "made    = ", 10, f );
     admin_writeconfig_string( g_admin_bans[ i ]->made, f );
     trap_FS_Write( "expires = ", 10, f );
+    admin_writeconfig_int( g_admin_bans[ i ]->expires, f );
     if( g_admin_bans[ i ]->suspend > t ) {
       trap_FS_Write( "suspend = ", 10, f );
       admin_writeconfig_int( g_admin_bans[ i ]->suspend, f );
     }
-    admin_writeconfig_int( g_admin_bans[ i ]->expires, f );
     trap_FS_Write( "banner  = ", 10, f );
     admin_writeconfig_string( g_admin_bans[ i ]->banner, f );
     trap_FS_Write( "\n", 1, f );
