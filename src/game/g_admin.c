@@ -4753,7 +4753,8 @@ qboolean G_admin_showbans( gentity_t *ent, int skiparg )
 qboolean G_admin_help( gentity_t *ent, int skiparg )
 {
   int i;
-  char additional[ MAX_STRING_CHARS ] = "\nThe following non-standard /commands may also be available to you: \n^3";
+  int count = 0;
+  int commandsPerLine = 6;
 
   if( G_SayArgc() < 2 + skiparg )
   {
@@ -4790,34 +4791,102 @@ qboolean G_admin_help( gentity_t *ent, int skiparg )
         j = 0;
       }
     }
-    
-    if( ent )
-      strcat( additional, " /builder /say_area" );
-    if( g_publicSayadmins.integer || G_admin_permission( ent, ADMF_ADMINCHAT ) )
-      strcat( additional, " /a /say_admins" );
-    if( g_privateMessages.integer )
-      strcat( additional, " /m" );
-    if( ent && g_actionPrefix.string[0] )
-      strcat( additional, " /me /mt /me_team" );
-    if( ent && g_myStats.integer )
-      strcat( additional, " /mystats" );
-    if( ent && ent->client )
-    {
-      if( ent->client->pers.designatedBuilder )
-      {
-        strcat( additional, " /protect /resign" );
-      }
-    }
-    if( ent && g_allowShare.integer )
-      strcat( additional, " /share /donate" );
-    
+
     if( count )
       ADMBP( "\n" );
     ADMBP( va( "^3!help: ^7%i available commands\n", count ) );
     ADMBP( "run !help [^3command^7] for help with a specific command.\n" );
-    ADMBP( va( "%s\n", additional ) );
+    ADMBP( "The following non-standard /commands may also be available to you: \n" );
+    count = 1;
+
+    if( ent && g_AllStats.integer ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "allstats" ) );
+      count++;
+    }
+    if ( ent ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "builder" ) );
+      count++;
+    }
+    if( ent && g_allowVote.integer && G_admin_permission( ent, ADMF_VOTE_ALLOW ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "callvote" ) );
+      count++;
+    }
+    if( ent && g_allowVote.integer && G_admin_permission( ent, ADMF_VOTE_ALLOW ) && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "callteamvote" ) );
+      count++;
+    }
+    if( ent && g_allowShare.integer && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "donate" ) );
+      count++;
+    }
+    if( g_privateMessages.integer ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "m" ) );
+      count++;
+    }
+    if( ent && g_markDeconstruct.integer == 2 && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "mark" ) );
+      count++;
+    }
+    if( ent && g_actionPrefix.string[0] ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "me" ) );
+      count++;
+    }
+    if( ent && g_actionPrefix.string[0] ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "me_team" ) );
+      count++;
+    }
+    if( ent && g_actionPrefix.string[0] && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "mt" ) );
+      count++;
+    }
+    if( ent && g_myStats.integer && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "mystats" ) );
+      count++;
+    }
+    if( ent->client->pers.designatedBuilder && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "protect" ) );
+      count++;
+    }
+    if( ent->client->pers.designatedBuilder && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "resign" ) );
+      count++;
+    }
+    if( g_publicSayadmins.integer || G_admin_permission( ent, ADMF_ADMINCHAT ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "say_admins" ) );
+      count++;
+    }
+    if( ent && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "say_area" ) );
+      count++;
+    }
+    if( ent && g_allowShare.integer && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "share" ) );
+      count++;
+    }
+    if( ent && g_teamStatus.integer && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+      if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
+      ADMBP( va( "^5/%-12s", "teamstatus" ) );
+      count++;
+    }
+    ADMBP( "\n" );
     ADMBP_end();
-    
+
     return qtrue;
   }
   else
