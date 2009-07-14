@@ -1498,12 +1498,12 @@ void ClientBegin( int clientNum )
     if( !Q_stricmp( ent->client->pers.guid, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ) )
     {
       trap_SendServerCommand( client->ps.clientNum, va( "print \"^1Your client is out of date. Updating your client will allow you to "
-        "become an admin on servers and download maps much more quickly. Please replace your client executable with a newer client. "
-        "at ^2http://trem.tjw.org/backport/^1 and reconnect. \n\"" ) );
-      trap_SendServerCommand( client->ps.clientNum, va("^1Some available clients: \n"
-          "^2TremFusion ^7- \"^3http://www.tremfusion.net/download/^7\"\n"
-          "^2FSM-Trem^7 - \"^3http://code.google.com/p/fsm-trem/^7\"\n"
-          "^2MGClient^7 - \"^3http://releases.mercenariesguild.net/client/^7\"\n" ) );
+          "become an admin on servers and download maps much more quickly. Please replace your client executable with a newer client. \n\"" ) );
+
+      trap_SendServerCommand( client->ps.clientNum, va("print \"^1Some available clients: \n"
+          "^2TremFusion^7- ^3http://www.tremfusion.net/download/^7\n"
+          "^2FSM-Trem^7 - ^3http://code.google.com/p/fsm-trem/^7\n"
+          "^2MGClient^7 - ^3http://releases.mercenariesguild.net/client/^7\n\"" ) );
     }
   }
 
