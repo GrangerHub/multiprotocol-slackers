@@ -240,6 +240,7 @@ qboolean G_admin_cp( gentity_t *ent, int skiparg );
 
 qboolean G_admin_slap( gentity_t *ent, int skiparg );
 qboolean G_admin_drop( gentity_t *ent, int skiparg );
+qboolean G_admin_invisible( gentity_t *ent, int skiparg );
 
 void G_admin_print( gentity_t *ent, char *m );
 void G_admin_buffer_print( gentity_t *ent, char *m );

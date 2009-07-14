@@ -760,7 +760,14 @@ void Cmd_Team_f( gentity_t *ent )
   // stop team join spam
   if( level.time - ent->client->pers.teamChangeTime < 1000 )
     return;
-
+  // Prevent invisible players from joining a team
+  if ( ent->client->sess.invisible == qtrue )
+  {
+    trap_SendServerCommand( ent-g_entities,
+          va( "print \"You cannot join a team while invisible\n\"" ) );
+    return;
+  }
+  
   if( oldteam == PTE_ALIENS )
     aliens--;
   else if( oldteam == PTE_HUMANS )
@@ -1008,6 +1015,12 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
   if( ! chatText[0] )
      return;
 
+  // Invisible players cannot use chat
+  if( ent->client->sess.invisible == qtrue )
+  {
+    trap_SendServerCommand( ent-g_entities, "print \"You cannot chat while invisible\n\"" );
+    return;
+  }
   // Flood limit.  If they're talking too fast, determine that and return.
   if( g_floodMinTime.integer )
     if ( G_Flood_Limited( ent ) )
@@ -1417,12 +1430,21 @@ void Cmd_CallVote_f( gentity_t *ent )
 
   arg1plus = G_SayConcatArgs( 1 );
   arg2plus = G_SayConcatArgs( 2 );
+  
+  // Invisible players cannot call votes
+  if( ent->client->sess.invisible == qtrue )
+  {
+    trap_SendServerCommand( ent-g_entities, "print \"You cannot call votes while invisible\n\"" );
+    return;
+  }
 
   if( !g_allowVote.integer )
   {
     trap_SendServerCommand( ent-g_entities, "print \"Voting not allowed here\n\"" );
     return;
   }
+  
+  
   
   // Flood limit.  If they're talking too fast, determine that and return.
   if( g_floodMinTime.integer )
@@ -5172,7 +5194,15 @@ void G_PrivateMessage( gentity_t *ent )
 
       if( teamonly && !OnSameTeam( ent, tmpent ) )
         continue;
-
+      
+      // Ignore sending to invisible players
+      if( tmpent->client->sess.invisible == qtrue && !G_admin_permission( ent, "invisible" ) )
+        continue;
+      
+      // Ignore sending to non-invisible-capable players while invisible
+      if( ent->client->sess.invisible == qtrue && !G_admin_permission( tmpent, "invisible" ) )
+        continue;
+      
       if( BG_ClientListTest( &tmpent->client->sess.ignoreList,
         ent-g_entities ) )
       {

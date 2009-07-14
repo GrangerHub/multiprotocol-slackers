@@ -46,7 +46,7 @@ void G_WriteClientSessionData( gclient_t *client )
   const char  *s;
   const char  *var;
 
-  s = va( "%i %i %i %i %i %i %i %i %s",
+  s = va( "%i %i %i %i %i %i %i %i %i %s",
     client->sess.sessionTeam,
     client->sess.restartTeam,
     client->sess.spectatorTime,
@@ -55,6 +55,7 @@ void G_WriteClientSessionData( gclient_t *client )
     client->sess.wins,
     client->sess.losses,
     client->sess.teamLeader,
+    client->sess.invisible,
     BG_ClientListString( &client->sess.ignoreList )
     );
 
@@ -80,13 +81,14 @@ void G_ReadSessionData( gclient_t *client )
   int spectatorState;
   int sessionTeam;
   int restartTeam;
+  int invisible;
 
   var = va( "session%i", client - level.clients );
   trap_Cvar_VariableStringBuffer( var, s, sizeof(s) );
 
   // FIXME: should be using BG_ClientListParse() for ignoreList, but
   //        bg_lib.c's sscanf() currently lacks %s
-  sscanf( s, "%i %i %i %i %i %i %i %i %x%x",
+  sscanf( s, "%i %i %i %i %i %i %i %i %i %x%x",
     &sessionTeam,
     &restartTeam,
     &client->sess.spectatorTime,
@@ -95,6 +97,7 @@ void G_ReadSessionData( gclient_t *client )
     &client->sess.wins,
     &client->sess.losses,
     &teamLeader,
+    &invisible,
     &client->sess.ignoreList.hi,
     &client->sess.ignoreList.lo
     );
@@ -103,6 +106,7 @@ void G_ReadSessionData( gclient_t *client )
   client->sess.restartTeam = (pTeam_t)restartTeam;
   client->sess.spectatorState = (spectatorState_t)spectatorState;
   client->sess.teamLeader = (qboolean)teamLeader;
+  client->sess.invisible = (qboolean)invisible;
 }
 
 

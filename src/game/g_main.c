@@ -2065,6 +2065,10 @@ void G_SendGameStat( pTeam_t team )
     int ping;
 
     cl = &level.clients[ level.sortedClients[ i ] ];
+    
+    // Ignore invisible players
+    if ( cl->sess.invisible == qtrue )
+      continue;
 
     if( cl->pers.connected == CON_CONNECTING )
       ping = -1;

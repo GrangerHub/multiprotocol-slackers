@@ -319,6 +319,7 @@ typedef struct
   spectatorState_t  spectatorState;
   int               spectatorClient;  // for chasecam and follow mode
   int               wins, losses;     // tournament stats
+  qboolean          invisible;       // for being invisible on the server - ghosts!
   qboolean          teamLeader;       // true when this client is a team leader
   clientList_t      ignoreList;
 } clientSession_t;

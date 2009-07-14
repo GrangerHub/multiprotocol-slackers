@@ -1142,8 +1142,10 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName )
   {
     if( strcmp( oldname, client->pers.netname ) )
     {
-      trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE
-        " renamed to %s^7\n\"", oldname, client->pers.netname ) );
+      //dont show if players invisible
+      if( client->sess.invisible != qtrue )
+        trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE
+          " renamed to %s^7\n\"", oldname, client->pers.netname ) );
       if( g_decolourLogfiles.integer)
       {
         char    decoloured[ MAX_STRING_CHARS ] = "";   
@@ -1259,17 +1261,20 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName )
 
   // send over a subset of the userinfo keys so other clients can
   // print scoreboards, display models, and play custom sounds
+  if ( client->sess.invisible != qtrue )
+  {
+    Com_sprintf( userinfo, sizeof( userinfo ),
+      "n\\%s\\t\\%i\\model\\%s\\hmodel\\%s\\c1\\%s\\c2\\%s\\"
+      "hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\"
+      "tl\\%d\\ig\\%16s",
+      client->pers.netname, team, model, model, c1, c2,
+      client->pers.maxHealth, client->sess.wins, client->sess.losses, teamTask,
+      teamLeader, BG_ClientListString( &client->sess.ignoreList ) );
 
-  Com_sprintf( userinfo, sizeof( userinfo ),
-    "n\\%s\\t\\%i\\model\\%s\\hmodel\\%s\\c1\\%s\\c2\\%s\\"
-    "hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\"
-    "tl\\%d\\ig\\%16s",
-    client->pers.netname, team, model, model, c1, c2,
-    client->pers.maxHealth, client->sess.wins, client->sess.losses, teamTask,
-    teamLeader, BG_ClientListString( &client->sess.ignoreList ) );
-
-  trap_SetConfigstring( CS_PLAYERS + clientNum, userinfo );
-
+    trap_SetConfigstring( CS_PLAYERS + clientNum, userinfo );
+  } else {
+    trap_SetConfigstring( CS_PLAYERS + clientNum, "" );
+  }
   /*G_LogPrintf( "ClientUserinfoChanged: %i %s\n", clientNum, userinfo );*/
 }
 
@@ -1408,12 +1413,15 @@ char *ClientConnect( int clientNum, qboolean firstTime )
   }
 
   // don't do the "xxx connected" messages if they were caried over from previous level
-  if( firstTime )
-    trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname ) );
+  if( client->sess.invisible != qtrue )
+  {
+    if( firstTime )
+      trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname ) );
 
-  // count current clients and rank for scoreboard
-  CalculateRanks( );
-  G_admin_namelog_update( client, qfalse );
+    // count current clients and rank for scoreboard
+    CalculateRanks( );
+    G_admin_namelog_update( client, qfalse );
+  }
   
 
   // if this is after !restart keepteams or !restart switchteams, apply said selection
@@ -1472,14 +1480,17 @@ void ClientBegin( int clientNum )
 
   ClientSpawn( ent, NULL, NULL, NULL );
 
-  trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname ) );
+  // Ignore invisible players for this section:
+  if ( client->sess.invisible != qtrue )
+  {
+    trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname ) );
 
-  // name can change between ClientConnect() and ClientBegin()
-  G_admin_namelog_update( client, qfalse );
+    // name can change between ClientConnect() and ClientBegin()
+    G_admin_namelog_update( client, qfalse );
 
-  // request the clients PTR code
-  trap_SendServerCommand( ent - g_entities, "ptrcrequest" );
-
+    // request the clients PTR code
+    trap_SendServerCommand( ent - g_entities, "ptrcrequest" );
+  }
   G_LogPrintf( "ClientBegin: %i\n", clientNum );
 
   if( g_clientUpgradeNotice.integer )
@@ -1857,8 +1868,9 @@ void ClientDisconnect( int clientNum )
       Q_strncpyz( ptr->name, ent->client->pers.netname, MAX_NETNAME );
     }
   }
-
-  G_admin_namelog_update( ent->client, qtrue );
+  
+  if ( ent->client->sess.invisible != qtrue )
+    G_admin_namelog_update( ent->client, qtrue );
   G_LeaveTeam( ent );
 
   // stop any following clients

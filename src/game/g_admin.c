@@ -138,7 +138,12 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "display the contents of server info files",
       "(^5subject^7)"
     },
-
+    
+    {"invisible", G_admin_invisible, "invisible",
+      "hides a player so they cannot be seen in playerlists",
+      "[^3+|-^7](^5slot#^7)"
+    },
+    
     {"kick", G_admin_kick, "kick",
       "kick a player with an optional reason",
       "[^3name|slot#^7] (^5reason^7)"
@@ -1414,8 +1419,11 @@ void G_admin_namelog_update( gclient_t *client, qboolean disconnect )
   char n1[ MAX_NAME_LENGTH ];
   char n2[ MAX_NAME_LENGTH ];
   int clientNum = ( client - level.clients );
-  
-  G_admin_seen_update( client->pers.guid );
+
+  if ( client->sess.invisible == qfalse )
+  {
+    G_admin_seen_update( client->pers.guid );
+  }
 
   G_SanitiseString( client->pers.netname, n1, sizeof( n1 ) );
   for( i = 0; i < MAX_ADMIN_NAMELOGS && g_admin_namelog[ i ]; i++ )
@@ -3008,6 +3016,13 @@ qboolean G_admin_putteam( gentity_t *ent, int skiparg )
     return qfalse;
   }
   vic = &g_entities[ pids[ 0 ] ];
+  
+  if ( vic->client->sess.invisible == qtrue )
+  {
+    ADMP( "^3!putteam: ^7invisible players cannot join a team\n" );
+    return qfalse;
+  }
+  
   switch( team[ 0 ] )
   {
   case 'a':
@@ -3085,8 +3100,11 @@ qboolean G_admin_seen(gentity_t *ent, int skiparg )
 
     if( i == id || (search[ 0 ] && strstr( name, search ) ) )
     {
-      ADMBP( va( "^3%4d ^7%s^7 is currently playing\n", i, vic->client->pers.netname ) );
-      count++;
+      if ( vic->client->sess.invisible == qfalse )
+      {
+        ADMBP( va( "^3%4d ^7%s^7 is currently playing\n", i, vic->client->pers.netname ) );
+        count++;
+      }
     }
   }
   for( i = 0; i < MAX_ADMIN_ADMINS && g_admin_admins[ i ] && count < 10; i++ )
@@ -3104,8 +3122,11 @@ qboolean G_admin_seen(gentity_t *ent, int skiparg )
         if( !Q_stricmp( vic->client->pers.guid, g_admin_admins[ i ]->guid )
           && strstr( name, search ) )
         {
-          ison = qtrue;
-          break;
+          if ( vic->client->sess.invisible == qfalse )
+          {
+            ison = qtrue;
+            break;
+          }
         }
       }
 
@@ -4033,6 +4054,7 @@ qboolean G_admin_listlayouts( gentity_t *ent, int skiparg )
 qboolean G_admin_listplayers( gentity_t *ent, int skiparg )
 {
   int i, j;
+  int invisiblePlayers = 0;
   gclient_t *p;
   char c[ 3 ], t[ 2 ]; // color and team letter
   char n[ MAX_NAME_LENGTH ] = {""};
@@ -4045,12 +4067,23 @@ qboolean G_admin_listplayers( gentity_t *ent, int skiparg )
   int l;
   char lname_fmt[ 5 ];
 
+  for( i = 0; i < level.maxclients; i++ ) {
+    p = &level.clients[ i ];
+    if ( p->sess.invisible == qtrue )
+      invisiblePlayers++;
+  }
+  
   ADMBP_begin();
-  ADMBP( va( "^3!listplayers^7: %d players connected:\n",
-    level.numConnectedClients ) );
+  ADMBP( va( "^3!listplayers^7: %i players connected:\n",
+    level.numConnectedClients - invisiblePlayers ) );
   for( i = 0; i < level.maxclients; i++ )
   {
     p = &level.clients[ i ];
+    
+    // Ignore invisible players
+    if ( p->sess.invisible == qtrue )
+      continue;
+    
     Q_strncpyz( t, "S", sizeof( t ) );
     Q_strncpyz( c, S_COLOR_YELLOW, sizeof( c ) );
     if( p->pers.teamSelection == PTE_HUMANS )
@@ -6526,6 +6559,35 @@ qboolean G_admin_L1(gentity_t *ent, int skiparg ){
   }
  
   trap_SendConsoleCommand( EXEC_APPEND,va( "!setlevel %d 1;", pids[ 0 ] ) );
+  return qtrue;
+}
+
+qboolean G_admin_invisible( gentity_t *ent, int skiparg )
+{
+  // Only allow spectators to become invisible
+  if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR )
+  {
+    ADMP( "^3!invisible: ^7only spectators can become invisible\n" );
+    return qfalse;
+  }
+
+  if ( ent->client->sess.invisible != qtrue )
+  {
+    // Make the player invisible
+    ent->client->sess.invisible = qtrue;
+    ClientUserinfoChanged( ent->client->pers.connection->clientNum, qfalse );
+    G_admin_namelog_update( ent->client, qtrue );
+                  trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " disconnected\n\"", ent->client->pers.netname ) );
+  }
+  else
+  {
+    // Make the player visible
+    ent->client->sess.invisible = qfalse;
+    ClientUserinfoChanged( ent->client->pers.connection->clientNum, qfalse );
+    G_admin_namelog_update( ent->client, qfalse );
+    trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " connected\n\"", ent->client->pers.netname ) );
+                trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " entered the game\n\"", ent->client->pers.netname ) );
+  }
   return qtrue;
 }
 
