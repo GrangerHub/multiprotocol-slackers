@@ -1437,6 +1437,8 @@ extern  vmCvar_t  mod_jetpackRegen;
 
 extern  vmCvar_t  g_adminExpireTime;
 
+extern  vmCvar_t  g_autoGhost;
+
 void      trap_Printf( const char *fmt );
 void      trap_Error( const char *fmt );
 int       trap_Milliseconds( void );

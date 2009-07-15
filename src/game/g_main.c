@@ -205,6 +205,8 @@ vmCvar_t  mod_jetpackRegen;
 
 vmCvar_t  g_adminExpireTime;
 
+vmCvar_t  g_autoGhost;
+
 static cvarTable_t   gameCvarTable[ ] =
 {
   // don't override the cheat state set by the system
@@ -260,6 +262,8 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_filterBan, "g_filterBan", "1", CVAR_ARCHIVE, 0, qfalse  },
 
   { &g_needpass, "g_needpass", "0", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse },
+  
+  { &g_autoGhost, "g_autoGhost", "1", CVAR_SERVERINFO, 0, qfalse },
 
   { &g_dedicated, "dedicated", "0", 0, 0, qfalse  },
 
