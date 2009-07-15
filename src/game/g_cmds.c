@@ -2439,8 +2439,7 @@ void Cmd_SetViewpos_f( gentity_t *ent )
 
 #define AS_OVER_RT3         ((ALIENSENSE_RANGE*0.5f)/M_ROOT3)
 
-static qboolean G_RoomForClassChange( gentity_t *ent, pClass_t class,
-  vec3_t newOrigin )
+qboolean G_RoomForClassChange( gentity_t *ent, pClass_t class, vec3_t newOrigin )
 {
   vec3_t    fromMins, fromMaxs;
   vec3_t    toMins, toMaxs;
@@ -2660,6 +2659,14 @@ void Cmd_Class_f( gentity_t *ent )
       if( !level.overmindPresent )
       {
         G_TriggerMenu( clientNum, MN_A_NOOVMND_EVOLVE );
+        return;
+      }
+
+      // denyweapons
+      if( newClass >= PCL_ALIEN_LEVEL1 && newClass <= PCL_ALIEN_LEVEL4 &&
+        ent->client->pers.denyAlienClasses & ( 1 << newClass ) )
+      {
+        trap_SendServerCommand( ent-g_entities, va( "print \"You are denied from using this class\n\"" ) );
         return;
       }
 
@@ -3197,6 +3204,14 @@ void Cmd_Buy_f( gentity_t *ent )
       return;
     }
 
+    // denyweapons
+    if( weapon >= WP_PAIN_SAW && weapon <= WP_GRENADE &&
+        ent->client->pers.denyHumanWeapons & ( 1 << (weapon - WP_BLASTER) ) )
+    {
+      trap_SendServerCommand( ent-g_entities, va( "print \"You are denied from buying this weapon\n\"" ) );
+      return;
+    }
+
     //can afford this?
     if( BG_FindPriceForWeapon( weapon ) > (short)ent->client->ps.persistant[ PERS_CREDIT ] )
     {
@@ -3257,6 +3272,14 @@ void Cmd_Buy_f( gentity_t *ent )
     if( BG_InventoryContainsUpgrade( upgrade, ent->client->ps.stats ) )
     {
       G_TriggerMenu( ent->client->ps.clientNum, MN_H_ITEMHELD );
+      return;
+    }
+
+    // denyweapons
+    if( upgrade == UP_GRENADE &&
+        ent->client->pers.denyHumanWeapons & ( 1 << (WP_GRENADE - WP_BLASTER) ) )
+    {
+      trap_SendServerCommand( ent-g_entities, va( "print \"You are denied from buying this upgrade\n\"" ) );
       return;
     }
 

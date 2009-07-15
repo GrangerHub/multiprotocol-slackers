@@ -215,6 +215,7 @@ qboolean G_admin_layoutsave( gentity_t *ent, int skiparg );
 qboolean G_admin_demo( gentity_t *ent, int skiparg );
 qboolean G_admin_mute( gentity_t *ent, int skiparg );
 qboolean G_admin_denybuild( gentity_t *ent, int skiparg );
+qboolean G_admin_denyweapon( gentity_t *ent, int skiparg );
 qboolean G_admin_showbans( gentity_t *ent, int skiparg );
 qboolean G_admin_help( gentity_t *ent, int skiparg );
 qboolean G_admin_admintest( gentity_t *ent, int skiparg );

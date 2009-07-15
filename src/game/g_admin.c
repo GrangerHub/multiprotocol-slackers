@@ -61,6 +61,11 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "restore a player's ability to build",
       "[^3name|slot#^7]"
     },
+
+    {"allowweapon", G_admin_denyweapon, "denyweapon",
+      "restore a player's ability to use a weapon or class",
+      "[^3name|slot#^7] [^3class|weapon|all^7]"
+    },
     
     {"allready", G_admin_allready, "allready",
       "makes everyone ready in intermission",
@@ -107,12 +112,17 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "give the player designated builder privileges",
       "[^3name|slot#^7]"
     },
-    
+
     {"devmap", G_admin_devmap, "devmap",
       "load a map with cheats (and optionally force layout)",
       "[^3mapname^7] (^5layout^7)"
     },
-    
+
+    {"denyweapon", G_admin_denyweapon, "denyweapon",
+      "take away a player's ability to use a weapon or class",
+      "[^3name|slot#^7] [^3class|weapon^7]"
+    },
+
     {"drop", G_admin_drop, "drop",
       "kick a client from the server without log",
       "[^3name|slot#^7] [^3message^7]"
@@ -4018,6 +4028,229 @@ qboolean G_admin_denybuild( gentity_t *ent, int skiparg )
   return qtrue;
 }
 
+qboolean G_admin_denyweapon( gentity_t *ent, int skiparg )
+{
+  int pids[ MAX_CLIENTS ];
+  char name[ MAX_NAME_LENGTH ], err[ MAX_STRING_CHARS ];
+  char command[ MAX_ADMIN_CMD_LEN ], *cmd;
+  char buffer[ 32 ];
+  int weapon = WP_NONE;
+  int class = PCL_NONE;
+  char *realname;
+  gentity_t *vic;
+  int flag;
+  qboolean all = qfalse;
+
+  G_SayArgv( skiparg, command, sizeof( command ) );
+  cmd = command;
+  if( cmd && *cmd == '!' )
+    cmd++;
+  if( G_SayArgc() < 3 + skiparg )
+  {
+    ADMP( va( "^3!%s: ^7usage: !%s [name|slot#] [class|weapon]\n", cmd, cmd ) );
+    return qfalse;
+  }
+  G_SayArgv( 1 + skiparg, name, sizeof( name ) );
+  if( G_ClientNumbersFromString( name, pids ) != 1 )
+  {
+    G_MatchOnePlayer( pids, err, sizeof( err ) );
+    ADMP( va( "^3!%s: ^7%s\n", cmd, err ) );
+    return qfalse;
+  }
+  if( !admin_higher( ent, &g_entities[ pids[ 0 ] ] ) )
+  {
+    ADMP( va( "^3!%s: ^7sorry, but your intended victim has a higher admin"
+              " level than you\n", cmd ) );
+    return qfalse;
+  }
+  vic = &g_entities[ pids[ 0 ] ];
+
+  if( vic == ent &&
+      !Q_stricmp( cmd, "denyweapon" ) )
+  {
+    ADMP( va( "^3!%s: ^7sorry, you cannot %s yourself\n", cmd, cmd ) );
+    return qfalse;
+  }
+
+  G_SayArgv( 2 + skiparg, buffer, sizeof( buffer ) );
+
+  if( !Q_stricmp( buffer, "all" ) &&
+      !Q_stricmp( cmd, "allowweapon" ) )
+  {
+    if( vic->client->pers.denyHumanWeapons ||
+        vic->client->pers.denyAlienClasses )
+    {
+      vic->client->pers.denyHumanWeapons = 0;
+      vic->client->pers.denyAlienClasses = 0;
+
+      CPx( pids[ 0 ], "cp \"^1You've regained all weapon and class rights\"" );
+      AP( va( "print \"^3!%s: ^7all weapon and class rights for ^7%s^7 restored by %s\n\"",
+        cmd,
+        vic->client->pers.netname,
+        ( ent ) ? ent->client->pers.netname : "console" ) );
+    }
+    else
+    {
+      ADMP( va( "^3!%s: ^7player already has all rights\n", cmd ) );
+    }
+    return qtrue;
+  }
+
+  if( !Q_stricmp( buffer, "all" ) &&
+      !Q_stricmp( cmd, "denyweapon" ) )
+  {
+    all = qtrue;
+    weapon = WP_NONE;
+    class = PCL_NONE;
+
+    if( vic->client->pers.denyHumanWeapons == 0xFFFFFF &&
+        vic->client->pers.denyAlienClasses == 0xFFFFFF )
+    {
+      ADMP( va( "^3!%s: ^7player already has no weapon or class rights\n", cmd ) );
+      return qtrue;
+    }
+
+    if( vic->client->pers.teamSelection == PTE_HUMANS )
+    {
+      weapon = vic->client->ps.weapon;
+      if( weapon < WP_PAIN_SAW || weapon > WP_GRENADE )
+        weapon = WP_NONE;
+    }
+    if( vic->client->pers.teamSelection == PTE_ALIENS )
+    {
+      class = vic->client->pers.classSelection;
+      if( class < PCL_ALIEN_LEVEL1 || class > PCL_ALIEN_LEVEL4 )
+        class = PCL_NONE;
+    }
+
+    vic->client->pers.denyHumanWeapons = 0xFFFFFF;
+    vic->client->pers.denyAlienClasses = 0xFFFFFF;
+  }
+  else
+  {
+    weapon = BG_FindWeaponNumForName( buffer );
+    if( weapon < WP_PAIN_SAW || weapon > WP_GRENADE )
+      class = BG_FindClassNumForName( buffer );
+    if( ( weapon < WP_PAIN_SAW || weapon > WP_GRENADE ) &&
+        ( class < PCL_ALIEN_LEVEL1 || class > PCL_ALIEN_LEVEL4 ) )
+    {
+      {
+        ADMP( va( "^3!%s: ^7unknown weapon or class\n", cmd ) );
+        return qfalse;
+      }
+    }
+  }
+
+  if( class == PCL_NONE )
+  {
+    realname = BG_FindHumanNameForWeapon( weapon );
+    flag = 1 << (weapon - WP_BLASTER);
+    if( !Q_stricmp( cmd, "denyweapon" ) )
+    {
+      if( ( vic->client->pers.denyHumanWeapons & flag ) && !all )
+      {
+        ADMP( va( "^3!%s: ^7player already has no %s rights\n", cmd, realname ) );
+        return qtrue;
+      }
+      vic->client->pers.denyHumanWeapons |= flag;
+      if( vic->client->pers.teamSelection == PTE_HUMANS )
+      {
+        if( ( weapon == WP_GRENADE || all ) &&
+            BG_InventoryContainsUpgrade( UP_GRENADE, vic->client->ps.stats ) )
+        {
+          BG_RemoveUpgradeFromInventory( UP_GRENADE, vic->client->ps.stats );
+          G_AddCreditToClient( vic->client, (short)BG_FindPriceForUpgrade( UP_GRENADE ), qfalse );
+        }
+        if( BG_InventoryContainsWeapon( weapon, vic->client->ps.stats ) )
+        {
+          int maxAmmo, maxClips;
+
+          BG_RemoveWeaponFromInventory( weapon, vic->client->ps.stats );
+          G_AddCreditToClient( vic->client, (short)BG_FindPriceForWeapon( weapon ), qfalse );
+
+          BG_AddWeaponToInventory( WP_MACHINEGUN, vic->client->ps.stats );
+          BG_FindAmmoForWeapon( WP_MACHINEGUN, &maxAmmo, &maxClips );
+          BG_PackAmmoArray( WP_MACHINEGUN, vic->client->ps.ammo, vic->client->ps.powerups,
+                            maxAmmo, maxClips );
+          G_ForceWeaponChange( vic, WP_MACHINEGUN );
+          vic->client->ps.stats[ STAT_MISC ] = 0;
+          ClientUserinfoChanged( pids[ 0 ], qfalse );
+        }
+      }
+    }
+    else
+    {
+      if( !( vic->client->pers.denyHumanWeapons & flag ) )
+      {
+        ADMP( va( "^3!%s: ^7player already has %s rights\n", cmd, realname ) );
+        return qtrue;
+      }
+      vic->client->pers.denyHumanWeapons &= ~flag;
+    }
+  }
+  else
+  {
+    realname = BG_FindHumanNameForClassNum( class );
+    flag = 1 << class;
+    if( !Q_stricmp( cmd, "denyweapon" ) )
+    {
+      if( ( vic->client->pers.denyAlienClasses & flag ) && !all )
+      {
+        ADMP( va( "^3!%s: ^7player already has no %s rights\n", cmd, realname ) );
+        return qtrue;
+      }
+      vic->client->pers.denyAlienClasses |= flag;
+      if( vic->client->pers.teamSelection == PTE_ALIENS &&
+          vic->client->pers.classSelection == class )
+      {
+        vec3_t infestOrigin;
+        short cost;
+
+        G_RoomForClassChange( vic, PCL_ALIEN_LEVEL0, infestOrigin );
+
+        vic->client->pers.evolveHealthFraction = (float)vic->client->ps.stats[ STAT_HEALTH ] /
+            (float)BG_FindHealthForClass( class );
+        if( vic->client->pers.evolveHealthFraction < 0.0f )
+          vic->client->pers.evolveHealthFraction = 0.0f;
+        else if( vic->client->pers.evolveHealthFraction > 1.0f )
+          vic->client->pers.evolveHealthFraction = 1.0f;
+
+        vic->client->pers.classSelection = PCL_ALIEN_LEVEL0;
+        cost = BG_ClassCanEvolveFromTo( PCL_ALIEN_LEVEL0, class, 9, 0 );
+        if( cost < 0 ) cost = 0;
+        G_AddCreditToClient( vic->client, cost, qfalse );
+        ClientUserinfoChanged( pids[ 0 ], qfalse );
+        VectorCopy( infestOrigin, vic->s.pos.trBase );
+        ClientSpawn( vic, vic, vic->s.pos.trBase, vic->s.apos.trBase );
+      }
+    }
+    else
+    {
+      if( !( vic->client->pers.denyAlienClasses & flag ) )
+      {
+        ADMP( va( "^3!%s: ^7player already has %s rights\n", cmd, realname ) );
+        return qtrue;
+      }
+      vic->client->pers.denyAlienClasses &= ~flag;
+    }
+  }
+
+  if( all )
+    realname = "weapon and class";
+
+  CPx( pids[ 0 ], va( "cp \"^1You've %s your %s rights\"",
+    ( !Q_stricmp( cmd, "denyweapon" ) ) ? "lost" : "regained",
+    realname ) );
+  AP( va(
+    "print \"^3!%s: ^7%s rights for ^7%s^7 %s by %s\n\"",
+    cmd, realname,
+    vic->client->pers.netname,
+    ( !Q_stricmp( cmd, "denyweapon" ) ) ? "revoked" : "restored",
+    ( ent ) ? ent->client->pers.netname : "console" ) );
+  
+  return qtrue;
+}
+
 qboolean G_admin_listadmins( gentity_t *ent, int skiparg )
 {
   int i, found = 0;
@@ -4232,6 +4465,10 @@ qboolean G_admin_listplayers( gentity_t *ent, int skiparg )
     if( p->pers.denyBuild )
     {
       Q_strncpyz( denied, "B", sizeof( denied ) );
+    }
+    if( p->pers.denyHumanWeapons || p->pers.denyAlienClasses )
+    {
+      Q_strncpyz( denied, "W", sizeof( denied ) );
     }
 
     dbuilder[ 0 ] = '\0';

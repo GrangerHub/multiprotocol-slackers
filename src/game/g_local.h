@@ -434,6 +434,8 @@ typedef struct
   int                 muteExpires;           // level.time at which a player is unmuted
   qboolean            ignoreAdminWarnings;
   qboolean            denyBuild;
+  int                 denyHumanWeapons;
+  int                 denyAlienClasses;
   int                 adminLevel;
   char                adminName[ MAX_NETNAME ];
   qboolean            designatedBuilder;
@@ -834,6 +836,7 @@ char      *G_NewString( const char *string );
 // g_cmds.c
 //
 void      Cmd_Score_f( gentity_t *ent );
+qboolean  G_RoomForClassChange( gentity_t *ent, pClass_t class, vec3_t newOrigin );
 void      G_StopFromFollowing( gentity_t *ent );
 void      G_StopFollowing( gentity_t *ent );
 qboolean  G_FollowNewClient( gentity_t *ent, int dir );
