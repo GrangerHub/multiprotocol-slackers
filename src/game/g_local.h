@@ -1140,6 +1140,7 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName );
 void ClientDisconnect( int clientNum );
 void ClientBegin( int clientNum );
 void ClientCommand( int clientNum );
+int  ClientPingOverride( void );
 
 //
 // g_active.c
@@ -1414,6 +1415,8 @@ extern  vmCvar_t  g_publicSayadmins;
 extern  vmCvar_t  g_myStats;
 extern  vmCvar_t  g_teamStatus;
 extern  vmCvar_t  g_antiSpawnBlock;
+
+extern  vmCvar_t  g_hiddenClients;
 
 extern  vmCvar_t  g_dretchPunt;
 

@@ -180,6 +180,8 @@ vmCvar_t  g_buildLogMaxLength;
 
 vmCvar_t  g_tag;
 
+vmCvar_t  g_hiddenClients;
+
 vmCvar_t  g_dretchPunt;
 
 vmCvar_t  g_allowShare;
@@ -382,6 +384,8 @@ static cvarTable_t   gameCvarTable[ ] =
   
   { &g_tag, "g_tag", "main", CVAR_INIT, 0, qfalse },
   
+  { &g_hiddenClients, "g_hiddenClients", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse },
+  
   { &g_dretchPunt, "g_dretchPunt", "1", CVAR_ARCHIVE, 0, qfalse  },
   
   { &g_msg, "g_msg", "", CVAR_ARCHIVE, 0, qfalse  },
@@ -461,6 +465,9 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4,
 
     case GAME_CONSOLE_COMMAND:
       return ConsoleCommand( );
+
+    case GAME_PING_OVERRIDE:
+      return ClientPingOverride( );
   }
 
   return -1;

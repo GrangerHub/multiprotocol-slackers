@@ -253,10 +253,12 @@ typedef enum {
 
   GAME_RUN_FRAME,         // ( int levelTime );
 
-  GAME_CONSOLE_COMMAND      // ( void );
+  GAME_CONSOLE_COMMAND,      // ( void );
   // ConsoleCommand will be called when a command has been issued
   // that is not recognized as a builtin function.
   // The game can issue trap_argc() / trap_argv() commands to get the command
   // and parameters.  Return qfalse if the game doesn't recognize it as a command.
+  GAME_PING_OVERRIDE        // ( void ), guid retrieved through trap_Argc and trap_Argv
+  // returns 1 if the client overrides ping restrictions
 } gameExport_t;
 
