@@ -1897,7 +1897,37 @@ void QDECL G_AdminsPrintf( const char *fmt, ... )
   G_LogPrintf("%s",string);
 
 }
+/*
+=================
+G_WarningsPrintf
+ 
+Print to everyone with a certain flag, and the logfile with a time stamp if it is open, and to the console 
+(just a copy of the G_AdminsPrintf with flag suport)
+=================
+*/
+void QDECL G_WarningsPrintf( char *flag, const char *fmt, ... )
+{
+  va_list argptr;
+  char    string[ 1024 ];
+  gentity_t   *tempent;
+  int j;
 
+  va_start( argptr, fmt );
+  vsprintf( string, fmt,argptr );
+  va_end( argptr );
+
+  for( j = 0; j < level.maxclients; j++ )
+  {
+    tempent = &g_entities[ j ];
+    if( G_admin_permission( tempent, flag ) ) 
+    {
+       trap_SendServerCommand(tempent-g_entities,va( "print \"^6[Warnings]^7 %s\"", string) ); 
+    }
+  }
+  
+  G_LogPrintf("%s",string);
+
+}
 /*
 =================
 G_LogPrintf

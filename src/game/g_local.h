@@ -1115,6 +1115,7 @@ void QDECL G_LogPrintf( const char *fmt, ... );
 void QDECL G_LogPrintfColoured( const char *fmt, ... );
 void QDECL G_LogOnlyPrintf( const char *fmt, ... );
 void QDECL G_AdminsPrintf( const char *fmt, ... );
+void QDECL G_WarningsPrintf( char *flag, const char *fmt, ... );
 void QDECL G_LogOnlyPrintf( const char *fmt, ... );
 void SendScoreboardMessageToAllClients( void );
 void QDECL G_Printf( const char *fmt, ... );

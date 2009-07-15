@@ -1824,6 +1824,11 @@ void Cmd_CallVote_f( gentity_t *ent )
                                    g_extendVotesCount.integer ) );
        return;
      }
+     if( !g_timelimit.integer ) {
+       trap_SendServerCommand( ent-g_entities,
+                               "print \"This match has no timelimit so extend votes wont work\n\"" );
+       return;
+     }
      if( level.time - level.startTime <
          ( g_timelimit.integer - g_extendVotesTime.integer / 2 ) * 60000 )
      {

@@ -1294,7 +1294,8 @@ qboolean G_admin_ban_check( char *userinfo, char *reason, int rlen )
           lastConnectTime = t;
           Q_strncpyz( lastConnectIP, ip, sizeof( lastConnectIP ) );
 
-          G_AdminsPrintf(
+          G_WarningsPrintf(
+            "ban",
             "Banned player %s^7 (%s^7) tried to connect (ban #%i on %s by %s^7 expires %s reason: %s^7 )\n",
             Info_ValueForKey( userinfo, "name" ),
             g_admin_bans[ i ]->name,
