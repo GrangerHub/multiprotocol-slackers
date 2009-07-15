@@ -4606,7 +4606,7 @@ void G_NobuildLoad( void )
 
 	// Make the marker...
 	nb = G_Spawn( );
-	nb->s.modelindex = 1337; //Coder humor is win
+	nb->s.modelindex = 0;
 	VectorCopy( origin, nb->s.pos.trBase );
 	VectorCopy( origin, nb->r.currentOrigin );
 	nb->noBuild.isNB = qtrue;

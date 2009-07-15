@@ -1079,7 +1079,7 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName )
 
     if( !forceName )
     {
-      if( client->pers.muted )
+      if( G_IsMuted( client ) )
       {
         trap_SendServerCommand( ent - g_entities,
             "print \"You cannot change your name while you are muted\n\"" );
