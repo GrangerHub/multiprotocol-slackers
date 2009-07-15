@@ -2969,10 +2969,12 @@ qboolean G_admin_suspendban( gentity_t *ent, int skiparg )
 {
   int bnum;
   int length;
+  int timenow = 0;
   int expires = 0;
   char *arg;
   char bs[ 5 ];
   char duration[ 32 ];
+  qtime_t qt;
 
   if( G_SayArgc() < 3 + skiparg )
   {
@@ -2988,7 +2990,9 @@ qboolean G_admin_suspendban( gentity_t *ent, int skiparg )
   }
 
   arg = G_SayConcatArgs( 2 + skiparg );
+  timenow = trap_RealTime( &qt );
   length = G_admin_parse_time( arg );
+
   if( length < 0 )
   {
     ADMP( "^3!suspendban: ^7invalid length\n" );
@@ -2999,13 +3003,16 @@ qboolean G_admin_suspendban( gentity_t *ent, int skiparg )
     length = MAX_ADMIN_BANSUSPEND_DAYS * 24 * 60 * 60;
     ADMP( va( "^3!suspendban: ^7maximum ban suspension is %d days\n",
       MAX_ADMIN_BANSUSPEND_DAYS ) );
+  } else if( g_admin_bans[ bnum - 1 ]->expires > 0 && length + timenow > g_admin_bans[ bnum - 1 ]->expires ) {
+    length = g_admin_bans[ bnum - 1 ]->expires - timenow;
+    G_admin_duration( length , duration, sizeof( duration ) );
+    ADMP( va( "^3!suspendban: ^7Suspension Duration trimmed to Ban duration: %s\n",
+          duration ) );
   }
 
   if ( length > 0 )
   {
-    qtime_t qt;
-
-    expires = trap_RealTime( &qt ) + length;
+    expires = timenow + length;
   }
   if( g_admin_bans[ bnum - 1 ]->suspend == expires )
   {
