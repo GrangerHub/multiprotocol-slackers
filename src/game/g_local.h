@@ -1189,7 +1189,8 @@ typedef enum
   MCV_RANDOM,
   MCV_NUMCLIENTS,
   MCV_LASTWIN,
-  MCV_VOTE
+  MCV_VOTE,
+  MCV_SELECTEDRANDOM
 } mapConditionVariable_t;
 
 typedef enum
@@ -1260,6 +1261,7 @@ qboolean G_IntermissionMapVoteWinner( void );
 void G_IntermissionMapVoteMessage( gentity_t *ent );
 void G_IntermissionMapVoteMessageAll( void );
 void G_IntermissionMapVoteCommand( gentity_t *ent, qboolean next, qboolean choose );
+static qboolean G_GetRandomMap( char *name, int size, int rotation, int map );
 
 //
 // g_ptr.c

@@ -4461,6 +4461,52 @@ qboolean G_admin_listrotation( gentity_t *ent, int skiparg )
             statusColor = 7;
             status = "vote";
           }
+        } else if( !Q_stricmp( mapRotations.rotations[ i ].maps[ j ].name, "*RANDOM*" ) )
+        {
+          char slotMap[ 64 ];
+          int lineLen = 0;
+          int k;
+
+          trap_Cvar_VariableStringBuffer( "mapname", slotMap, sizeof( slotMap ) );
+          mapnames[ 0 ] = '\0';
+          for( k = 0; k < mapRotations.rotations[ i ].maps[ j ].numConditions; k++ )
+          {
+            char *thisMap;
+            int mc = 7;
+
+            if( mapRotations.rotations[ i ].maps[ j ].conditions[ k ].lhs != MCV_SELECTEDRANDOM )
+              continue;
+
+            thisMap = mapRotations.rotations[ i ].maps[ j ].conditions[ k ].dest;
+            lineLen += strlen( thisMap ) + 1;
+
+            if( currentMap == j && !Q_stricmp( thisMap, slotMap ) )
+              mc = 3;
+            Q_strcat( mapnames, sizeof( mapnames ), va( "^7%s%s^%i%s",
+                      ( k ) ? ", " : "",
+                        ( lineLen > 50 ) ? "\n                  " : "",
+                          mc, thisMap ) );
+            if( lineLen > 50 )
+              lineLen = strlen( thisMap ) + 2;
+            else
+              lineLen++;
+          }
+
+          if( currentMap == j )
+          {
+            statusColor = 3;
+            status = "current slot";
+          }
+          else if( !k )
+          {
+            statusColor = 1;
+            status = "empty Random";
+          }
+          else
+          {
+            statusColor = 7;
+            status = "Random";
+          }
         }
         else if ( currentMap == j )
         {

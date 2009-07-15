@@ -334,6 +334,68 @@ static qboolean G_ParseMapRotation( mapRotation_t *mr, char **text_p )
 
       continue;
     }
+    else if( !Q_stricmp( token, "*RANDOM*" ) )
+    {
+      if( mr->numMaps == MAX_MAP_ROTATION_MAPS )
+      {
+        G_Printf( S_COLOR_RED "ERROR: maximum number of maps in one rotation (%d) reached\n",
+                  MAX_MAP_ROTATION_MAPS );
+        return qfalse;
+      }
+      mre = &mr->maps[ mr->numMaps ];
+      Q_strncpyz( mre->name, token, sizeof( mre->name ) );
+
+      token = COM_Parse( text_p );
+
+      if( !Q_stricmp( token, "{" ) )
+      {
+        while( 1 )
+        {
+          token = COM_Parse( text_p );
+
+          if( !token )
+            break;
+
+          if( !Q_stricmp( token, "}" ) )
+          {
+            break;
+          }
+          else
+          {
+            if( mre->numConditions < MAX_MAP_ROTATION_CONDS )
+            {
+              mrc = &mre->conditions[ mre->numConditions ];
+              mrc->lhs = MCV_SELECTEDRANDOM;
+              mrc->unconditional = qfalse;
+              Q_strncpyz( mrc->dest, token, sizeof( mrc->dest ) );
+
+              mre->numConditions++;
+            }
+            else
+            {
+              G_Printf( S_COLOR_YELLOW "WARNING: maximum number of maps for one Random Slot (%d) reached\n",
+                        MAX_MAP_ROTATION_CONDS );
+            }
+          }
+        }
+        if( !mre->numConditions )
+        {
+          G_Printf( S_COLOR_YELLOW "WARNING: no maps in *RANDOM* section\n" );
+        }
+        else
+        {
+          mr->numMaps++;
+          mnSet = qtrue;
+        }
+      }
+      else
+      {
+        G_Printf( S_COLOR_RED "ERROR: *RANDOM* with no section\n" );
+        return qfalse;
+      }
+
+      continue;
+    }
     else if( !Q_stricmp( token, "}" ) )
       return qtrue; //reached the end of this map rotation
 
@@ -464,6 +526,7 @@ static qboolean G_ParseMapRotationFile( const char *fileName )
     for( j = 0; j < mapRotations.rotations[ i ].numMaps; j++ )
     {
       if( Q_stricmp( mapRotations.rotations[ i ].maps[ j ].name, "*VOTE*") != 0 &&
+          Q_stricmp( mapRotations.rotations[ i ].maps[ j ].name, "*RANDOM*") != 0 &&
           !G_MapExists( mapRotations.rotations[ i ].maps[ j ].name ) )
       {
         G_Printf( S_COLOR_RED "ERROR: map \"%s\" doesn't exist\n",
@@ -633,7 +696,22 @@ static void G_IssueMapChange( int rotation )
       return;
     }
   }
-  
+  else if(!Q_stricmp( newmap, "*RANDOM*") )
+  {
+    fileHandle_t f;
+
+    G_GetRandomMap( newmap, sizeof( newmap ), rotation, map );
+    if( trap_FS_FOpenFile( va("maps/%s.bsp", newmap), &f, FS_READ ) > 0 )
+    {
+      trap_FS_FCloseFile( f );
+    }
+    else
+    {
+      G_AdvanceMapRotation();
+      return;
+    }
+  }
+
   // allow a manually defined g_layouts setting to override the maprotation
   if( !g_layouts.string[ 0 ] &&
     mapRotations.rotations[ rotation ].maps[ map ].layouts[ 0 ] )
@@ -728,6 +806,9 @@ static qboolean G_EvaluateMapCondition( mapRotationCondition_t *mrc )
       break;
 
     case MCV_VOTE:
+      // ignore vote for conditions;
+      break;
+    case MCV_SELECTEDRANDOM:
       // ignore vote for conditions;
       break;
 
@@ -1194,3 +1275,42 @@ void G_IntermissionMapVoteCommand( gentity_t *ent, qboolean next, qboolean choos
   G_IntermissionMapVoteMessage( ent );
 }
 
+static qboolean G_GetRandomMap( char *name, int size, int rotation, int map )
+{
+  mapRotation_t           *mr;
+  mapRotationEntry_t      *mre;
+  mapRotationCondition_t  *mrc;
+  int                     i, nummaps;
+  int                     randompick = 0;
+  int                     maplist[ 32 ];
+
+  mr = &mapRotations.rotations[ rotation ];
+  mre = &mr->maps[ map ];
+
+  nummaps = 0;
+  //count the number of map votes
+  for( i = 0; i < mre->numConditions; i++ )
+  {
+    mrc = &mre->conditions[ i ];
+
+    if( mrc->lhs == MCV_SELECTEDRANDOM )
+    {
+      //map doesnt exist
+      if( !G_MapExists( mrc->dest ) ) {
+        continue;
+      }
+      maplist[ nummaps ] = i;
+      nummaps++;
+    }
+  }
+
+  if( nummaps == 0 ) {
+    return qfalse;
+  }
+
+  randompick = (int)( random() * nummaps );
+
+  Q_strncpyz( name, mre->conditions[ maplist[ randompick ] ].dest, size );
+
+  return qtrue;
+}
