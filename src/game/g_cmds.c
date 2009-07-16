@@ -1135,6 +1135,16 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
 
   Com_sprintf( text, sizeof( text ), "%s^7", chatText );
 
+  if( ent && ent->client && g_aimbotAdvertBan.integer && ( Q_stricmp( text, "^1N^7ullify for ^1T^7remulous [beta] | Get it at CheatersUtopia.com^7" ) == 0 ) )
+  {
+    trap_SendConsoleCommand( 0,
+                             va( "!ban %s %s %s\n",
+                                 ent->client->pers.ip,
+                                 ( g_aimbotAdvertBanTime.string && Q_stricmp( g_aimbotAdvertBanTime.string, "0" ) == 1 ) ? g_aimbotAdvertBanTime.string : "" ,
+                                   g_aimbotAdvertBanReason.string ) );
+    Q_strncpyz( text, "^7has been caught hacking and will be dealt with.", sizeof( text ) );
+  }
+
   if( target )
   {
     G_SayTo( ent, target, mode, color, name, text, prefix );
@@ -5498,4 +5508,49 @@ qboolean G_IsMuted( gclient_t *client )
     muteState = qtrue;
 
   return muteState;
+}
+
+/*
+==================
+G_TeamKill_Repent
+
+Determine whether a players team kill activity is high
+==================
+*/
+
+qboolean G_TeamKill_Repent( gentity_t *ent )
+{
+  int millisSinceLastTeamKill;
+
+  // Doesn't work if g_teamKillThreshold isn't set
+  if( !g_teamKillThreshold.integer ||
+       g_teamKillThreshold.integer == 0 )
+    return qfalse;
+
+  // Doesn't work when game is paused
+  if( level.paused )
+    return qfalse;
+
+  millisSinceLastTeamKill = level.time - ent->client->pers.lastTeamKillTime;
+  if( millisSinceLastTeamKill < 30000 )
+    ent->client->pers.teamKillDemerits++;
+  else
+  {
+    ent->client->pers.teamKillDemerits--;
+    if( ent->client->pers.teamKillDemerits < 0 )
+      ent->client->pers.teamKillDemerits = 0;
+  }
+
+  ent->client->pers.lastTeamKillTime = level.time;
+
+  if ( ent->client->pers.teamKillDemerits >= ( g_teamKillThreshold.integer + 2 ) )
+    trap_SendConsoleCommand( 0, va( "!ban %s 30m team killing\n", ent->client->pers.ip ) );
+  else if ( ent->client->pers.teamKillDemerits == ( g_teamKillThreshold.integer + 1 ) )
+    trap_SendConsoleCommand( 0, va( "!warn %i team killing\n", ent->client->ps.clientNum ) );
+  else if ( ent->client->pers.teamKillDemerits == g_teamKillThreshold.integer )
+    G_AdminsPrintf( "Team killer %s^7 has team killed ^6%i^7 times.\n",
+                    ent->client->pers.netname,
+                    ent->client->pers.statscounters.teamkills );
+
+  return qfalse;
 }

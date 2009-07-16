@@ -426,6 +426,9 @@ typedef struct
   int                 lastFloodTime;         // level.time of last flood-limited command
   int                 floodDemerits;         // number of flood demerits accumulated
 
+  int                 lastTeamKillTime;      // level.time of last team kill
+  int                 teamKillDemerits;      // number of team kill demerits accumulated
+
   vec3_t              lastDeathLocation;
   char                guid[ 33 ];
   char                ip[ 16 ];
@@ -862,6 +865,7 @@ void      Cmd_Builder_f( gentity_t *ent );
 void      G_WordWrap( char *buffer, int maxwidth );
 void      G_CP( gentity_t *ent );
 qboolean  G_IsMuted( gclient_t *ent );
+qboolean  G_TeamKill_Repent( gentity_t *ent );
 
 //
 // g_physics.c
@@ -1449,6 +1453,12 @@ extern  vmCvar_t  mod_jetpackRegen;
 extern  vmCvar_t  g_adminExpireTime;
 
 extern  vmCvar_t  g_autoGhost;
+
+extern  vmCvar_t  g_teamKillThreshold;
+
+extern  vmCvar_t  g_aimbotAdvertBan;
+extern  vmCvar_t  g_aimbotAdvertBanTime;
+extern  vmCvar_t  g_aimbotAdvertBanReason;
 
 void      trap_Printf( const char *fmt );
 void      trap_Error( const char *fmt );

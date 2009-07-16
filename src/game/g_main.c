@@ -211,6 +211,12 @@ vmCvar_t  g_adminExpireTime;
 
 vmCvar_t  g_autoGhost;
 
+vmCvar_t  g_teamKillThreshold;
+
+vmCvar_t  g_aimbotAdvertBan;
+vmCvar_t  g_aimbotAdvertBanTime;
+vmCvar_t  g_aimbotAdvertBanReason;
+
 static cvarTable_t   gameCvarTable[ ] =
 {
   // don't override the cheat state set by the system
@@ -401,8 +407,13 @@ static cvarTable_t   gameCvarTable[ ] =
   
   { &mod_jetpackFuel, "mod_jetpackFuel", "0", CVAR_ARCHIVE, 0, qtrue  },
   { &mod_jetpackConsume, "mod_jetpackConsume", "2", CVAR_ARCHIVE, 0, qfalse  },
-  { &mod_jetpackRegen, "mod_jetpackRegen", "3", CVAR_ARCHIVE, 0, qfalse  }
+  { &mod_jetpackRegen, "mod_jetpackRegen", "3", CVAR_ARCHIVE, 0, qfalse  },
 
+  { &g_teamKillThreshold, "g_teamKillThreshold", "0", CVAR_ARCHIVE, 0, qfalse  },
+
+  { &g_aimbotAdvertBan, "g_aimbotAdvertBan", "0", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_aimbotAdvertBanTime, "g_aimbotAdvertBanTime", "0", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_aimbotAdvertBanReason, "g_aimbotAdvertBanReason", "AUTOBAN: AIMBOT", CVAR_ARCHIVE, 0, qfalse  }
 };
 
 static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[ 0 ] );
