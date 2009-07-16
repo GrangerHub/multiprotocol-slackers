@@ -158,6 +158,7 @@ vmCvar_t  g_adminNameProtect;
 vmCvar_t  g_adminTempMute;
 vmCvar_t  g_adminTempBan;
 vmCvar_t  g_adminMaxBan;
+vmCvar_t  g_adminTempSpec;
 vmCvar_t  g_adminMapLog;
 vmCvar_t  g_minLevelToJoinTeam;
 vmCvar_t  g_forceAutoSelect;
@@ -363,6 +364,7 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_adminTempMute, "g_adminTempMute", "5m", CVAR_ARCHIVE, 0, qfalse },
   { &g_adminTempBan, "g_adminTempBan", "2m", CVAR_ARCHIVE, 0, qfalse  },
   { &g_adminMaxBan, "g_adminMaxBan", "2w", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_adminTempSpec, "g_adminTempSpec", "2m", CVAR_ARCHIVE, 0, qfalse  },
   { &g_adminMapLog, "g_adminMapLog", "", CVAR_ROM, 0, qfalse  },
   { &g_minLevelToJoinTeam, "g_minLevelToJoinTeam", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_forceAutoSelect, "g_forceAutoSelect", "0", CVAR_ARCHIVE, 0, qtrue }, 

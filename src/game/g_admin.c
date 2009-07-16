@@ -243,7 +243,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
 
     {"putteam", G_admin_putteam, "putteam",
       "move a player to a specified team",
-      "[^3name|slot#^7] [^3h|a|s^7]"
+      "[^3name|slot#^7] [^3h|a|s^7] (^3duration^7)"
     },
 
     {"readconfig", G_admin_readconfig, "readconfig",
@@ -3100,12 +3100,15 @@ qboolean G_admin_putteam( gentity_t *ent, int skiparg )
   gentity_t *vic;
   pTeam_t teamnum = PTE_NONE;
   char teamdesc[ 32 ] = {"spectators"};
+  char secs[ 7 ];
+  int seconds = 0;
+  qboolean useDuration = qfalse;
 
   G_SayArgv( 1 + skiparg, name, sizeof( name ) );
   G_SayArgv( 2 + skiparg, team, sizeof( team ) );
   if( G_SayArgc() < 3 + skiparg )
   {
-    ADMP( "^3!putteam: ^7usage: !putteam [name] [h|a|s]\n" );
+    ADMP( "^3!putteam: ^7usage: !putteam [name] [h|a|s] (duration)\n" );
     return qfalse;
   }
 
@@ -3122,13 +3125,13 @@ qboolean G_admin_putteam( gentity_t *ent, int skiparg )
     return qfalse;
   }
   vic = &g_entities[ pids[ 0 ] ];
-  
+
   if ( vic->client->sess.invisible == qtrue )
   {
     ADMP( "^3!putteam: ^7invisible players cannot join a team\n" );
     return qfalse;
   }
-  
+
   switch( team[ 0 ] )
   {
   case 'a':
@@ -3146,13 +3149,34 @@ qboolean G_admin_putteam( gentity_t *ent, int skiparg )
     ADMP( va( "^3!putteam: ^7unknown team %c\n", team[ 0 ] ) );
     return qfalse;
   }
-  if( vic->client->pers.teamSelection == teamnum )
+  //duration code
+  if( G_SayArgc() > 3 + skiparg ) {
+    //can only lock players in spectator
+    if ( teamnum != PTE_NONE )
+    {
+      ADMP( "^3!putteam: ^7You can only lock a player into the spectators team\n" );
+      return qfalse;
+    }
+    G_SayArgv( 3 + skiparg, secs, sizeof( secs ) );
+    seconds = G_admin_parse_time( secs );
+    useDuration = qtrue;
+  }
+
+  if( vic->client->pers.teamSelection == teamnum && teamnum != PTE_NONE )
+  {
+    ADMP( va( "^3!putteam: ^7%s ^7is already on the %s team\n", vic->client->pers.netname, teamdesc ) );
     return qfalse;
+  }
+
+  if( useDuration == qtrue && seconds > 0 ) {
+    vic->client->pers.specExpires = level.time + ( seconds * 1000 );
+  }
   G_ChangeTeam( vic, teamnum );
 
-  AP( va( "print \"^3!putteam: ^7%s^7 put %s^7 on to the %s team\n\"",
+  AP( va( "print \"^3!putteam: ^7%s^7 put %s^7 on to the %s team%s\n\"",
           ( ent ) ? G_admin_adminPrintName( ent ) : "console",
-          vic->client->pers.netname, teamdesc ) );
+          vic->client->pers.netname, teamdesc,
+          ( seconds ) ? va( " for %i seconds", seconds ) : "" ) );
   return qtrue;
 }
 

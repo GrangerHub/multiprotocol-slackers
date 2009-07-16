@@ -810,6 +810,12 @@ void Cmd_Team_f( gentity_t *ent )
       g_maxGameClients.integer ) );
     return;
   }
+  else if ( ent->client->pers.specExpires > level.time )
+  {
+  trap_SendServerCommand( ent-g_entities, va( "print \"You can't join a team yet. Expires in %d seconds.\n\"",
+                          ( ent->client->pers.specExpires - level.time ) / 1000 ) );
+  return;
+  }
   else if( !Q_stricmpn( s, "alien", 5 ) )
   {
     if( g_forceAutoSelect.integer && !G_admin_permission(ent, ADMF_FORCETEAMCHANGE) )
@@ -1545,6 +1551,7 @@ void Cmd_CallVote_f( gentity_t *ent )
 
   // detect clientNum for partial name match votes
   if( !Q_stricmp( arg1, "kick" ) ||
+    !Q_stricmp( arg1, "spec" ) ||
     !Q_stricmp( arg1, "mute" ) ||
     !Q_stricmp( arg1, "unmute" ) )
   {
@@ -1638,6 +1645,17 @@ void Cmd_CallVote_f( gentity_t *ent )
       Q_strcat( level.voteString, sizeof( level.voteDisplayString ), va( "(%s^7)", reason ) );
     Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ),
       "Kick player \'%s\'", name );
+  }
+  else if( !Q_stricmp( arg1, "spec" ) )
+  {
+    if( G_admin_permission( &g_entities[ clientNum ], ADMF_IMMUNITY ) )
+    {
+          trap_SendServerCommand( ent-g_entities, "print \"callvote: admin is immune from vote spec\n\"" );
+          return;
+    }
+    Com_sprintf( level.voteString, sizeof( level.voteString ), "!putteam %i s %s", clientNum, g_adminTempSpec.string );
+    Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "Spec player \'%s\'", name );
+
   }
   else if( !Q_stricmp( arg1, "mute" ) )
   {
@@ -1848,7 +1866,7 @@ void Cmd_CallVote_f( gentity_t *ent )
   {
     trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string\n\"" );
     trap_SendServerCommand( ent-g_entities, "print \"Valid vote commands are: "
-      "map, map_restart, draw, extend, nextmap, kick, mute, unmute, poll, and sudden_death\n" );
+      "map, map_restart, draw, extend, nextmap, kick, spec, mute, unmute, poll, and sudden_death\n" );
     return;
   }
   

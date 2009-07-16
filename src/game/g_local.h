@@ -434,6 +434,7 @@ typedef struct
   int                 muteExpires;           // level.time at which a player is unmuted
   qboolean            ignoreAdminWarnings;
   qboolean            denyBuild;
+  int                 specExpires;          // level.time at which a player can join a team again after being forced into spectator
   int                 denyHumanWeapons;
   int                 denyAlienClasses;
   int                 adminLevel;
@@ -1400,6 +1401,7 @@ extern  vmCvar_t  g_adminNameProtect;
 extern  vmCvar_t  g_adminTempMute;
 extern  vmCvar_t  g_adminTempBan;
 extern  vmCvar_t  g_adminMaxBan;
+extern  vmCvar_t  g_adminTempSpec;
 extern  vmCvar_t  g_adminMapLog;
 extern  vmCvar_t  g_minLevelToJoinTeam;
 extern  vmCvar_t  g_forceAutoSelect;
