@@ -1346,6 +1346,27 @@ qboolean G_admin_ban_check( char *userinfo, char *reason, int rlen )
       return qtrue;
     }
   }
+  if ( *guid )
+  {
+    int count = 0;
+    qboolean valid = qtrue;
+
+    while( guid[ count ] != '\0' && valid )
+    {
+      if( (guid[ count ] < '0' || guid[ count ] > '9') &&
+          (guid[ count ] < 'A' || guid[ count ] > 'F') )
+      {
+        valid = qfalse;
+      }
+      count++;
+    }
+    if( !valid || count != 32 )
+    {
+      Com_sprintf( reason, rlen, "Invalid client data" );
+      G_Printf("Player with invalid GUID [%s] connect from IP %s\n", guid, ip);
+      return qtrue;
+    }
+  }
   return qfalse;
 }
 
