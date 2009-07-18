@@ -3039,6 +3039,10 @@ static itemBuildError_t G_SufficientBPAvailable( buildable_t     buildable,
         // If it's a unique buildable, it must be replaced by the same type
         pointsYielded += BG_FindBuildPointsForBuildable(  ent->s.modelindex );
         level.numBuildablesForRemoval++;
+      } else if( g_markDeconstructPriority.integer == 1 && ent->s.modelindex == buildable ) {
+        //if g_markDeconstructPriority = 1 and buildable matches one being removed prefer it
+        pointsYielded += BG_FindBuildPointsForBuildable(  ent->s.modelindex );
+        level.numBuildablesForRemoval++;
       }
     }
   }
@@ -3701,7 +3705,7 @@ static void G_SpawnMarker( vec3_t origin )
   
   	// Make the marker...
 	nb = G_Spawn( );
-	nb->s.modelindex = 1337; //Coder humor is win
+	nb->s.modelindex = 0; //Coder humor is win
 	VectorCopy( origin, nb->s.pos.trBase );
 	VectorCopy( origin, nb->r.currentOrigin );
 	nb->noBuild.isNB = qtrue;
