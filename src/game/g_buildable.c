@@ -2932,6 +2932,7 @@ static itemBuildError_t G_SufficientBPAvailable( buildable_t     buildable,
   itemBuildError_t  bpError;
   buildable_t       spawn;
   buildable_t       core;
+  int               spawnremoval = 0;
   int               spawnCount = 0;
 
   level.numBuildablesForRemoval = 0;
@@ -3041,6 +3042,11 @@ static itemBuildError_t G_SufficientBPAvailable( buildable_t     buildable,
         level.numBuildablesForRemoval++;
       } else if( g_markDeconstructPriority.integer == 1 && ent->s.modelindex == buildable ) {
         //if g_markDeconstructPriority = 1 and buildable matches one being removed prefer it
+        if( ent->s.modelindex == spawn && ( remainingSpawns - spawnremoval ) > 1 ) {
+          spawnremoval++;
+        } else {
+          continue;
+        }
         pointsYielded += BG_FindBuildPointsForBuildable(  ent->s.modelindex );
         level.numBuildablesForRemoval++;
       }
