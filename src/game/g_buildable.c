@@ -3040,15 +3040,18 @@ static itemBuildError_t G_SufficientBPAvailable( buildable_t     buildable,
         // If it's a unique buildable, it must be replaced by the same type
         pointsYielded += BG_FindBuildPointsForBuildable(  ent->s.modelindex );
         level.numBuildablesForRemoval++;
-      } else if( g_markDeconstructPriority.integer == 1 && ent->s.modelindex == buildable ) {
+      } else if( g_markDeconstructPriority.integer && ent->s.modelindex == buildable ) {
         //if g_markDeconstructPriority = 1 and buildable matches one being removed prefer it
-        if( ent->s.modelindex == spawn && ( remainingSpawns - spawnremoval ) > 1 ) {
-          spawnremoval++;
+        if( ent->s.modelindex == spawn ) {
+          if( ( remainingSpawns - spawnremoval ) > 1 ) {
+            spawnremoval++;
+            pointsYielded += BG_FindBuildPointsForBuildable(  ent->s.modelindex );
+            level.numBuildablesForRemoval++;
+          }
         } else {
-          continue;
+          pointsYielded += BG_FindBuildPointsForBuildable(  ent->s.modelindex );
+          level.numBuildablesForRemoval++;
         }
-        pointsYielded += BG_FindBuildPointsForBuildable(  ent->s.modelindex );
-        level.numBuildablesForRemoval++;
       }
     }
   }
