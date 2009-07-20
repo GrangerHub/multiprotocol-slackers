@@ -1364,6 +1364,13 @@ char *ClientConnect( int clientNum, qboolean firstTime )
   if( G_FilterPacket( value ) )
     return "You are banned from this server.";
 
+  if( strlen( ip ) < 7 )
+  {
+    G_AdminsPrintf( "Connect from client with invalid IP: '%s' NAME: '%s^7'\n",
+                    ip, Info_ValueForKey( userinfo, "name" ) );
+    return "Invalid client data";
+  }
+
   // check for a password
   value = Info_ValueForKey( userinfo, "password" );
 
