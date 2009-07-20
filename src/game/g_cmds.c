@@ -1516,7 +1516,7 @@ void Cmd_CallVote_f( gentity_t *ent )
   trap_Argv( 1, arg1, sizeof( arg1 ) );
   trap_Argv( 2, arg2, sizeof( arg2 ) );
 
-  if( strchr( arg1, ';' ) || strchr( arg2, ';' ) )
+  if( strchr( arg1plus, ';' ) )
   {
     trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string\n\"" );
     return;
@@ -2080,7 +2080,7 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
   trap_Argv( 1, arg1, sizeof( arg1 ) );
   trap_Argv( 2, arg2, sizeof( arg2 ) );
 
-  if( strchr( arg1, ';' ) || strchr( arg2, ';' ) )
+  if( strchr( arg1plus, ';' ) )
   {
     trap_SendServerCommand( ent-g_entities, "print \"Invalid team vote string\n\"" );
     return;
