@@ -1607,7 +1607,7 @@ void Cmd_CallVote_f( gentity_t *ent )
     }
     
     if( clientNum != -1 &&
-      level.clients[ clientNum ].pers.connected == CON_DISCONNECTED )
+        level.clients[ clientNum ].pers.connected != CON_CONNECTED )
     {
       clientNum = -1;
     }
@@ -2879,6 +2879,13 @@ void Cmd_Destroy_f( gentity_t *ent )
         return;
       }
  
+      // Check the minimum level to deconstruct
+      if ( G_admin_level( ent ) < g_minDeconLevel.integer )
+      {
+        trap_SendServerCommand( ent-g_entities,
+          "print \"You do not have deconstructuction rights.\n\"" );
+        return;
+      }
 
       // Prevent destruction of the last spawn
       if( g_markDeconstruct.integer != 1 && !g_cheats.integer )
@@ -2992,6 +2999,14 @@ void Cmd_Mark_f( gentity_t *ent )
   {
     trap_SendServerCommand( ent-g_entities,
       "print \"Your building rights have been revoked\n\"" );
+    return;
+  }
+
+  // Check the minimum level to deconstruct
+  if ( G_admin_level( ent ) < g_minDeconLevel.integer )
+  {
+    trap_SendServerCommand( ent-g_entities,
+      "print \"You do not have deconstructuction rights.\n\"" );
     return;
   }
 

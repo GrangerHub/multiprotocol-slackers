@@ -162,6 +162,7 @@ vmCvar_t  g_adminMaxBan;
 vmCvar_t  g_adminTempSpec;
 vmCvar_t  g_adminMapLog;
 vmCvar_t  g_minLevelToJoinTeam;
+vmCvar_t  g_minDeconLevel;
 vmCvar_t  g_forceAutoSelect;
 
 vmCvar_t  g_privateMessages;
@@ -375,6 +376,7 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_adminTempSpec, "g_adminTempSpec", "2m", CVAR_ARCHIVE, 0, qfalse  },
   { &g_adminMapLog, "g_adminMapLog", "", CVAR_ROM, 0, qfalse  },
   { &g_minLevelToJoinTeam, "g_minLevelToJoinTeam", "0", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_minDeconLevel, "g_minDeconLevel", "0", 0, 0, qfalse},
   { &g_forceAutoSelect, "g_forceAutoSelect", "0", CVAR_ARCHIVE, 0, qtrue }, 
   { &g_adminExpireTime, "g_adminExpireTime", "0", CVAR_ARCHIVE, 0, qfalse  },
   

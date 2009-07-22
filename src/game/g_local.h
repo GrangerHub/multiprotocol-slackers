@@ -1409,6 +1409,7 @@ extern  vmCvar_t  g_adminMaxBan;
 extern  vmCvar_t  g_adminTempSpec;
 extern  vmCvar_t  g_adminMapLog;
 extern  vmCvar_t  g_minLevelToJoinTeam;
+extern  vmCvar_t  g_minDeconLevel;
 extern  vmCvar_t  g_forceAutoSelect;
 extern  vmCvar_t  g_minLevelToSpecMM1;
 extern  vmCvar_t  g_banNotice;
