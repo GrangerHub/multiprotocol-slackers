@@ -996,7 +996,10 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
 
   if( BG_ClientListTest( &other->client->sess.ignoreList, ent-g_entities ) )
     ignore = qtrue;
-  
+
+  if ( ignore && g_fullIgnore.integer )
+    return;
+
   trap_SendServerCommand( other-g_entities, va( "%s \"%s%s%s%c%c%s\"",
     ( mode == SAY_TEAM || mode == SAY_ACTION_T ) ? "tchat" : "chat",
     ( ignore ) ? "[skipnotify]" : "",

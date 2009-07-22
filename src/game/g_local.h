@@ -1417,6 +1417,7 @@ extern  vmCvar_t  g_devmapKillerHP;
 extern  vmCvar_t  g_killerHP;
 
 extern  vmCvar_t  g_privateMessages;
+extern  vmCvar_t  g_fullIgnore;
 extern  vmCvar_t  g_decolourLogfiles;
 extern  vmCvar_t  g_publicSayadmins;
 extern  vmCvar_t  g_myStats;

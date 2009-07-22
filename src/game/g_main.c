@@ -165,6 +165,7 @@ vmCvar_t  g_minDeconLevel;
 vmCvar_t  g_forceAutoSelect;
 
 vmCvar_t  g_privateMessages;
+vmCvar_t  g_fullIgnore;
 vmCvar_t  g_decolourLogfiles;
 vmCvar_t  g_minLevelToSpecMM1;
 vmCvar_t  g_publicSayadmins;
@@ -379,6 +380,7 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_adminExpireTime, "g_adminExpireTime", "0", CVAR_ARCHIVE, 0, qfalse  },
   
   { &g_privateMessages, "g_privateMessages", "1", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_fullIgnore, "g_fullIgnore", "1", CVAR_ARCHIVE, 0, qtrue  },
   { &g_decolourLogfiles, "g_decolourLogfiles", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_buildLogMaxLength, "g_buildLogMaxLength", "50", CVAR_ARCHIVE, 0, qfalse  },
   { &g_myStats, "g_myStats", "1", CVAR_ARCHIVE, 0, qtrue  },
