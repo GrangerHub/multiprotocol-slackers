@@ -2932,8 +2932,6 @@ static itemBuildError_t G_SufficientBPAvailable( buildable_t     buildable,
   itemBuildError_t  bpError;
   buildable_t       spawn;
   buildable_t       core;
-  int               spawnremoval = 0;
-  qboolean          Buildablematch = qfalse;
   int               spawnCount = 0;
 
   level.numBuildablesForRemoval = 0;
@@ -3041,19 +3039,6 @@ static itemBuildError_t G_SufficientBPAvailable( buildable_t     buildable,
         // If it's a unique buildable, it must be replaced by the same type
         pointsYielded += BG_FindBuildPointsForBuildable(  ent->s.modelindex );
         level.numBuildablesForRemoval++;
-      } else if( g_markDeconstructPriority.integer && ent->s.modelindex == buildable && Buildablematch == qfalse ) {
-        //if g_markDeconstructPriority = 1 and buildable matches one being removed prefer it
-        if( ent->s.modelindex == spawn ) {
-          if( ( remainingSpawns - spawnremoval ) > 1 ) {
-            spawnremoval++;
-            pointsYielded += BG_FindBuildPointsForBuildable(  ent->s.modelindex );
-            level.numBuildablesForRemoval++;
-          }
-        } else {
-          pointsYielded += BG_FindBuildPointsForBuildable(  ent->s.modelindex );
-          level.numBuildablesForRemoval++;
-        }
-        Buildablematch = qtrue;
       }
     }
   }
