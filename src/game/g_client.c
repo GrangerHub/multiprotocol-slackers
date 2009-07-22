@@ -1346,7 +1346,6 @@ char *ClientConnect( int clientNum, qboolean firstTime )
     }
   }
 
-
   // IP filtering
   // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=500
   // recommanding PB based IP / GUID banning, the builtin system is pretty limited
@@ -1364,7 +1363,7 @@ char *ClientConnect( int clientNum, qboolean firstTime )
   if( G_FilterPacket( value ) )
     return "You are banned from this server.";
 
-  if( strlen( ip ) < 7 )
+  if( ip[ 0 ] == 0 ||strlen( ip ) < 7 )
   {
     G_AdminsPrintf( "Connect from client with invalid IP: '%s' NAME: '%s^7'\n",
                     ip, Info_ValueForKey( userinfo, "name" ) );
@@ -1385,7 +1384,7 @@ char *ClientConnect( int clientNum, qboolean firstTime )
   memset( client, 0, sizeof(*client) );
 
   // add guid to session so we don't have to keep parsing userinfo everywhere
-  if( !guid[0] )
+  if( !guid[ 0 ] )
   {
     Q_strncpyz( client->pers.guid, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
       sizeof( client->pers.guid ) );
@@ -1394,11 +1393,12 @@ char *ClientConnect( int clientNum, qboolean firstTime )
   {
     Q_strncpyz( client->pers.guid, guid, sizeof( client->pers.guid ) );
   }
+
   Q_strncpyz( client->pers.ip, ip, sizeof( client->pers.ip ) );
   client->pers.adminLevel = G_admin_level( ent );
-  
+
   // do autoghost now so that there won't be any name conflicts later on
-  if ( g_autoGhost.integer && client->pers.guid[0] != 'X' )
+  if ( g_autoGhost.integer && client->pers.guid[ 0 ] != 'X' )
   {
     for ( i = 0; i < MAX_CLIENTS; i++ )
     {
