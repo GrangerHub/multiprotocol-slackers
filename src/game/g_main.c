@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-#define QVM_NAME       "Slackers QVM " QVM_VERSIONNUM " (Lakitu7 5.5)"
+#define QVM_NAME       "Slackers QVM" " (Lakitu7 5.5)"
 #define QVM_VERSIONNUM      "1.0+"
 
 level_locals_t  level;
