@@ -703,6 +703,8 @@ static void admin_writeconfig( void )
     }
     trap_FS_Write( "banner  = ", 10, f );
     admin_writeconfig_string( g_admin_bans[ i ]->banner, f );
+    trap_FS_Write( "blevel  = ", 10, f );
+    admin_writeconfig_int( g_admin_bans[ i ]->bannerlevel, f );
     trap_FS_Write( "\n", 1, f );
   }
   for( i = 0; i < MAX_ADMIN_COMMANDS && g_admin_commands[ i ]; i++ )
@@ -1669,6 +1671,10 @@ qboolean G_admin_readconfig( gentity_t *ent, int skiparg )
       {
         admin_readconfig_string( &cnf, b->banner, sizeof( b->banner ) );
       }
+      else if( !Q_stricmp( t, "blevel" ) )
+      {
+        admin_readconfig_int( &cnf, &b->bannerlevel );
+      }
       else
       {
         ADMP( va( "^3!readconfig: ^7[ban] parse error near %s on line %d\n",
@@ -1736,6 +1742,7 @@ qboolean G_admin_readconfig( gentity_t *ent, int skiparg )
       b->expires = 0;
       b->suspend = 0;
       *b->reason = '\0';
+      b->bannerlevel = 0;
       ban_open = qtrue;
     }
     else if( !Q_stricmp( t, "[command]" ) )
@@ -2492,6 +2499,11 @@ static qboolean admin_create_ban( gentity_t *ent,
 
   Q_strncpyz( b->banner, G_admin_get_adminname( ent ), sizeof( b->banner ) );
 
+  if( ent )
+    b->bannerlevel = G_admin_level( ent );
+  else
+    b->bannerlevel = 0;
+
   if( !seconds )
     b->expires = 0;
   else
@@ -2805,6 +2817,11 @@ qboolean G_admin_adjustban( gentity_t *ent, int skiparg )
     ADMP( "^3!adjustban: ^7you cannot modify permanent bans\n" );
     return qfalse;
   }
+  if( g_admin_bans[ bnum - 1 ]->bannerlevel > G_admin_level( ent ) )
+  {
+    ADMP( "^3!adjustban: ^7you cannot modify Bans made by admins higher than you\n" );
+    return qfalse;
+  }
   if( g_adminMaxBan.integer &&
       !G_admin_permission( ent, ADMF_CAN_PERM_BAN ) &&
       g_admin_bans[ bnum - 1 ]->expires - time > G_admin_parse_time( g_adminMaxBan.string ) )
@@ -2875,9 +2892,12 @@ qboolean G_admin_adjustban( gentity_t *ent, int skiparg )
     ( length >= 0 && *reason ) ? ", " : "",
     ( *reason ) ? "reason: " : "",
     reason ) );
-  if( ent )
+  if( ent ) {
     Q_strncpyz( g_admin_bans[ bnum - 1 ]->banner, G_admin_get_adminname( ent ),
       sizeof( g_admin_bans[ bnum - 1 ]->banner ) );
+    g_admin_bans[ bnum - 1 ]->bannerlevel = G_admin_level( ent );
+  }
+
   if( g_admin.string[ 0 ] )
     admin_writeconfig();
   return qtrue;
@@ -2905,6 +2925,11 @@ qboolean G_admin_subnetban( gentity_t *ent, int skiparg )
   if( bnum < 1 || bnum > MAX_ADMIN_BANS || !g_admin_bans[ bnum - 1] )
   {
     ADMP( "^3!subnetban: ^7invalid ban#\n" );
+    return qfalse;
+  }
+  if( g_admin_bans[ bnum - 1 ]->bannerlevel > G_admin_level( ent ) )
+  {
+    ADMP( "^3!subnetban: ^7you cannot subnetban Bans on bans made by admins higher than you\n" );
     return qfalse;
   }
 
@@ -3019,6 +3044,11 @@ qboolean G_admin_suspendban( gentity_t *ent, int skiparg )
     ADMP( "^3!suspendban: ^7invalid ban #\n" );
     return qfalse;
   }
+  if( g_admin_bans[ bnum - 1 ]->bannerlevel > G_admin_level( ent ) )
+  {
+    ADMP( "^3!suspendban: ^7you cannot suspend Bans made by admins higher than you\n" );
+    return qfalse;
+  }
 
   arg = G_SayConcatArgs( 2 + skiparg );
   timenow = trap_RealTime( &qt );
@@ -3094,6 +3124,11 @@ qboolean G_admin_unban( gentity_t *ent, int skiparg )
       !G_admin_permission( ent, ADMF_CAN_PERM_BAN ) )
   {
     ADMP( "^3!unban: ^7you cannot remove permanent bans\n" );
+    return qfalse;
+  }
+  if( g_admin_bans[ bnum - 1 ]->bannerlevel > G_admin_level( ent ) )
+  {
+    ADMP( "^3!unban: ^7you cannot Remove Bans made by admins higher than you\n" );
     return qfalse;
   }
   if( g_adminMaxBan.integer &&
@@ -4862,6 +4897,7 @@ qboolean G_admin_showbans( gentity_t *ent, int skiparg )
   int j;
   char n1[ MAX_NAME_LENGTH * 2 ] = {""};
   char n2[ MAX_NAME_LENGTH * 2 ] = {""};
+  int bannerslevel = 0;
   qboolean numeric = qtrue;
   char *ip_match = NULL;
   int ip_match_len = 0;
@@ -5052,14 +5088,16 @@ qboolean G_admin_showbans( gentity_t *ent, int skiparg )
     G_DecolorString( g_admin_bans[ i ]->banner, n2 );
     Com_sprintf( banner_fmt, sizeof( banner_fmt ), "%%%is",
       ( max_banner + strlen( g_admin_bans[ i ]->banner ) - strlen( n2 ) ) );
-    Com_sprintf( n2, sizeof( n2 ), banner_fmt, g_admin_bans[ i ]->banner ); 
+    Com_sprintf( n2, sizeof( n2 ), banner_fmt, g_admin_bans[ i ]->banner );
+    bannerslevel = g_admin_bans[ i ]->bannerlevel;
 
-    ADMBP( va( "%4i %s^7 %-15s %-8s %s^7 %-10s\n%s     \\__ %s\n",
+    ADMBP( va( "%4i %s^7 %-15s %-8s %s^7 ^3Level:^2%2i^7 %-10s\n%s     \\__ %s\n",
              ( i + 1 ),
              n1,
              g_admin_bans[ i ]->ip,
              date,
              n2,
+             bannerslevel,
              duration,
              suspended,
              g_admin_bans[ i ]->reason ) );

@@ -140,6 +140,7 @@ typedef struct g_admin_ban
   int expires;
   int suspend;
   char banner[ MAX_NAME_LENGTH ];
+  int  bannerlevel;
 }
 g_admin_ban_t;
 
