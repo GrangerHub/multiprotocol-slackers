@@ -1027,7 +1027,8 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
   // Invisible players cannot use chat
   if( ent->client->sess.invisible == qtrue )
   {
-    trap_SendServerCommand( ent-g_entities, "print \"You cannot chat while invisible\n\"" );
+    if( !G_admin_cmd_check( ent, qtrue ) )
+      trap_SendServerCommand( ent-g_entities, "print \"You cannot chat while invisible\n\"" );
     return;
   }
 

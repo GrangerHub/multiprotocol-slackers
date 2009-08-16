@@ -7122,20 +7122,14 @@ qboolean G_admin_L1(gentity_t *ent, int skiparg ){
 
 qboolean G_admin_invisible( gentity_t *ent, int skiparg )
 {
-  // Only allow spectators to become invisible
-  if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR )
-  {
-    ADMP( "^3!invisible: ^7only spectators can become invisible\n" );
-    return qfalse;
-  }
-
   if ( ent->client->sess.invisible != qtrue )
   {
     // Make the player invisible
+    G_ChangeTeam( ent, PTE_NONE );
     ent->client->sess.invisible = qtrue;
     ClientUserinfoChanged( ent->client->pers.connection->clientNum, qfalse );
     G_admin_namelog_update( ent->client, qtrue );
-                  trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " disconnected\n\"", ent->client->pers.netname ) );
+    trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " disconnected\n\"", ent->client->pers.netname ) );
   }
   else
   {
@@ -7144,7 +7138,7 @@ qboolean G_admin_invisible( gentity_t *ent, int skiparg )
     ClientUserinfoChanged( ent->client->pers.connection->clientNum, qfalse );
     G_admin_namelog_update( ent->client, qfalse );
     trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " connected\n\"", ent->client->pers.netname ) );
-                trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " entered the game\n\"", ent->client->pers.netname ) );
+    trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " entered the game\n\"", ent->client->pers.netname ) );
   }
   return qtrue;
 }
