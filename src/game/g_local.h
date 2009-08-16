@@ -426,6 +426,9 @@ typedef struct
   int                 lastFloodTime;         // level.time of last flood-limited command
   int                 floodDemerits;         // number of flood demerits accumulated
 
+  char                lastMessage[ MAX_SAY_TEXT ];  // last message said by this player
+  int                 lastMessageTime;              // level.time of last message said by this player
+
   int                 lastTeamKillTime;      // level.time of last team kill
   int                 teamKillDemerits;      // number of team kill demerits accumulated
 
@@ -1407,6 +1410,7 @@ extern  vmCvar_t  g_chatTeamPrefix;
 extern  vmCvar_t  g_actionPrefix;
 extern  vmCvar_t  g_floodMaxDemerits;
 extern  vmCvar_t  g_floodMinTime;
+extern  vmCvar_t  g_spamTime;
 
 extern  vmCvar_t  g_shove;
 

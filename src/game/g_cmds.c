@@ -1030,6 +1030,25 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
     trap_SendServerCommand( ent-g_entities, "print \"You cannot chat while invisible\n\"" );
     return;
   }
+
+  // Spam limit: If they said this message recently, ignore it.
+  if( g_spamTime.integer )
+    if ( ( level.time - ent->client->pers.lastMessageTime ) < ( g_spamTime.integer * 1000 ) &&
+         !Q_stricmp( ent->client->pers.lastMessage, chatText) &&
+         !G_admin_permission( ent, ADMF_NOCENSORFLOOD ) &&
+         ent->client->pers.floodDemerits <= g_floodMaxDemerits.integer )
+    {
+      trap_SendServerCommand( ent-g_entities, "print \"Your message has been ignored to prevent spam\n\"" );
+      return;
+    }
+    else
+    {
+      ent->client->pers.lastMessageTime = level.time;
+
+      Q_strncpyz( ent->client->pers.lastMessage, chatText,
+        sizeof( ent->client->pers.lastMessage ) );
+    }
+
   // Flood limit.  If they're talking too fast, determine that and return.
   if( g_floodMinTime.integer )
     if ( G_Flood_Limited( ent ) )
@@ -1037,7 +1056,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
       trap_SendServerCommand( ent-g_entities, "print \"Your chat is flood-limited; wait before chatting again\n\"" );
       return;
     }
-       
+
   if (g_chatTeamPrefix.integer && ent && ent->client )
   {
     switch( ent->client->pers.teamSelection)
