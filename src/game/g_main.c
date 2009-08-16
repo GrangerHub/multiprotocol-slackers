@@ -87,6 +87,19 @@ vmCvar_t  g_requireVoteReasons;
 vmCvar_t  g_voteLimit;
 vmCvar_t  g_suddenDeathVotePercent;
 vmCvar_t  g_suddenDeathVoteDelay;
+vmCvar_t  g_extendVotesPercent;
+vmCvar_t  g_extendVotesTime;
+vmCvar_t  g_extendVotesCount;
+vmCvar_t  g_kickVotesPercent;
+vmCvar_t  g_customVote1;
+vmCvar_t  g_customVote2;
+vmCvar_t  g_customVote3;
+vmCvar_t  g_customVote4;
+vmCvar_t  g_customVote5;
+vmCvar_t  g_customVote6;
+vmCvar_t  g_customVote7;
+vmCvar_t  g_customVote8;
+vmCvar_t  g_customVotePercent;
 vmCvar_t  g_mapVotesPercent;
 vmCvar_t  g_extendVotesPercent;
 vmCvar_t  g_extendVotesTime;
@@ -303,6 +316,15 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_votableMaps, "g_votableMaps", "", CVAR_ARCHIVE, 0, qtrue },
   { &g_suddenDeathVotePercent, "g_suddenDeathVotePercent", "74", CVAR_ARCHIVE, 0, qfalse },
   { &g_suddenDeathVoteDelay, "g_suddenDeathVoteDelay", "180", CVAR_ARCHIVE, 0, qfalse },
+  { &g_customVote1, "g_customVote1", "", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_customVote2, "g_customVote2", "", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_customVote3, "g_customVote3", "", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_customVote4, "g_customVote4", "", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_customVote5, "g_customVote5", "", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_customVote6, "g_customVote6", "", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_customVote7, "g_customVote7", "", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_customVote8, "g_customVote8", "", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_customVotePercent, "g_customVotePercent", "50", CVAR_ARCHIVE, 0, qfalse  },
   { &g_mapVotesPercent, "g_mapVotesPercent", "50", CVAR_ARCHIVE, 0, qfalse },
   { &g_extendVotesPercent, "g_extendVotesPercent", "74", CVAR_ARCHIVE, 0, qfalse },
   { &g_extendVotesTime, "g_extendVotesTime", "10", CVAR_ARCHIVE, 0, qfalse },

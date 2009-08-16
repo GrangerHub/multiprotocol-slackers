@@ -1877,15 +1877,104 @@ void Cmd_CallVote_f( gentity_t *ent )
    }
   else
   {
-    trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string\n\"" );
-    trap_SendServerCommand( ent-g_entities, "print \"Valid vote commands are: "
-      "map, map_restart, draw, extend, nextmap, kick, spec, mute, unmute, poll, and sudden_death\n" );
-    return;
+    qboolean match = qfalse;
+    char customVoteKeys[ MAX_STRING_CHARS ];
+
+    customVoteKeys[ 0 ] = '\0';
+    if( g_customVotePercent.integer )
+    {
+      char text[ MAX_STRING_CHARS ];
+      char *votekey, *votemsg, *votecmd, *voteperc;
+      int votePValue;
+
+      text[ 0 ] = '\0';
+      for( i = 0; i < CUSTOM_VOTE_COUNT; i++ )
+      {
+        switch( i )
+        {
+          case 0:
+            Q_strncpyz( text, g_customVote1.string, sizeof( text ) );
+            break;
+          case 1:
+            Q_strncpyz( text, g_customVote2.string, sizeof( text ) );
+            break;
+          case 2:
+            Q_strncpyz( text, g_customVote3.string, sizeof( text ) );
+            break;
+          case 3:
+            Q_strncpyz( text, g_customVote4.string, sizeof( text ) );
+            break;
+          case 4:
+            Q_strncpyz( text, g_customVote5.string, sizeof( text ) );
+            break;
+          case 5:
+            Q_strncpyz( text, g_customVote6.string, sizeof( text ) );
+            break;
+          case 6:
+            Q_strncpyz( text, g_customVote7.string, sizeof( text ) );
+            break;
+          case 7:
+            Q_strncpyz( text, g_customVote8.string, sizeof( text ) );
+            break;
+        }
+        if ( text[ 0 ] == '\0' )
+          continue;
+
+        // custom vote cvar format:  "callvote_name,Vote message string,vote success command[,percent]"
+        votekey = text;
+        votemsg = strchr( votekey, ',' );
+        if( !votemsg || *votemsg != ',' )
+          continue;
+        *votemsg = '\0';
+        votemsg++;
+        Q_strcat( customVoteKeys, sizeof( customVoteKeys ),
+                  va( "%s%s", ( customVoteKeys[ 0 ] == '\0' ) ? "" : ", ", votekey ) );
+        votecmd = strchr( votemsg, ',' );
+        if( !votecmd || *votecmd != ',' )
+          continue;
+        *votecmd = '\0';
+        votecmd++;
+
+        voteperc = strchr( votecmd, ',' );
+        if( !voteperc || *voteperc != ',' )
+          votePValue = g_customVotePercent.integer;
+        else
+        {
+          *voteperc = '\0';
+          voteperc++;
+          votePValue = atoi( voteperc );
+          if( !votePValue )
+            votePValue = g_customVotePercent.integer;
+        }
+
+        if( Q_stricmp( arg1, votekey ) != 0 )
+          continue;
+        if( votemsg[ 0 ] == '\0' || votecmd[ 0 ] == '\0' )
+          continue;
+
+        level.votePassThreshold = votePValue;
+        Com_sprintf( level.voteString, sizeof( level.voteString ), "%s", votecmd );
+        Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", votemsg );
+        match = qtrue;
+        break;
+      }
+   }
+
+    if( !match )
+    {
+      trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string\n\"" );
+      trap_SendServerCommand( ent-g_entities, "print \"Valid vote commands are: "
+        "map, map_restart, draw, extend, nextmap, kick, spec, mute, unmute, poll, and sudden_death\n" );
+      if( customVoteKeys[ 0 ] != '\0' )
+        trap_SendServerCommand( ent-g_entities,
+          va( "print \"Additional custom vote commands: %s\n\"", customVoteKeys ) );
+      return;
+    }
   }
   
   if( level.votePassThreshold!=50 )
   {
-    Q_strcat( level.voteDisplayString, sizeof( level.voteDisplayString ), va( " (Needs > %d percent)", level.votePassThreshold ) );
+    Q_strcat( level.voteDisplayString, sizeof( level.voteDisplayString ), va( "^7 (Needs > %d percent)", level.votePassThreshold ) );
   }
   
   if ( reason[0]!='\0' )
