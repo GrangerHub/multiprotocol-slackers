@@ -81,6 +81,97 @@ void SP_info_human_intermission( gentity_t *ent )
 
 /*
 ===============
+G_OverflowCredits
+===============
+*/
+void G_OverflowCredits( gclient_t *doner, int credits )
+{
+  int i;
+  int maxCredits;
+  int clientNum;
+
+  if( !g_creditOverflow.integer )
+    return;
+
+  if( doner->ps.stats[ STAT_PTEAM ] == PTE_ALIENS )
+  {
+    maxCredits = ALIEN_MAX_KILLS;
+    clientNum = level.lastCreditedAlien;
+  }
+  else if( doner->ps.stats[ STAT_PTEAM ] == PTE_HUMANS )
+  {
+    maxCredits = HUMAN_MAX_CREDITS;
+    clientNum = level.lastCreditedHuman;
+  }
+  else
+  {
+    return;
+  }
+
+  if( g_creditOverflow.integer == 1 )
+  {
+    // distribute to everyone on team
+    gentity_t *vic;
+
+    i = 0;
+    while( credits > 0 && i < level.maxclients )
+    {
+      i++;
+      clientNum++;
+      if( clientNum >= level.maxclients )
+        clientNum = 0;
+
+      vic = &g_entities[ clientNum ];
+      if( vic->client->ps.stats[ STAT_PTEAM ] != doner->ps.stats[ STAT_PTEAM ] ||
+          vic->client->ps.persistant[ PERS_CREDIT ] >= maxCredits )
+        continue;
+
+      if( vic->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS )
+        level.lastCreditedAlien = clientNum;
+      else
+        level.lastCreditedHuman = clientNum;
+
+      if( vic->client->ps.persistant[ PERS_CREDIT ] + credits > maxCredits )
+      {
+        credits -= maxCredits - vic->client->ps.persistant[ PERS_CREDIT ];
+        vic->client->ps.persistant[ PERS_CREDIT ] = maxCredits;
+      }
+      else
+      {
+        vic->client->ps.persistant[ PERS_CREDIT ] += credits;
+        return;
+      }
+    }
+  }
+  else if( g_creditOverflow.integer == 2 )
+  {
+    // distribute by team rank
+    gclient_t *cl;
+
+    for( i = 0; i < level.numPlayingClients && credits > 0; i++ )
+    {
+      // get the client list sorted by rank
+      cl = &level.clients[ level.sortedClients[ i ] ];
+      if( cl->ps.stats[ STAT_PTEAM ] != doner->ps.stats[ STAT_PTEAM ] ||
+          cl->ps.persistant[ PERS_CREDIT ] >= maxCredits )
+        continue;
+
+      if( cl->ps.persistant[ PERS_CREDIT ] + credits > maxCredits )
+      {
+        credits -= maxCredits - cl->ps.persistant[ PERS_CREDIT ];
+        cl->ps.persistant[ PERS_CREDIT ] = maxCredits;
+      }
+      else
+      {
+        cl->ps.persistant[ PERS_CREDIT ] += credits;
+        return;
+      }
+    }
+  }
+}
+
+/*
+===============
 G_AddCreditToClient
 ===============
 */
@@ -96,13 +187,19 @@ void G_AddCreditToClient( gclient_t *client, short credit, qboolean cap )
     {
       if( client->pers.credit >= ALIEN_MAX_KILLS &&
           credit > 0 )
+      {
+        G_OverflowCredits( client, credit );
         return;
+      }
     }
     else if( client->pers.teamSelection == PTE_HUMANS )
     {
       if( client->pers.credit >= HUMAN_MAX_CREDITS &&
           credit > 0 )
+      {
+        G_OverflowCredits( client, credit );
         return;
+      }
     }
   }
 
@@ -113,12 +210,18 @@ void G_AddCreditToClient( gclient_t *client, short credit, qboolean cap )
     if( client->pers.teamSelection == PTE_ALIENS )
     {
       if( client->pers.credit > ALIEN_MAX_KILLS )
+      {
+        G_OverflowCredits( client, client->ps.persistant[ PERS_CREDIT ] - ALIEN_MAX_KILLS );
         client->pers.credit = ALIEN_MAX_KILLS;
+      }
     }
     else if( client->pers.teamSelection == PTE_HUMANS )
     {
       if( client->pers.credit > HUMAN_MAX_CREDITS )
+      {
+        G_OverflowCredits( client, client->ps.persistant[ PERS_CREDIT ] - HUMAN_MAX_CREDITS );
         client->pers.credit = HUMAN_MAX_CREDITS;
+      }
     }
   }
 

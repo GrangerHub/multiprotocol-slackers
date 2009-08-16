@@ -786,6 +786,9 @@ typedef struct
   int               pause_ff;
   int               pause_ffb;
 
+  int               lastCreditedAlien;
+  int               lastCreditedHuman;
+
   int unlaggedIndex;
   int unlaggedTimes[ MAX_UNLAGGED_MARKERS ];
 
@@ -1367,6 +1370,7 @@ extern  vmCvar_t  pmove_fixed;
 extern  vmCvar_t  pmove_msec;
 extern  vmCvar_t  g_rankings;
 extern  vmCvar_t  g_allowShare;
+extern  vmCvar_t  g_creditOverflow;
 extern  vmCvar_t  g_enableDust;
 extern  vmCvar_t  g_enableBreath;
 extern  vmCvar_t  g_singlePlayer;

@@ -201,6 +201,7 @@ vmCvar_t  g_hiddenClients;
 vmCvar_t  g_dretchPunt;
 
 vmCvar_t  g_allowShare;
+vmCvar_t  g_creditOverflow;
 
 vmCvar_t  g_devmapNoGod;
 vmCvar_t  g_devmapNoStructDmg;
@@ -429,6 +430,7 @@ static cvarTable_t   gameCvarTable[ ] =
   
   { &g_rankings, "g_rankings", "0", 0, 0, qfalse },
   { &g_allowShare, "g_allowShare", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
+  { &g_creditOverflow, "g_creditOverflow", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
   { &g_banNotice, "g_banNotice", "", CVAR_ARCHIVE, 0, qfalse  },
   
   { &mod_jetpackFuel, "mod_jetpackFuel", "0", CVAR_ARCHIVE, 0, qtrue  },
