@@ -2992,7 +2992,7 @@ void Cmd_Destroy_f( gentity_t *ent )
       }
  
       // Check the minimum level to deconstruct
-      if ( G_admin_level( ent ) < g_minDeconLevel.integer )
+      if ( G_admin_level( ent ) < g_minDeconLevel.integer && !ent->client->pers.designatedBuilder )
       {
         trap_SendServerCommand( ent-g_entities,
           "print \"You do not have deconstructuction rights.\n\"" );
@@ -3116,7 +3116,7 @@ void Cmd_Mark_f( gentity_t *ent )
   }
 
   // Check the minimum level to deconstruct
-  if ( G_admin_level( ent ) < g_minDeconLevel.integer )
+  if ( G_admin_level( ent ) < g_minDeconLevel.integer  && !ent->client->pers.designatedBuilder )
   {
     trap_SendServerCommand( ent-g_entities,
       "print \"You do not have deconstructuction rights.\n\"" );
