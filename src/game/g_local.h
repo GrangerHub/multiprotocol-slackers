@@ -1399,6 +1399,7 @@ extern  vmCvar_t  g_disabledClasses;
 extern  vmCvar_t  g_disabledBuildables;
 
 extern  vmCvar_t  g_markDeconstruct;
+extern  vmCvar_t  g_markDeconstructMode;
 extern  vmCvar_t  g_deconDead;
 
 extern  vmCvar_t  g_debugMapRotation;

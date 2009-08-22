@@ -144,6 +144,7 @@ vmCvar_t  g_disabledClasses;
 vmCvar_t  g_disabledBuildables;
 
 vmCvar_t  g_markDeconstruct;
+vmCvar_t  g_markDeconstructMode;
 vmCvar_t  g_deconDead;
 
 vmCvar_t  g_debugMapRotation;
@@ -374,7 +375,8 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_floodMinTime, "g_floodMinTime", "2000", CVAR_ARCHIVE, 0, qfalse  },
   { &g_spamTime, "g_spamTime", "2", CVAR_ARCHIVE, 0, qfalse  },
 
-  { &g_markDeconstruct, "g_markDeconstruct", "0", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_markDeconstruct, "g_markDeconstruct", "0", CVAR_ARCHIVE, 0, qtrue  },
+  { &g_markDeconstructMode, "g_markDeconstructMode", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_deconDead, "g_deconDead", "0", CVAR_ARCHIVE, 0, qtrue  },
 
   { &g_debugMapRotation, "g_debugMapRotation", "0", 0, 0, qfalse  },
