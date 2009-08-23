@@ -3015,7 +3015,12 @@ static itemBuildError_t G_SufficientBPAvailable( buildable_t     buildable,
 
     // Don't allow destruction of hovel with granger inside
     if( ent->s.modelindex == BA_A_HOVEL && ent->active )
-      continue;
+    {
+      if( buildable == BA_A_HOVEL )
+        return IBE_HOVEL;
+      else
+        continue;
+    }
 
     // Explicitly disallow replacement of the core buildable with anything
     // other than the core buildable
