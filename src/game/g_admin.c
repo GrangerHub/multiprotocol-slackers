@@ -5094,10 +5094,6 @@ qboolean G_admin_showbans( gentity_t *ent, int skiparg )
   for( i = start; i < MAX_ADMIN_BANS && g_admin_bans[ i ]
     && show_count < MAX_ADMIN_SHOWBANS; i++ )
   {
-    if( g_admin_bans[ i ]->expires != 0
-      && ( g_admin_bans[ i ]->expires - t ) < 1 )
-      continue;
-
     if (!numeric)
     {
       if( !subnetfilter )
@@ -5136,8 +5132,14 @@ qboolean G_admin_showbans( gentity_t *ent, int skiparg )
       made++;
     }
 
-    secs = ( g_admin_bans[ i ]->expires - t );
-    G_admin_duration( secs, duration, sizeof( duration ) );
+    if( g_admin_bans[ i ]->expires != 0
+        && ( g_admin_bans[ i ]->expires - t ) < 1 )
+    {
+      Com_sprintf( duration, sizeof( duration ), "^1*EXPIRED*^7" );
+    } else {
+      secs = ( g_admin_bans[ i ]->expires - t );
+      G_admin_duration( secs, duration, sizeof( duration ) );
+    }
 
     suspended[ 0 ] = '\0';
     if( g_admin_bans[ i ]->suspend > t )
@@ -5158,14 +5160,14 @@ qboolean G_admin_showbans( gentity_t *ent, int skiparg )
     Com_sprintf( n2, sizeof( n2 ), banner_fmt, g_admin_bans[ i ]->banner );
     bannerslevel = g_admin_bans[ i ]->bannerlevel;
 
-    ADMBP( va( "%4i %s^7 %-15s %-8s %s^7 ^3Level:^2%2i^7 %-10s\n%s     \\__ %s\n",
+    ADMBP( va( "%4i %s^7 %-15s %-8s %-10s\n     |  %-15s^7 Level:%2i\n%s     \\__ %s\n",
              ( i + 1 ),
              n1,
              g_admin_bans[ i ]->ip,
              date,
+             duration,
              n2,
              bannerslevel,
-             duration,
              suspended,
              g_admin_bans[ i ]->reason ) );
 
