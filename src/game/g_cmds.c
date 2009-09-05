@@ -1482,9 +1482,7 @@ void Cmd_CallVote_f( gentity_t *ent )
     trap_SendServerCommand( ent-g_entities, "print \"Voting not allowed here\n\"" );
     return;
   }
-  
-  
-  
+
   // Flood limit.  If they're talking too fast, determine that and return.
   if( g_floodMinTime.integer )
     if ( G_Flood_Limited( ent ) )
@@ -1492,11 +1490,11 @@ void Cmd_CallVote_f( gentity_t *ent )
       trap_SendServerCommand( ent-g_entities, "print \"Your /callvote attempt is flood-limited; wait before chatting again\n\"" );
       return;
     }
-    
+
   //see if they can vote
-  if( !G_admin_permission( ent, ADMF_VOTE_ALLOW ) )
+  if( G_admin_permission( ent, ADMF_NO_VOTE ) )
   {
-    trap_SendServerCommand( ent-g_entities, va("print \"You dont have the admin rights to make votes\n\"" ) );
+    trap_SendServerCommand( ent-g_entities, "print \"You have no voting rights\n\"" );
     return;
   }
 
@@ -2153,9 +2151,9 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
   }
 
   //see if they can vote
-  if( !G_admin_permission( ent, ADMF_VOTE_ALLOW ) )
+  if( G_admin_permission( ent, ADMF_NO_VOTE ) )
   {
-    trap_SendServerCommand( ent-g_entities, va("print \"You dont have the admin rights to make votes\n\"" ) );
+    trap_SendServerCommand( ent-g_entities, "print \"You have no voting rights\n\"" );
     return;
   }
 

@@ -1631,6 +1631,10 @@ void ClientBegin( int clientNum )
   {
     trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname ) );
 
+    // auto mute flag
+    if( G_admin_permission( ent, ADMF_NO_CHAT ) )
+      client->pers.muted = qtrue;
+
     // name can change between ClientConnect() and ClientBegin()
     G_admin_namelog_update( client, qfalse );
 

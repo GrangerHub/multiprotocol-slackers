@@ -382,6 +382,9 @@ g_admin_namelog_t *g_admin_namelog[ MAX_ADMIN_NAMELOGS ];
 static qboolean admin_permission( char *flags, const char *flag, qboolean *perm )
 {
   char *token, *token_p = flags;
+  qboolean all_found = qfalse;
+  qboolean base_perm = qfalse;
+
   while( *( token = COM_Parse( &token_p ) ) )
   {
     *perm = qtrue;
@@ -391,20 +394,17 @@ static qboolean admin_permission( char *flags, const char *flag, qboolean *perm 
       return qtrue;
     if( !strcmp( token, ADMF_ALLFLAGS ) )
     {
-      while( *( token = COM_Parse( &token_p ) ) )
-      {
-        // -ALLFLAGS +flag or ALLFLAGS -flag
-        if( *token != ( *perm ? '-' : '+' ) )
-          continue;
-        if( !strcmp( token + 1, flag ) )
-        {
-          *perm = !*perm;
-          break;
-        }
-      }
-      return qtrue;
+      all_found = qtrue;
+      base_perm = *perm;
     }
   }
+
+  if( all_found && flag[ 0 ] != '.' )
+  {
+    *perm = base_perm;
+    return qtrue;
+  }
+
   return qfalse;
 }
 
@@ -2292,7 +2292,9 @@ static AdminFlagListEntry_t adminFlagList[] =
   { ADMF_ADMINSTEALTH,         "uses admin stealth" },
   { ADMF_TEAMCHANGEFREE,       "keeps credits on team switch" },
   { ADMF_TEAMCHAT_CMD,         "can run commands from team chat" },
-  { ADMF_UNACCOUNTABLE,        "does not need to specify reason for kick/ban" }
+  { ADMF_UNACCOUNTABLE,        "does not need to specify reason for kick/ban" },
+  { ADMF_NO_CHAT,              "can not talk" },
+  { ADMF_NO_VOTE,              "can not call votes" }
 };
 static int adminNumFlags= sizeof( adminFlagList ) / sizeof( adminFlagList[ 0 ] );
 
@@ -2309,7 +2311,8 @@ qboolean G_admin_flaglist( gentity_t *ent, int skiparg )
 
   for( i = 0; i < adminNumFlags; i++ )
   {
-    ADMBP( va( "  ^5%-20s ^7%s\n",
+    ADMBP( va( "  %s%-20s ^7%s\n",
+      ( adminFlagList[ i ].flag[ 0 ] != '.' ) ? "^5" : "^1",
       adminFlagList[ i ].flag,
       adminFlagList[ i ].description ) );
   }
@@ -2446,7 +2449,7 @@ qboolean G_admin_flag( gentity_t *ent, int skiparg )
     ADMP( va( "^3%s:^7 you may not change your own flags (use rcon)\n", cmd ) );
     return qfalse;
   }
-  if( !G_admin_permission( ent, flag ) )
+  if( flag[ 0 ] != '.' && !G_admin_permission( ent, flag ) )
   {
     ADMP( va( "^3%s:^7 you can only change flags that you also have\n", cmd ) );
     return qfalse;
@@ -5263,12 +5266,12 @@ qboolean G_admin_help( gentity_t *ent, int skiparg )
       ADMBP( va( "^5/%-12s", "builder" ) );
       count++;
     }
-    if( ent && g_allowVote.integer && G_admin_permission( ent, ADMF_VOTE_ALLOW ) ) {
+    if( ent && g_allowVote.integer && G_admin_permission( ent, ADMF_NO_VOTE ) ) {
       if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
       ADMBP( va( "^5/%-12s", "callvote" ) );
       count++;
     }
-    if( ent && g_allowVote.integer && G_admin_permission( ent, ADMF_VOTE_ALLOW ) && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+    if( ent && g_allowVote.integer && G_admin_permission( ent, ADMF_NO_VOTE ) && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
       if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
       ADMBP( va( "^5/%-12s", "callteamvote" ) );
       count++;

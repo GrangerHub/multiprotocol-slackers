@@ -63,9 +63,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  * SEESFULLLISTPLAYERS - sees all information in !listplayers 
  * DBUILDER - permanent designated builder
  * STEALTH - uses admin stealth
- * ALLOWVOTE - allows a player to vote
  * SPECIAL - allows some special permissions (unlimited votes etc)
  * SPECIALNAME - allows black text in name
+ * .NOCHAT - mutes a player on connect
+ * .NOVOTE - disallows voting by a player
  * ALLFLAGS - all flags (including command flags) apply to this player
  */
 
@@ -91,10 +92,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define ADMF_BAN_IMMUNITY        "BANIMMUNITY"
 
-#define ADMF_VOTE_ALLOW          "ALLOWVOTE"
 #define ADMF_VIP                 "VIP"
 #define ADMF_SPECIAL             "SPECIAL"
 #define ADMF_SPECIALNAME         "SPECIALNAME"
+
+#define ADMF_NO_CHAT             ".NOCHAT"
+#define ADMF_NO_VOTE             ".NOVOTE"
 
 #define MAX_ADMIN_LISTITEMS 20
 #define MAX_ADMIN_SHOWBANS 10
