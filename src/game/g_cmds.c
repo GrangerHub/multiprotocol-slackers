@@ -4965,6 +4965,7 @@ static void Cmd_Ignore_f( gentity_t *ent )
      }
 
    G_Free( amounts );
+   G_Free( totals );
 
    trap_SendServerCommand( ent-g_entities,
      va( "print \"Donated %d %s to the cause.\n\"",
