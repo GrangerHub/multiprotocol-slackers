@@ -5145,7 +5145,7 @@ qboolean G_admin_showbans( gentity_t *ent, int skiparg )
     if( g_admin_bans[ i ]->suspend > t )
     {
       G_admin_duration( g_admin_bans[ i ]->suspend - t, sduration, sizeof( sduration ) );
-      Com_sprintf( suspended, sizeof( suspended ), "     |  ^3SUSPENDED^7 for %s\n",
+      Com_sprintf( suspended, sizeof( suspended ), "^3*SUSPENDED*^7 for %s^7",
         sduration );
     }
 
@@ -5160,7 +5160,7 @@ qboolean G_admin_showbans( gentity_t *ent, int skiparg )
     Com_sprintf( n2, sizeof( n2 ), banner_fmt, g_admin_bans[ i ]->banner );
     bannerslevel = g_admin_bans[ i ]->bannerlevel;
 
-    ADMBP( va( "%4i %s^7 %-15s %-8s %-10s\n     |  %-15s^7 Level:%2i\n%s     \\__ %s\n",
+    ADMBP( va( "%4i %s^7 %-15s %-8s %-10s\n     |  %-15s^7 Level:%2i\n     |  %s\n     \\__ %s\n",
              ( i + 1 ),
              n1,
              g_admin_bans[ i ]->ip,
