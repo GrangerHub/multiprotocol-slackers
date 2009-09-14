@@ -1412,8 +1412,6 @@ char *ClientConnect( int clientNum, qboolean firstTime )
   char      ip[ 16 ] = {""};
   char      reason[ MAX_STRING_CHARS ] = {""};
   int       i;
-  int       used_privateSlots;
-  int       privateClients;
 
   ent = &g_entities[ clientNum ];
 
@@ -1426,27 +1424,6 @@ char *ClientConnect( int clientNum, qboolean firstTime )
   if( G_admin_ban_check( userinfo, reason, sizeof( reason ) ) )
   {
     return va( "%s", reason );
-  }
-
-  privateClients = trap_Cvar_VariableIntegerValue( "sv_privateClients" );
-  if( firstTime && clientNum >= privateClients && !G_admin_permission( ent, ADMF_VIP ) )
-  {
-    // not flag ADMF_VIP, not already connected player after mapchange, and not privateClient...
-    // may be refused, because too many players in game
-    used_privateSlots = 0;
-    for( i = 0 ; i < privateClients; i++ )
-    {
-      if( level.clients[ i ].pers.connected != CON_DISCONNECTED )
-      {
-        used_privateSlots++;
-      }
-    }
-
-    if( ( level.numConnectedClients - used_privateSlots ) >= ( level.maxclients - privateClients - g_hiddenClients.integer ) )
-    {
-      // not flag ADMF_VIP and maxPlayers exceeded
-      return "Server is full";
-    }
   }
 
   // IP filtering
@@ -2059,32 +2036,4 @@ void ClientDisconnect( int clientNum )
   trap_SetConfigstring( CS_PLAYERS + clientNum, "");
 
   CalculateRanks( );
-}
-
-/*
-==================
-ClientPingOverride
-
-Called by server every time a client connects to check
-whether it is immune to ping restrictions.
-==================
-*/
-
-int ClientPingOverride( void )
-{
-  char userinfo[ MAX_INFO_STRING ];
-  // create a temporary gentity
-  gentity_t ent;
-  gclient_t client;
-
-  ent.client = &client;
-
-  // userinfo for the client is not yet availible so just use Argv(1)
-  trap_Argv( 1, userinfo, sizeof( userinfo ) );
-  Q_strncpyz( client.pers.guid, Info_ValueForKey( userinfo, "cl_guid" ), sizeof( client.pers.guid ) );
-  if ( !client.pers.guid[0] ) {
-    return 0;
-  }
-
-  return G_admin_permission( &ent, ADMF_VIP );
 }

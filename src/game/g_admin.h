@@ -92,7 +92,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define ADMF_BAN_IMMUNITY        "BANIMMUNITY"
 
-#define ADMF_VIP                 "VIP"
 #define ADMF_SPECIAL             "SPECIAL"
 #define ADMF_SPECIALNAME         "SPECIALNAME"
 
