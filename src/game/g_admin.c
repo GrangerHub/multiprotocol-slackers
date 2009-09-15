@@ -151,7 +151,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
     
     {"invisible", G_admin_invisible, "invisible",
       "hides a player so they cannot be seen in playerlists",
-      "[^3+|-^7](^5slot#^7)"
+      ""
     },
     
     {"kick", G_admin_kick, "kick",
@@ -7218,6 +7218,12 @@ qboolean G_admin_L1(gentity_t *ent, int skiparg ){
 
 qboolean G_admin_invisible( gentity_t *ent, int skiparg )
 {
+  if( !ent )
+  {
+    ADMP( "!invisible: console can not become invisible.\n" );
+    return qfalse;
+  }
+  
   if ( ent->client->sess.invisible != qtrue )
   {
     // Make the player invisible
