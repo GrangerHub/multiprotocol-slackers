@@ -168,6 +168,7 @@ typedef struct g_admin_namelog
   int       denyHumanWeapons;
   int       denyAlienClasses;
   int       specExpires;
+  int       voteCount;
 }
 g_admin_namelog_t;
 

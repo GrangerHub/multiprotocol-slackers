@@ -4569,8 +4569,30 @@ void Cmd_PTRCRestore_f( gentity_t *ent )
   connection = ent->client->pers.connection;
   if( connection && connection->ptrCode == code )
   {
-    // set the correct team
-    G_ChangeTeam( ent, connection->clientTeam );
+    // Set the correct team
+    if( !( ent->client->pers.specExpires > level.time ) )
+    {
+        // Check if the alien team is full
+        if( connection->clientTeam == PTE_ALIENS &&
+            !G_admin_permission(ent, ADMF_FORCETEAMCHANGE) &&
+            g_teamForceBalance.integer &&
+            level.numAlienClients > level.numHumanClients )
+        {
+            G_TriggerMenu( ent - g_entities, MN_A_TEAMFULL );
+        }
+        // Check if the human team is full
+        else if( connection->clientTeam == PTE_HUMANS &&
+                 !G_admin_permission(ent, ADMF_FORCETEAMCHANGE) &&
+                 g_teamForceBalance.integer &&
+                 level.numHumanClients > level.numAlienClients )
+        {
+            G_TriggerMenu( ent - g_entities, MN_H_TEAMFULL );
+        }
+        else
+        {
+            G_ChangeTeam( ent, connection->clientTeam );
+        }
+    }
 
     // set the correct credit etc.
     ent->client->ps.persistant[ PERS_CREDIT ] = 0;
