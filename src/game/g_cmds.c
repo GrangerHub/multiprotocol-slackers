@@ -3114,7 +3114,7 @@ void Cmd_Mark_f( gentity_t *ent )
   }
 
   // Check the minimum level to deconstruct
-  if ( G_admin_level( ent ) < g_minDeconLevel.integer  && !ent->client->pers.designatedBuilder )
+  if ( G_admin_level( ent ) < g_minDeconLevel.integer  && !ent->client->pers.designatedBuilder && g_minDeconAffectsMark.integer > 0 )
   {
     trap_SendServerCommand( ent-g_entities,
       "print \"You do not have deconstructuction rights.\n\"" );
@@ -4014,8 +4014,8 @@ char *G_statsString( statsCounters_t *sc, pTeam_t *pt )
  {
     int i;
     int NextViewTime;
-    int NumResults;
-    int Teamcolor;
+    int NumResults = 0;
+    int Teamcolor = 3;
     gentity_t *tmpent;
  
     //check if ent exists
@@ -4037,7 +4037,7 @@ char *G_statsString( statsCounters_t *sc, pTeam_t *pt )
     ADMP("^3K^2=^7Kills ^3A^2=^7Assists ^3SK^2=^7StructKills\n^3D^2=^7Deaths ^3F^2=^7Feeds ^3S^2=^7Suicides ^3TK^2=^7Teamkills\n^3DD^2=^7Damage done ^3TDD^2=^7Team Damage done\n^3SB^2=^7Structs Built\n\n" );
     //display a header describing the data
     ADMP( "^3 #|  K   A  SK|  D   F   S  TK|   DD   TDD| SB| Name\n" );
-    NumResults = 0;
+
     //loop through the clients that are connected
     for( i = 0; i < level.numConnectedClients; i++ ) 
     {
