@@ -3371,7 +3371,7 @@ qboolean G_admin_seen(gentity_t *ent, int skiparg )
   }
   for( i = 0; i < MAX_ADMIN_ADMINS && g_admin_admins[ i ] && count < 10; i++ )
   {
-    G_SanitiseString( g_admin_admins[ i ]->name, name, strlen( name ) );
+    G_SanitiseString( g_admin_admins[ i ]->name, name, sizeof( name ) );
     if( i + MAX_CLIENTS == id || (search[ 0 ] && strstr( name, search ) ) )
     {
       ison = qfalse;
@@ -3380,7 +3380,7 @@ qboolean G_admin_seen(gentity_t *ent, int skiparg )
         vic = &g_entities[ j ];
         if( !vic->client || vic->client->pers.connected != CON_CONNECTED )
           continue;
-        G_SanitiseString( vic->client->pers.netname, name, strlen( name ) );
+        G_SanitiseString( vic->client->pers.netname, name, sizeof( name ) );
         if( !Q_stricmp( vic->client->pers.guid, g_admin_admins[ i ]->guid )
           && strstr( name, search ) )
         {
