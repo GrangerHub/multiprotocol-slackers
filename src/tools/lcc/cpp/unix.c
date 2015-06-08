@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include "cpp.h"
 
 extern	int lcc_getopt(int, char *const *, const char *);
@@ -66,7 +67,12 @@ setup(int argc, char **argv)
 			error(FATAL, "Can't open input file %s", fp);
 	}
 	if (optind+1<argc) {
-		int fdo = creat(argv[optind+1], 0666);
+		int fdo;
+#ifdef WIN32
+		fdo = creat(argv[optind+1], _S_IREAD | _S_IWRITE);
+#else
+		fdo = creat(argv[optind+1], 0666);
+#endif
 		if (fdo<0)
 			error(FATAL, "Can't open output file %s", argv[optind+1]);
 		dup2(fdo, 1);
@@ -109,7 +115,7 @@ memmove(void *dp, const void *sp, size_t n)
 	unsigned char *cdp, *csp;
 
 	if (n<=0)
-		return 0;
+		return dp;
 	cdp = dp;
 	csp = (unsigned char *)sp;
 	if (cdp < csp) {
@@ -123,6 +129,6 @@ memmove(void *dp, const void *sp, size_t n)
 			*--cdp = *--csp;
 		} while (--n);
 	}
-	return 0;
+	return dp;
 }
 #endif

@@ -9,7 +9,7 @@ char rcsid[] = "cpp.c - faked rcsid";
 
 #define	OUTS	16384
 char	outbuf[OUTS];
-char	*outp = outbuf;
+char	*outbufp = outbuf;
 Source	*cursource;
 int	nerrs;
 struct	token nltoken = { NL, 0, 0, 0, 1, (uchar*)"\n" };
@@ -51,7 +51,7 @@ process(Tokenrow *trp)
 	for (;;) {
 		if (trp->tp >= trp->lp) {
 			trp->tp = trp->lp = trp->bp;
-			outp = outbuf;
+			outbufp = outbuf;
 			anymacros |= gettokens(trp, 1);
 			trp->tp = trp->bp;
 		}
@@ -204,9 +204,14 @@ control(Tokenrow *trp)
 			error(WARNING, "Syntax error in #endif");
 		break;
 
+	case KWARNING:
+		trp->tp = tp+1;
+		error(WARNING, "#warning directive: %r", trp);
+		break;
+
 	case KERROR:
 		trp->tp = tp+1;
-		error(WARNING, "#error directive: %r", trp);
+		error(ERROR, "#error directive: %r", trp);
 		break;
 
 	case KLINE:
@@ -245,7 +250,6 @@ control(Tokenrow *trp)
 		break;
 	}
 	setempty(trp);
-	return;
 }
 
 void *
