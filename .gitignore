@@ -1,0 +1,17 @@
+makefile.local
+build/
+src/tools/asm/q3asm
+src/tools/asm/q3asm.exe
+src/tools/lcc/build-*
+src/tools/q3asm
+src/tools/q3asm.exe
+src/tools/q3cpp
+src/tools/q3cpp.exe
+src/tools/q3lcc
+src/tools/q3lcc.exe
+src/tools/q3rcc
+src/tools/q3rcc.exe
+*.dll
+*.exe
+*.pk3
+*.o
