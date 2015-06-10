@@ -34,6 +34,7 @@ int forceModelModificationCount = -1;
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( void );
+static char *CG_VoIPString( void );
 
 /*
 ================
@@ -87,6 +88,11 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3,
     case CG_EVENT_HANDLING:
       CG_EventHandling( arg0 );
       return 0;
+
+#ifndef MODULE_INTERFACE_11
+    case CG_VOIP_STRING:
+      return (intptr_t)CG_VoIPString( );
+#endif
 
     default:
       CG_Error( "vmMain: unknown command %i", command );
@@ -1839,4 +1845,54 @@ void CG_Shutdown( void )
 {
   // some mods may need to do cleanup work here,
   // like closing files or archiving session data
+}
+
+/*
+================
+CG_VoIPString
+================
+*/
+static char *CG_VoIPString( void )
+{
+  // a generous overestimate of the space needed for 0,1,2...61,62,63
+  static char voipString[ MAX_CLIENTS * 4 ];
+  char voipSendTarget[ MAX_CVAR_VALUE_STRING ];
+
+  trap_Cvar_VariableStringBuffer( "cl_voipSendTarget", voipSendTarget,
+                                  sizeof( voipSendTarget ) );
+
+  if( Q_stricmp( voipSendTarget, "team" ) == 0 )
+  {
+    int i, slen;
+    for( slen = i = 0; i < cgs.maxclients; i++ )
+    {
+      if( !cgs.clientinfo[ i ].infoValid || i == cg.clientNum )
+        continue;
+      if( cgs.clientinfo[ i ].team != cgs.clientinfo[ cg.clientNum ].team )
+        continue;
+
+      Com_sprintf( &voipString[ slen ], sizeof( voipString ) - slen,
+                   "%s%d", ( slen > 0 ) ? "," : "", i );
+      slen = strlen( voipString );
+      if( slen + 1 >= sizeof( voipString ) )
+      {
+        CG_Printf( S_COLOR_YELLOW "WARNING: voipString overflowed\n" );
+        break;
+      }
+    }
+
+    // Notice that if the snprintf was truncated, slen was not updated
+    // so this will remove any trailing commas or partially-completed numbers
+    voipString[ slen ] = '\0';
+  }
+  else if( Q_stricmp( voipSendTarget, "crosshair" ) == 0 )
+    Com_sprintf( voipString, sizeof( voipString ), "%d",
+                 CG_CrosshairPlayer( ) );
+  else if( Q_stricmp( voipSendTarget, "attacker" ) == 0 )
+    Com_sprintf( voipString, sizeof( voipString ), "%d",
+                 CG_LastAttacker( ) );
+  else
+    return NULL;
+
+  return voipString;
 }
