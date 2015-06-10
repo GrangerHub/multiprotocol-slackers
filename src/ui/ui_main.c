@@ -36,6 +36,13 @@ USER INTERFACE MAIN
 
 uiInfo_t uiInfo;
 
+#ifdef MODULE_INTERFACE_11
+#undef AS_GLOBAL
+#undef AS_LOCAL
+#define AS_GLOBAL                      2
+#define AS_LOCAL                       0
+#endif
+
 static const char *MonthAbbrev[] = {
   "Jan","Feb","Mar",
   "Apr","May","Jun",
@@ -56,9 +63,15 @@ static const int numSkillLevels = sizeof(skillLevels) / sizeof(const char*);
 
 
 static const char *netSources[] = {
+#ifdef MODULE_INTERFACE_11
   "LAN",
   "Mplayer",
   "Internet",
+#else
+  "Internet",
+  "Mplayer",
+  "LAN",
+#endif
   "Favorites"
 };
 static const int numNetSources = sizeof(netSources) / sizeof(const char*);

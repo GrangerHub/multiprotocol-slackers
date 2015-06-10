@@ -407,7 +407,11 @@ void trap_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime )
   syscall( CG_GETCURRENTSNAPSHOTNUMBER, snapshotNumber, serverTime );
 }
 
+#ifdef MODULE_INTERFACE_11
+qboolean  trap_GetSnapshot( int snapshotNumber, moduleAlternateSnapshot_t *snapshot )
+#else
 qboolean  trap_GetSnapshot( int snapshotNumber, snapshot_t *snapshot )
+#endif
 {
   return syscall( CG_GETSNAPSHOT, snapshotNumber, snapshot );
 }
