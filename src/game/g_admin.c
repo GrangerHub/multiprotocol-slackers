@@ -376,6 +376,8 @@ g_admin_ban_t *g_admin_bans[ MAX_ADMIN_BANS ];
 g_admin_command_t *g_admin_commands[ MAX_ADMIN_COMMANDS ];
 g_admin_namelog_t *g_admin_namelog[ MAX_ADMIN_NAMELOGS ];
 
+int G_admin_parse_time( const char *time );
+
 // match a certain flag within these flags
 // return state of whether flag was found or not, 
 // set *perm to indicate whether found flag was + or -
@@ -615,7 +617,7 @@ static void admin_writeconfig_int( int v, fileHandle_t f )
   trap_FS_Write( "\n", 1, f );
 }
 
-static void admin_writeconfig( void )
+void admin_writeconfig( void )
 {
   fileHandle_t f;
   int len, i;
