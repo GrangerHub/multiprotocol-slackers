@@ -1590,7 +1590,7 @@ void G_admin_namelog_update( gclient_t *client, qboolean disconnect )
     return;
   }
   namelog = G_Alloc( sizeof( g_admin_namelog_t ) );
-  memset( namelog, 0, sizeof( namelog ) );
+  memset( namelog, 0, sizeof( *namelog ) );
   for( j = 0; j < MAX_ADMIN_NAMELOG_NAMES ; j++ )
     namelog->name[ j ][ 0 ] = '\0';
   Q_strncpyz( namelog->ip, client->pers.ip, sizeof( namelog->ip ) );
@@ -3487,7 +3487,7 @@ void G_admin_adminlog_log( gentity_t *ent, char *command, char *args, int skipar
   else
     adminlog = G_Alloc( sizeof( g_admin_adminlog_t ) );
 
-  memset( adminlog, 0, sizeof( adminlog ) );
+  memset( adminlog, 0, sizeof( *adminlog ) );
   adminlog->id = count;
   adminlog->time = level.time - level.startTime;
   adminlog->success = success;
