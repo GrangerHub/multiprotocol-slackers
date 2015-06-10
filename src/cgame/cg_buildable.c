@@ -121,7 +121,7 @@ static void CG_Creep( centity_t *cent )
     else
       frac = 1.0f;
   }
-  else if( time < 0 )
+  else
   {
     msec = cg.time + time;
     if( msec >= 0 && msec < CREEP_SCALEDOWN_TIME )
@@ -921,7 +921,7 @@ static void CG_BuildableStatusDisplay( centity_t *cent )
 
   // center point
   origin[ 2 ] += mins[ 2 ];
-  origin[ 2 ] += ( abs( mins[ 2 ] ) + abs( maxs[ 2 ] ) ) / 2;
+  origin[ 2 ] += ( fabs( mins[ 2 ] ) + fabs( maxs[ 2 ] ) ) / 2;
 
   entNum = cg.predictedPlayerState.clientNum;
 

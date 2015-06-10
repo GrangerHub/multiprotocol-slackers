@@ -236,7 +236,7 @@ static void G_ClientShove( gentity_t *ent, gentity_t *victim )
   VectorNormalizeFast( dir );
 
   // don't break the dretch elevator
-  if( abs( dir[ 2 ] ) > abs( dir[ 0 ] ) && abs( dir[ 2 ] ) > abs( dir[ 1 ] ) )
+  if( fabs( dir[ 2 ] ) > fabs( dir[ 0 ] ) && fabs( dir[ 2 ] ) > fabs( dir[ 1 ] ) )
     return;
 
   VectorScale( dir,

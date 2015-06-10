@@ -4034,7 +4034,6 @@ qboolean G_admin_mute( gentity_t *ent, int skiparg )
   char command[ MAX_ADMIN_CMD_LEN ], *cmd;
   gentity_t *vic;
   char secs[ 7 ];
-  qboolean usageDuration = qfalse;
   int seconds = 0;
 
   G_SayArgv( skiparg, command, sizeof( command ) );
@@ -4800,7 +4799,7 @@ qboolean G_admin_listrotation( gentity_t *ent, int skiparg )
 {
   int i, j, statusColor;
   char mapnames[ MAX_STRING_CHARS ];
-  char *status = '\0';
+  char *status = NULL;
 
   extern mapRotations_t mapRotations;
 
@@ -5223,7 +5222,6 @@ qboolean G_admin_showbans( gentity_t *ent, int skiparg )
 qboolean G_admin_help( gentity_t *ent, int skiparg )
 {
   int i;
-  int count = 0;
   int commandsPerLine = 6;
 
   if( G_SayArgc() < 2 + skiparg )

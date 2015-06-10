@@ -665,6 +665,8 @@ int G_GetCurrentMap( int rotation )
   return p[ rotation ];
 }
 
+static qboolean G_GetRandomMap( char *name, int size, int rotation, int map );
+
 /*
 ===============
 G_IssueMapChange

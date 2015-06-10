@@ -1035,6 +1035,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
 
   // Spam limit: If they said this message recently, ignore it.
   if( g_spamTime.integer )
+  {
     if ( ( level.time - ent->client->pers.lastMessageTime ) < ( g_spamTime.integer * 1000 ) &&
          !Q_stricmp( ent->client->pers.lastMessage, chatText) &&
          !G_admin_permission( ent, ADMF_NOCENSORFLOOD ) &&
@@ -1050,6 +1051,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
       Q_strncpyz( ent->client->pers.lastMessage, chatText,
         sizeof( ent->client->pers.lastMessage ) );
     }
+  }
 
   // Flood limit.  If they're talking too fast, determine that and return.
   if( g_floodMinTime.integer )
@@ -1164,7 +1166,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
     trap_SendConsoleCommand( 0,
                              va( "!ban %s %s %s\n",
                                  ent->client->pers.ip,
-                                 ( g_aimbotAdvertBanTime.string && Q_stricmp( g_aimbotAdvertBanTime.string, "0" ) == 1 ) ? g_aimbotAdvertBanTime.string : "" ,
+                                 ( Q_stricmp( g_aimbotAdvertBanTime.string, "0" ) == 1 ) ? g_aimbotAdvertBanTime.string : "" ,
                                    g_aimbotAdvertBanReason.string ) );
     Q_strncpyz( text, "^7has been caught hacking and will be dealt with.", sizeof( text ) );
   }
@@ -1462,7 +1464,6 @@ void Cmd_CallVote_f( gentity_t *ent )
   char  name[ MAX_NETNAME ];
   char *arg1plus;
   char *arg2plus;
-  char nullstring[] = "";
   char  message[ MAX_STRING_CHARS ];
   char targetname[ MAX_NAME_LENGTH] = "";
   char reason[ MAX_STRING_CHARS ] = "";
@@ -1825,7 +1826,7 @@ void Cmd_CallVote_f( gentity_t *ent )
         trap_SendServerCommand( ent-g_entities, "print \"callvote: You forgot to specify what people should vote on.\n\"" );
         return;
       }
-      Com_sprintf( level.voteString, sizeof( level.voteString ), nullstring);
+      level.voteString[ 0 ] = '\0';
       Com_sprintf( level.voteDisplayString,
           sizeof( level.voteDisplayString ), "[Poll] \'%s\'", arg2plus );
    }
@@ -2117,7 +2118,6 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
   char  arg2[ MAX_STRING_TOKENS ];
   int   clientNum = -1;
   char  name[ MAX_NETNAME ];
-  char nullstring[] = "";
   char  message[ MAX_STRING_CHARS ];
   char targetname[ MAX_NAME_LENGTH] = "";
   char reason[ MAX_STRING_CHARS ] = "";
@@ -2426,7 +2426,7 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
        trap_SendServerCommand( ent-g_entities, "print \"callteamvote: You forgot to specify what people should vote on.\n\"" );
        return;
      }
-     Com_sprintf( level.teamVoteString[ cs_offset ], sizeof( level.teamVoteString[ cs_offset ] ), nullstring );
+     level.teamVoteString[ cs_offset ][ 0 ] = '\0';
      Com_sprintf( level.teamVoteDisplayString[ cs_offset ],
          sizeof( level.voteDisplayString ), "[Poll] \'%s\'", arg2plus );
    }

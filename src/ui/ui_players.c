@@ -704,10 +704,10 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 
   dp_realtime = time;
 
-  if ( pi->pendingWeapon != -1 && dp_realtime > pi->weaponTimer ) {
+  if ( pi->pendingWeapon != WP_NUM_WEAPONS && dp_realtime > pi->weaponTimer ) {
     pi->weapon = pi->pendingWeapon;
     pi->lastWeapon = pi->pendingWeapon;
-    pi->pendingWeapon = -1;
+    pi->pendingWeapon = WP_NUM_WEAPONS;
     pi->weaponTimer = 0;
     if( pi->currentWeapon != pi->weapon ) {
       trap_S_StartLocalSound( weaponChangeSound, CHAN_LOCAL );
@@ -1194,7 +1194,7 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
     }
   }
 
-  if (headModelName && headModelName[0] == '*' ) {
+  if (headModelName[0] == '*' ) {
     Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/%s.md3", &headModelName[1], &headModelName[1] );
   }
   else {
@@ -1283,11 +1283,11 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
     pi->torso.yawAngle = viewAngles[YAW];
     pi->torso.yawing = qfalse;
 
-    if ( weaponNumber != -1 ) {
+    if ( weaponNumber != WP_NUM_WEAPONS ) {
       pi->weapon = weaponNumber;
       pi->currentWeapon = weaponNumber;
       pi->lastWeapon = weaponNumber;
-      pi->pendingWeapon = -1;
+      pi->pendingWeapon = WP_NUM_WEAPONS;
       pi->weaponTimer = 0;
       UI_PlayerInfo_SetWeapon( pi, pi->weapon );
     }
@@ -1296,8 +1296,8 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
   }
 
   // weapon
-  if ( weaponNumber == -1 ) {
-    pi->pendingWeapon = -1;
+  if ( weaponNumber == WP_NUM_WEAPONS ) {
+    pi->pendingWeapon = WP_NUM_WEAPONS;
     pi->weaponTimer = 0;
   }
   else if ( weaponNumber != WP_NONE ) {

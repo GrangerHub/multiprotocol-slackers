@@ -2095,8 +2095,8 @@ qboolean HMGTurret_TrackEnemy( gentity_t *self )
   vectoangles( dirToTarget, self->turretAim );
 
   //if pointing at our target return true
-  if( abs( angleToTarget[ YAW ] - self->s.angles2[ YAW ] ) <= accuracyTolerance &&
-      abs( angleToTarget[ PITCH ] - self->s.angles2[ PITCH ] ) <= accuracyTolerance )
+  if( fabs( angleToTarget[ YAW ] - self->s.angles2[ YAW ] ) <= accuracyTolerance &&
+      fabs( angleToTarget[ PITCH ] - self->s.angles2[ PITCH ] ) <= accuracyTolerance )
     return qtrue;
 
   return qfalse;
@@ -4599,7 +4599,6 @@ void G_NobuildLoad( void )
   vec3_t origin = { 0.0f, 0.0f, 0.0f };
   char line[ MAX_STRING_CHARS ];
   int i = 0;
-  int i2;
   gentity_t *nb;
   float area;
   float height;

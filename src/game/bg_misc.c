@@ -1057,7 +1057,7 @@ weapon_t BG_FindBuildWeaponForBuildable( int bclass )
     }
   }
 
-  return BA_NONE;
+  return WP_NONE;
 }
 
 /*

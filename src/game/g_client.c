@@ -1120,7 +1120,7 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName )
   char      c1[ MAX_INFO_STRING ];
   char      c2[ MAX_INFO_STRING ];
   char      userinfo[ MAX_INFO_STRING ];
-  team_t    team;
+  pTeam_t    team;
 
   ent = g_entities + clientNum;
   client = ent->client;

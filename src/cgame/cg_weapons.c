@@ -1189,7 +1189,7 @@ void CG_DrawItemSelect( rectDef_t *rect, vec4_t color )
     iconsize = width;
     length = height / width;
   }
-  else if( height <= width )
+  else
   {
     vertical = qfalse;
     iconsize = height;

@@ -34,7 +34,7 @@ int forceModelModificationCount = -1;
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( void );
-static char *CG_VoIPString( void );
+char *CG_VoIPString( void );
 
 /*
 ================
@@ -1852,7 +1852,7 @@ void CG_Shutdown( void )
 CG_VoIPString
 ================
 */
-static char *CG_VoIPString( void )
+char *CG_VoIPString( void )
 {
   // a generous overestimate of the space needed for 0,1,2...61,62,63
   static char voipString[ MAX_CLIENTS * 4 ];
