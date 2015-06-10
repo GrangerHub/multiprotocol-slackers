@@ -4826,8 +4826,8 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
     }
   }
 
-  //TA: use powerups field to store team/class info:
-  s->powerups = ps->stats[ STAT_PTEAM ] | ( ps->stats[ STAT_PCLASS ] << 8 );
+  // use misc field to store team/class info:
+  s->misc = ps->stats[ STAT_PTEAM ] | ( ps->stats[ STAT_PCLASS ] << 8 );
 
   //TA: have to get the surfNormal thru somehow...
   VectorCopy( ps->grapplePoint, s->angles2 );
@@ -4938,8 +4938,8 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
     }
   }
 
-  //TA: use powerups field to store team/class info:
-  s->powerups = ps->stats[ STAT_PTEAM ] | ( ps->stats[ STAT_PCLASS ] << 8 );
+  // use misc field to store team/class info:
+  s->misc = ps->stats[ STAT_PTEAM ] | ( ps->stats[ STAT_PCLASS ] << 8 );
 
   //TA: have to get the surfNormal thru somehow...
   VectorCopy( ps->grapplePoint, s->angles2 );

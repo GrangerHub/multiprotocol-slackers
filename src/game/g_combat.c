@@ -618,8 +618,8 @@ finish_dying: // from MOD_SLAP
   // g_forcerespawn may force spawning at some later time
   self->client->respawnTime = level.time + 1700;
 
-  // remove powerups
-  memset( self->client->ps.powerups, 0, sizeof( self->client->ps.powerups ) );
+  // clear misc
+  memset( self->client->ps.misc, 0, sizeof( self->client->ps.misc ) );
 
   {
     // normal death

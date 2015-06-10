@@ -689,7 +689,7 @@ void BodySink( gentity_t *ent )
     ent->active = qtrue;
 
     //sinking bodies can't be infested
-    ent->killedBy = ent->s.powerups = MAX_CLIENTS;
+    ent->killedBy = ent->s.misc = MAX_CLIENTS;
     ent->timestamp = level.time;
   }
 
@@ -767,7 +767,7 @@ void SpawnCorpse( gentity_t *ent )
   else
     body->classname = "alienCorpse";
 
-  body->s.powerups = MAX_CLIENTS;
+  body->s.misc = MAX_CLIENTS;
 
   body->think = BodySink;
   body->nextthink = level.time + 20000;

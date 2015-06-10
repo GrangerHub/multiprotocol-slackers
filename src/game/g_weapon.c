@@ -1147,7 +1147,7 @@ static void G_UpdateZapEffect( zap_t *zap )
   effect->s.eType = ET_LEV2_ZAP_CHAIN;
   effect->classname = "lev2zapchain";
   G_SetOrigin( effect, zap->creator->s.origin );
-  effect->s.powerups = zap->creator->s.number;
+  effect->s.misc = zap->creator->s.number;
 
   effect->s.time = effect->s.time2 = effect->s.constantLight = -1;
 
