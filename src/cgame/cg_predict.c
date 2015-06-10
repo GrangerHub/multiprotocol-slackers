@@ -506,7 +506,8 @@ static int CG_IsUnacceptableError( playerState_t *ps, playerState_t *pps )
 
   for( i = 0; i < MAX_WEAPONS; i++ )
   {
-    if( pps->ammo[ i ] != ps->ammo[ i ] )
+    // GH FIXME
+    if( pps->ammo != ps->ammo || pps->clips != ps->clips )
       return 18;
   }
 

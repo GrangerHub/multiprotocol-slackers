@@ -1053,7 +1053,11 @@ typedef struct playerState_s {
 	int			torsoTimer;		// don't change low priority animations until this runs out
 	int			torsoAnim;		// mask off ANIM_TOGGLEBIT
 
-	int			movementDir;	// a number 0 to 7 that represents the reletive angle
+	int			tauntTimer;		// don't allow another taunt until this runs out
+
+	int			weaponAnim;		// mask off ANIM_TOGGLEBIT
+
+	int			movementDir;	// a number 0 to 7 that represents the relative angle
 								// of movement to the view angle (axial and diagonals)
 								// when at rest, the value will remain unchanged
 								// used to twist the legs during strafing
@@ -1086,7 +1090,8 @@ typedef struct playerState_s {
 	int			stats[MAX_STATS];
 	int			persistant[MAX_PERSISTANT];	// stats that aren't cleared on death
 	int			powerups[MAX_POWERUPS];	// level.time that the powerup runs out
-	int			ammo[MAX_WEAPONS];
+	int			ammo;			// ammo held
+	int			clips;			// clips held
 
 	int			generic1;
 	int			loopSound;
@@ -1094,7 +1099,7 @@ typedef struct playerState_s {
 
 	// not communicated over the net at all
 	int			ping;			// server to game info for scoreboard
-	int			pmove_framecount;	// FIXME: don't transmit over the network
+	int			pmove_framecount;
 	int			jumppad_frame;
 	int			entityEventSequence;
 } playerState_t;
@@ -1208,6 +1213,7 @@ typedef struct entityState_s {
 	int		weapon;			// determines weapon and flash model, etc
 	int		legsAnim;		// mask off ANIM_TOGGLEBIT
 	int		torsoAnim;		// mask off ANIM_TOGGLEBIT
+	int		weaponAnim;		// mask off ANIM_TOGGLEBIT
 
 	int		generic1;
 } entityState_t;

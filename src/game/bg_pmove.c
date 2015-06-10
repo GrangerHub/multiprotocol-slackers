@@ -2788,8 +2788,8 @@ static void PM_Weapon( void )
   }
 
   // start the animation even if out of ammo
-
-  BG_UnpackAmmoArray( pm->ps->weapon, pm->ps->ammo, pm->ps->powerups, &ammo, &clips );
+  ammo = pm->ps->ammo;
+  clips = pm->ps->clips;
   BG_FindAmmoForWeapon( pm->ps->weapon, NULL, &maxClips );
 
   // check for out of ammo
@@ -2817,7 +2817,8 @@ static void PM_Weapon( void )
         BG_InventoryContainsUpgrade( UP_BATTPACK, pm->ps->stats ) )
       ammo = (int)( (float)ammo * BATTPACK_MODIFIER );
 
-    BG_PackAmmoArray( pm->ps->weapon, pm->ps->ammo, pm->ps->powerups, ammo, clips );
+    pm->ps->ammo = ammo;
+    pm->ps->clips = clips;
 
     //allow some time for the weapon to be raised
     pm->ps->weaponstate = WEAPON_RAISING;
@@ -3071,13 +3072,15 @@ static void PM_Weapon( void )
     else
       ammo--;
 
-    BG_PackAmmoArray( pm->ps->weapon, pm->ps->ammo, pm->ps->powerups, ammo, clips );
+    pm->ps->ammo = ammo;
+    pm->ps->clips = clips;
   }
   else if( pm->ps->weapon == WP_ALEVEL3_UPG && attack3 )
   {
     //special case for slowblob
     ammo--;
-    BG_PackAmmoArray( pm->ps->weapon, pm->ps->ammo, pm->ps->powerups, ammo, clips );
+    pm->ps->ammo = ammo;
+    pm->ps->clips = clips;
   }
 
   //FIXME: predicted angles miss a problem??
@@ -3283,7 +3286,8 @@ void PmoveSingle( pmove_t *pmove )
 
   pm = pmove;
 
-  BG_UnpackAmmoArray( pm->ps->weapon, pm->ps->ammo, pm->ps->powerups, &ammo, &clips );
+  ammo = pm->ps->ammo;
+  clips = pm->ps->clips;
 
   // this counter lets us debug movement problems with a journal
   // by setting a conditional breakpoint fot the previous frame

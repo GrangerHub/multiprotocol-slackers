@@ -1111,7 +1111,8 @@ static qboolean CG_WeaponSelectable( weapon_t weapon )
 {
   //int ammo, clips;
   //
-  //BG_UnpackAmmoArray( i, cg.snap->ps.ammo, cg.snap->ps.powerups, &ammo, &clips );
+  //ammo = cg.snap->ps.ammo;
+  //clips = cg.snap->ps.clips
   //
   // this is a pain in the ass
   //if( !ammo && !clips && !BG_FindInfinteAmmoForWeapon( i ) )
@@ -1205,7 +1206,8 @@ void CG_DrawItemSelect( rectDef_t *rect, vec4_t color )
     {
       int ammo, clips;
   
-      BG_UnpackAmmoArray( i, cg.snap->ps.ammo, cg.snap->ps.powerups, &ammo, &clips );
+      ammo = cg.snap->ps.ammo;
+      clips = cg.snap->ps.clips;
   
       if( !ammo && !clips && !BG_FindInfinteAmmoForWeapon( i ) )
         colinfo[ numItems ] = 1;

@@ -1109,9 +1109,7 @@ typedef struct
 
 
 //TA:
-void      BG_UnpackAmmoArray( int weapon, int psAmmo[ ], int psAmmo2[ ], int *ammo, int *clips );
-void      BG_PackAmmoArray( int weapon, int psAmmo[ ], int psAmmo2[ ], int ammo, int clips );
-qboolean  BG_WeaponIsFull( weapon_t weapon, int stats[ ], int psAmmo[ ], int psAmmo2[ ] );
+qboolean  BG_WeaponIsFull( weapon_t weapon, int stats[ ], int ammo, int clips );
 void      BG_AddWeaponToInventory( int weapon, int stats[ ] );
 void      BG_RemoveWeaponFromInventory( int weapon, int stats[ ] );
 qboolean  BG_InventoryContainsWeapon( int weapon, int stats[ ] );

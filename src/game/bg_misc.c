@@ -4957,62 +4957,16 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 
 /*
 ========================
-BG_UnpackAmmoArray
-
-Extract the ammo quantity from the array
-========================
-*/
-void BG_UnpackAmmoArray( int weapon, int psAmmo[ ], int psAmmo2[ ], int *ammo, int *clips )
-{
-  int   ammoarray[ 32 ];
-  int   i;
-
-  for( i = 0; i <= 15; i++ )
-    ammoarray[ i ] = psAmmo[ i ];
-
-  for( i = 16; i <= 31; i++ )
-    ammoarray[ i ] = psAmmo2[ i - 16 ];
-
-  if( ammo != NULL )
-    *ammo = ammoarray[ weapon ] & 0x0FFF;
-
-  if( clips != NULL )
-    *clips = ( ammoarray[ weapon ] >> 12 ) & 0x0F;
-}
-
-/*
-========================
-BG_PackAmmoArray
-
-Pack the ammo quantity into the array
-========================
-*/
-void BG_PackAmmoArray( int weapon, int psAmmo[ ], int psAmmo2[ ], int ammo, int clips )
-{
-  int   weaponvalue;
-
-  weaponvalue = ammo | ( clips << 12 );
-
-  if( weapon <= 15 )
-    psAmmo[ weapon ] = weaponvalue;
-  else if( weapon >= 16 )
-    psAmmo2[ weapon - 16 ] = weaponvalue;
-}
-
-/*
-========================
 BG_WeaponIsFull
 
 Check if a weapon has full ammo
 ========================
 */
-qboolean BG_WeaponIsFull( weapon_t weapon, int stats[ ], int psAmmo[ ], int psAmmo2[ ] )
+qboolean BG_WeaponIsFull( weapon_t weapon, int stats[ ], int ammo, int clips )
 {
   int maxAmmo, maxClips;
-  int ammo, clips;
 
   BG_FindAmmoForWeapon( weapon, &maxAmmo, &maxClips );
-  BG_UnpackAmmoArray( weapon, psAmmo, psAmmo2, &ammo, &clips );
 
   if( BG_InventoryContainsUpgrade( UP_BATTPACK, stats ) )
     maxAmmo = (int)( (float)maxAmmo * BATTPACK_MODIFIER );

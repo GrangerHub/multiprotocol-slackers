@@ -4326,8 +4326,8 @@ qboolean G_admin_denyweapon( gentity_t *ent, int skiparg )
 
           BG_AddWeaponToInventory( WP_MACHINEGUN, vic->client->ps.stats );
           BG_FindAmmoForWeapon( WP_MACHINEGUN, &maxAmmo, &maxClips );
-          BG_PackAmmoArray( WP_MACHINEGUN, vic->client->ps.ammo, vic->client->ps.powerups,
-                            maxAmmo, maxClips );
+          vic->client->ps.ammo = maxAmmo;
+          vic->client->ps.clips = maxClips;
           G_ForceWeaponChange( vic, WP_MACHINEGUN );
           vic->client->ps.stats[ STAT_MISC ] = 0;
           ClientUserinfoChanged( pids[ 0 ], qfalse );

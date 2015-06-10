@@ -855,7 +855,7 @@ static void CG_DrawPlayerPoisonBarbs( rectDef_t *rect, vec4_t color, qhandle_t s
   qboolean      vertical;
   int           iconsize, numBarbs, i;
 
-  BG_UnpackAmmoArray( ps->weapon, ps->ammo, ps->powerups, &numBarbs, NULL );
+  numBarbs = ps->ammo;
 
   if( height > width )
   {
@@ -940,7 +940,7 @@ static void CG_DrawPlayerAmmoValue( rectDef_t *rect, vec4_t color )
         break;
 
       default:
-        BG_UnpackAmmoArray( cent->currentState.weapon, ps->ammo, ps->powerups, &value, NULL );
+        value = ps->ammo;
         break;
     }
 
@@ -1099,7 +1099,7 @@ static void CG_DrawPlayerClipsValue( rectDef_t *rect, vec4_t color )
         break;
 
       default:
-        BG_UnpackAmmoArray( cent->currentState.weapon, ps->ammo, ps->powerups, NULL, &value );
+        value = ps->clips;
 
         if( value > -1 )
         {
@@ -1425,23 +1425,13 @@ float CG_GetValue( int ownerDraw )
     case CG_PLAYER_AMMO_VALUE:
       if( cent->currentState.weapon )
       {
-        int value;
-
-        BG_UnpackAmmoArray( cent->currentState.weapon, ps->ammo, ps->powerups,
-           &value, NULL );
-
-        return value;
+        return ps->ammo;
       }
       break;
     case CG_PLAYER_CLIPS_VALUE:
       if( cent->currentState.weapon )
       {
-        int value;
-
-        BG_UnpackAmmoArray( cent->currentState.weapon, ps->ammo, ps->powerups,
-           NULL, &value );
-
-        return value;
+        return ps->clips;
       }
       break;
     case CG_PLAYER_HEALTH:
@@ -2404,7 +2394,8 @@ void CG_DrawWeaponIcon( rectDef_t *rect, vec4_t color )
   cent = &cg_entities[ cg.snap->ps.clientNum ];
   ps = &cg.snap->ps;
 
-  BG_UnpackAmmoArray( cent->currentState.weapon, ps->ammo, ps->powerups, &ammo, &clips );
+  ammo = ps->ammo;
+  clips = ps->clips;
   BG_FindAmmoForWeapon( cent->currentState.weapon, &maxAmmo, NULL );
 
   // don't display if dead

@@ -407,7 +407,8 @@ static void CG_HumanText( char *text, playerState_t *ps )
     upgrade = cg.weaponSelect - 32;
   }
 
-  BG_UnpackAmmoArray( ps->weapon, ps->ammo, ps->powerups, &ammo, &clips );
+  ammo = ps->ammo;
+  clips = ps->clips;
 
   if( !ammo && !clips && !BG_FindInfinteAmmoForWeapon( ps->weapon ) )
   {

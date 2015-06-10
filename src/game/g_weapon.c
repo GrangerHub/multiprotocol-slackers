@@ -87,6 +87,8 @@ void G_GiveClientMaxAmmo( gentity_t *ent, qboolean buyingEnergyAmmo )
   int       maxAmmo, maxClips;
   qboolean  weaponType, restoredAmmo = qfalse;
 
+  // GH FIXME
+
   for( i = WP_NONE + 1; i < WP_NUM_WEAPONS; i++ )
   {
     if( buyingEnergyAmmo )
@@ -97,7 +99,7 @@ void G_GiveClientMaxAmmo( gentity_t *ent, qboolean buyingEnergyAmmo )
     if( BG_InventoryContainsWeapon( i, ent->client->ps.stats ) &&
         weaponType && !BG_FindInfinteAmmoForWeapon( i ) &&
         !BG_WeaponIsFull( i, ent->client->ps.stats,
-          ent->client->ps.ammo, ent->client->ps.powerups ) )
+          ent->client->ps.ammo, ent->client->ps.clips ) )
     {
       BG_FindAmmoForWeapon( i, &maxAmmo, &maxClips );
 
@@ -109,8 +111,8 @@ void G_GiveClientMaxAmmo( gentity_t *ent, qboolean buyingEnergyAmmo )
           maxAmmo = (int)( (float)maxAmmo * BATTPACK_MODIFIER );
       }
 
-      BG_PackAmmoArray( i, ent->client->ps.ammo, ent->client->ps.powerups,
-                        maxAmmo, maxClips );
+      ent->client->ps.ammo = maxAmmo;
+      ent->client->ps.clips = maxClips;
 
       restoredAmmo = qtrue;
     }
