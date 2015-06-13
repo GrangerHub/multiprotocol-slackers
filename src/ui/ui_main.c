@@ -131,6 +131,8 @@ void _UI_Init( qboolean );
 void _UI_Shutdown( void );
 void _UI_KeyEvent( int key, qboolean down );
 void _UI_MouseEvent( int dx, int dy );
+int _UI_MousePosition( void );
+void _UI_SetMousePosition( int x, int y );
 void _UI_Refresh( int realtime );
 qboolean _UI_IsFullscreen( void );
 intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3,
@@ -155,6 +157,15 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3,
     case UI_MOUSE_EVENT:
       _UI_MouseEvent( arg0, arg1 );
       return 0;
+
+#ifndef MODULE_INTERFACE_11
+    case UI_MOUSE_POSITION:
+      return _UI_MousePosition( );
+
+    case UI_SET_MOUSE_POSITION:
+      _UI_SetMousePosition( arg0, arg1 );
+      return 0;
+#endif
 
     case UI_REFRESH:
       _UI_Refresh( arg0 );
@@ -5705,6 +5716,31 @@ void _UI_MouseEvent( int dx, int dy )
     Display_MouseMove(NULL, uiInfo.uiDC.cursorx, uiInfo.uiDC.cursory);
   }
 
+}
+
+/*
+=================
+UI_MousePosition
+=================
+*/
+int _UI_MousePosition( void )
+{
+  return (int)rint( uiInfo.uiDC.cursorx ) |
+         (int)rint( uiInfo.uiDC.cursory ) << 16;
+}
+
+/*
+=================
+UI_SetMousePosition
+=================
+*/
+void _UI_SetMousePosition( int x, int y )
+{
+  uiInfo.uiDC.cursorx = x;
+  uiInfo.uiDC.cursory = y;
+
+  if( Menu_Count( ) > 0 )
+    Display_MouseMove( NULL, uiInfo.uiDC.cursorx, uiInfo.uiDC.cursory );
 }
 
 void UI_LoadNonIngame( void ) {
