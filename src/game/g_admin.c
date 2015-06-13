@@ -5322,12 +5322,12 @@ qboolean G_admin_help( gentity_t *ent, int skiparg )
       ADMBP( va( "^5/%-12s", "mystats" ) );
       count++;
     }
-    if( ent->client->pers.designatedBuilder && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+    if( ent && ent->client->pers.designatedBuilder && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
       if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
       ADMBP( va( "^5/%-12s", "protect" ) );
       count++;
     }
-    if( ent->client->pers.designatedBuilder && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
+    if( ent && ent->client->pers.designatedBuilder && ( ent->client->ps.stats[ STAT_PTEAM ] == PTE_ALIENS || ent->client->ps.stats[ STAT_PTEAM ] == PTE_HUMANS ) ) {
       if( count > commandsPerLine && ( count % commandsPerLine ) == 1 ) ADMBP( "\n" );
       ADMBP( va( "^5/%-12s", "resign" ) );
       count++;
