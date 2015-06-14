@@ -1048,6 +1048,9 @@ void Menus_CloseAll( void ) {
     Menu_RunCloseScript(&Menus[i]);
     Menus[i].window.flags &= ~(WINDOW_HASFOCUS | WINDOW_VISIBLE);
   }
+
+  g_editingField = qfalse;
+  g_waitingForKey = qfalse;
 }
 
 
@@ -1185,11 +1188,19 @@ void Script_SetFocus(itemDef_t *item, char **args) {
 
   if (String_Parse(args, &name)) {
     focusItem = Menu_FindItemByName(item->parent, name);
-    if (focusItem && !(focusItem->window.flags & WINDOW_DECORATION) && !(focusItem->window.flags & WINDOW_HASFOCUS)) {
+    if (focusItem && !(focusItem->window.flags & WINDOW_DECORATION)) {
       Menu_ClearFocus(item->parent);
       focusItem->window.flags |= WINDOW_HASFOCUS;
       if (focusItem->onFocus) {
         Item_RunScript(focusItem, focusItem->onFocus);
+      }
+      if (focusItem->type == ITEM_TYPE_EDITFIELD || focusItem->type == ITEM_TYPE_SAYFIELD || focusItem->type == ITEM_TYPE_NUMERICFIELD) {
+        focusItem->cursorPos = 0;
+        g_editingField = qtrue;
+        g_editItem = focusItem;
+        if (focusItem->type == ITEM_TYPE_SAYFIELD) {
+          DC->setOverstrikeMode(qfalse);
+        }
       }
       if (DC->Assets.itemFocusSound) {
         DC->startLocalSound( DC->Assets.itemFocusSound, CHAN_LOCAL_SOUND );
@@ -2183,17 +2194,32 @@ qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
     }
 
     if (key == K_TAB || key == K_DOWNARROW || key == K_KP_DOWNARROW) {
+      if (item->type == ITEM_TYPE_SAYFIELD) {
+        return qtrue;
+      }
+
       newItem = Menu_SetNextCursorItem(item->parent);
-      if (newItem && (newItem->type == ITEM_TYPE_EDITFIELD || newItem->type == ITEM_TYPE_NUMERICFIELD)) {
+      if (newItem && (newItem->type == ITEM_TYPE_EDITFIELD || newItem->type == ITEM_TYPE_SAYFIELD || newItem->type == ITEM_TYPE_NUMERICFIELD)) {
         g_editItem = newItem;
       }
     }
 
     if (key == K_UPARROW || key == K_KP_UPARROW) {
+      if (item->type == ITEM_TYPE_SAYFIELD) {
+        return qtrue;
+      }
+
       newItem = Menu_SetPrevCursorItem(item->parent);
-      if (newItem && (newItem->type == ITEM_TYPE_EDITFIELD || newItem->type == ITEM_TYPE_NUMERICFIELD)) {
+      if (newItem && (newItem->type == ITEM_TYPE_EDITFIELD || newItem->type == ITEM_TYPE_SAYFIELD || newItem->type == ITEM_TYPE_NUMERICFIELD)) {
         g_editItem = newItem;
       }
+    }
+
+    if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_MOUSE3 || key == K_MOUSE4) {
+      if (item->type == ITEM_TYPE_SAYFIELD) {
+        return qtrue;
+      }
+      return qfalse;
     }
 
     if ( key == K_ENTER || key == K_KP_ENTER || key == K_ESCAPE)  {
@@ -2314,6 +2340,7 @@ void Item_StartCapture(itemDef_t *item, int key) {
   int flags;
   switch (item->type) {
     case ITEM_TYPE_EDITFIELD:
+    case ITEM_TYPE_SAYFIELD:
     case ITEM_TYPE_NUMERICFIELD:
 
     case ITEM_TYPE_LISTBOX:
@@ -2427,6 +2454,7 @@ qboolean Item_HandleKey(itemDef_t *item, int key, qboolean down) {
       return qfalse;
       break;
     case ITEM_TYPE_EDITFIELD:
+    case ITEM_TYPE_SAYFIELD:
     case ITEM_TYPE_NUMERICFIELD:
       //return Item_TextField_HandleKey(item, key);
       return qfalse;
@@ -2641,14 +2669,9 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
   if (g_editingField && down) {
     if (!Item_TextField_HandleKey(g_editItem, key)) {
       g_editingField = qfalse;
+      Item_RunScript(g_editItem, g_editItem->onTextEntry);
       g_editItem = NULL;
       inHandler = qfalse;
-      return;
-    } else if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_MOUSE3) {
-      g_editingField = qfalse;
-      g_editItem = NULL;
-      Display_MouseMove(NULL, DC->cursorx, DC->cursory);
-    } else if (key == K_TAB || key == K_UPARROW || key == K_DOWNARROW) {
       return;
     }
   }
@@ -2737,6 +2760,8 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
             g_editItem = item;
             DC->setOverstrikeMode(qtrue);
           }
+        } else if (item->type == ITEM_TYPE_SAYFIELD) {
+          // do nothing
         } else {
           if (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory)) {
             Item_Action(item);
@@ -2769,7 +2794,7 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
     case K_KP_ENTER:
     case K_ENTER:
       if (item) {
-        if (item->type == ITEM_TYPE_EDITFIELD || item->type == ITEM_TYPE_NUMERICFIELD) {
+        if (item->type == ITEM_TYPE_EDITFIELD || item->type == ITEM_TYPE_SAYFIELD || item->type == ITEM_TYPE_NUMERICFIELD) {
           item->cursorPos = 0;
           g_editingField = qtrue;
           g_editItem = item;
@@ -4295,6 +4320,7 @@ void Item_Paint(itemDef_t *item) {
     case ITEM_TYPE_CHECKBOX:
       break;
     case ITEM_TYPE_EDITFIELD:
+    case ITEM_TYPE_SAYFIELD:
     case ITEM_TYPE_NUMERICFIELD:
       Item_TextField_Paint(item);
       break;
@@ -4578,10 +4604,10 @@ void Item_ValidateTypeData(itemDef_t *item) {
   if (item->type == ITEM_TYPE_LISTBOX) {
     item->typeData = UI_Alloc(sizeof(listBoxDef_t));
     memset(item->typeData, 0, sizeof(listBoxDef_t));
-  } else if (item->type == ITEM_TYPE_EDITFIELD || item->type == ITEM_TYPE_NUMERICFIELD || item->type == ITEM_TYPE_YESNO || item->type == ITEM_TYPE_BIND || item->type == ITEM_TYPE_SLIDER || item->type == ITEM_TYPE_TEXT) {
+  } else if (item->type == ITEM_TYPE_EDITFIELD || item->type == ITEM_TYPE_SAYFIELD || item->type == ITEM_TYPE_NUMERICFIELD || item->type == ITEM_TYPE_YESNO || item->type == ITEM_TYPE_BIND || item->type == ITEM_TYPE_SLIDER || item->type == ITEM_TYPE_TEXT) {
     item->typeData = UI_Alloc(sizeof(editFieldDef_t));
     memset(item->typeData, 0, sizeof(editFieldDef_t));
-    if (item->type == ITEM_TYPE_EDITFIELD) {
+    if (item->type == ITEM_TYPE_EDITFIELD || item->type == ITEM_TYPE_SAYFIELD) {
       if (!((editFieldDef_t *) item->typeData)->maxPaintChars) {
         ((editFieldDef_t *) item->typeData)->maxPaintChars = MAX_EDITFIELD;
       }
@@ -5123,6 +5149,13 @@ qboolean ItemParse_mouseExitText( itemDef_t *item, int handle ) {
   return qtrue;
 }
 
+qboolean ItemParse_onTextEntry( itemDef_t *item, int handle ) {
+  if (!PC_Script_Parse(handle, &item->onTextEntry)) {
+    return qfalse;
+  }
+  return qtrue;
+}
+
 qboolean ItemParse_action( itemDef_t *item, int handle ) {
   if (!PC_Script_Parse(handle, &item->action)) {
     return qfalse;
@@ -5408,6 +5441,7 @@ keywordHash_t itemParseKeywords[] = {
   {"mouseExit", ItemParse_mouseExit, NULL},
   {"mouseEnterText", ItemParse_mouseEnterText, NULL},
   {"mouseExitText", ItemParse_mouseExitText, NULL},
+  {"onTextEntry", ItemParse_onTextEntry, NULL},
   {"action", ItemParse_action, NULL},
   {"special", ItemParse_special, NULL},
   {"cvar", ItemParse_cvar, NULL},
@@ -5911,6 +5945,12 @@ int Menu_Count( void ) {
 
 void Menu_PaintAll( void ) {
   int i;
+
+  if( g_editingField || g_waitingForKey )
+    DC->setCVar( "ui_hideCursor", "1" );
+  else
+    DC->setCVar( "ui_hideCursor", "0" );
+
   if (captureFunc) {
     captureFunc(captureData);
   }

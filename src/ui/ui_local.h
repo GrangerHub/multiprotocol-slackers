@@ -132,6 +132,7 @@ extern vmCvar_t ui_serverStatusTimeOut;
 //TA: bank values
 extern vmCvar_t  ui_bank;
 
+extern vmCvar_t  ui_chatCommands;
 
 //
 // ui_qmenu.c
@@ -917,6 +918,8 @@ typedef struct {
   int effectsColor;
 
   qboolean inGameLoad;
+
+  qboolean chatTeam;
 }  uiInfo_t;
 
 extern uiInfo_t uiInfo;

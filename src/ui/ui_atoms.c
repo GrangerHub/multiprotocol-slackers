@@ -294,6 +294,36 @@ static void UI_CalcPostGameStats( void ) {
 
 }
 
+static void UI_MessageMode_f( void )
+{
+  char *arg = UI_Argv( 0 );
+
+  trap_Cvar_Set( "ui_sayBuffer", "" );
+
+  switch( arg[ 11 ] )
+  {
+    default:
+    case '\0':
+      // Global
+      uiInfo.chatTeam             = qfalse;
+      break;
+
+    case '2':
+      // Team
+      uiInfo.chatTeam             = qtrue;
+      break;
+  }
+
+  trap_Key_SetCatcher( KEYCATCH_UI );
+  Menus_CloseByName( "say" );
+  Menus_CloseByName( "say_team" );
+
+  if( uiInfo.chatTeam )
+    Menus_ActivateByName( "say_team" );
+  else
+    Menus_ActivateByName( "say" );
+}
+
 
 /*
 =================
@@ -375,6 +405,13 @@ qboolean UI_ConsoleCommand( int realTime )
       Menus_CloseAll( );
       return qtrue;
     }
+  }
+
+  if( Q_stricmp ( cmd, "messagemode" ) == 0 ||
+      Q_stricmp ( cmd, "messagemode2" ) == 0 )
+  {
+    UI_MessageMode_f();
+    return qtrue;
   }
 
   return qfalse;

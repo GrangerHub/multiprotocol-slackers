@@ -722,7 +722,7 @@ void _UI_Refresh( int realtime )
   UI_SetColor( NULL );
 
   //TA: don't draw the cursor whilst loading
-  if( Menu_Count( ) > 0 && !trap_Cvar_VariableValue( "ui_loading" ) )
+  if( Menu_Count( ) > 0 && !trap_Cvar_VariableValue( "ui_loading" ) && !trap_Cvar_VariableValue( "ui_hideCursor" ) )
     UI_DrawHandlePic( uiInfo.uiDC.cursorx-16, uiInfo.uiDC.cursory-16, 32, 32, uiInfo.uiDC.Assets.cursor);
 
 #ifndef NDEBUG
@@ -4055,6 +4055,23 @@ static void UI_RunMenuScript(char **args) {
       if( ( cmd = uiInfo.tremHumanBuildList[ uiInfo.tremHumanBuildIndex ].cmd ) )
         trap_Cmd_ExecuteText( EXEC_APPEND, cmd );
     }
+    else if( Q_stricmp( name, "Say" ) == 0 )
+    {
+      char buffer[ MAX_CVAR_VALUE_STRING ];
+      trap_Cvar_VariableStringBuffer( "ui_sayBuffer", buffer, sizeof( buffer ) );
+
+      if( !buffer[ 0 ] )
+        ;
+      else if( ui_chatCommands.integer && ( buffer[ 0 ] == '/' ||
+        buffer[ 0 ] == '\\' ) )
+      {
+        trap_Cmd_ExecuteText( EXEC_APPEND, va( "%s\n", buffer + 1 ) );
+      }
+      else if( uiInfo.chatTeam )
+        trap_Cmd_ExecuteText( EXEC_APPEND, va( "say_team \"%s\"\n", buffer ) );
+      else
+        trap_Cmd_ExecuteText( EXEC_APPEND, va( "say \"%s\"\n", buffer ) );
+    }
     else if( Q_stricmp( name, "PTRCRestore" ) == 0 )
     {
       int           len;
@@ -6218,6 +6235,8 @@ vmCvar_t  ui_serverStatusTimeOut;
 vmCvar_t  ui_bank;
 vmCvar_t  ui_winner;
 
+vmCvar_t  ui_chatCommands;
+
 
 // bk001129 - made static to avoid aliasing
 static cvarTable_t    cvarTable[] = {
@@ -6346,6 +6365,7 @@ static cvarTable_t    cvarTable[] = {
 
   { &ui_bank, "ui_bank", "0", 0 },
 
+  { &ui_chatCommands, "ui_chatCommands", "1", CVAR_ARCHIVE},
 };
 
 // bk001129 - made static to avoid aliasing
