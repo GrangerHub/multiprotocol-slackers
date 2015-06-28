@@ -1,0 +1,19 @@
+multiprotocol-slackers-qvm
+==========================
+
+This file is packaged with source, binaries, and/or assets for the
+multiprotocol Slacker's QVM.  See the accompanying COPYING file for details.
+
+This modification uses Slacker's QVM game module and Lakitu7's r181 cgame and
+ui modules.  Modifications are primarily for compatibility with the unreleased
+multiprotocol Tremulous server.
+
+Questions, comments, and/or source code requests can be made on the GrangerHub
+forum:
+    
+    http://discourse.grangerhub.com/
+
+Or if you choose, you may e-mail the maintainer, Jeff Kent, directly:
+
+    jeff@jkent.net
+
