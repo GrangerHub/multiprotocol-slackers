@@ -1,4 +1,5 @@
 GNUmakefile.local
+assets/ui/menudef.h
 bld/
 *.dll
 *.exe
