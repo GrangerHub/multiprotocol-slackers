@@ -38,42 +38,49 @@ void G_ForceWeaponChange( gentity_t *ent, weapon_t weapon )
 {
   int i;
 
-  if( ent )
+  if( !ent )
+    return;
+
+  if( ent->client->ps.weaponstate == WEAPON_RELOADING )
   {
-    ent->client->ps.pm_flags |= PMF_WEAPON_SWITCH;
-
-    if( weapon == WP_NONE 
-      || !BG_InventoryContainsWeapon( weapon, ent->client->ps.stats ))
-    {
-      //switch to the first non blaster weapon
-      for( i = WP_NONE + 1; i < WP_NUM_WEAPONS; i++ )
-      {
-        if( i == WP_BLASTER )
-          continue;
-
-        if( BG_InventoryContainsWeapon( i, ent->client->ps.stats ) )
-        {
-          ent->client->ps.persistant[ PERS_NEWWEAPON ] = i;
-          break;
-        }
-      }
-
-      //only got the blaster to switch to
-      if( i == WP_NUM_WEAPONS )
-        ent->client->ps.persistant[ PERS_NEWWEAPON ] = WP_BLASTER;
-    }
-    else
-      ent->client->ps.persistant[ PERS_NEWWEAPON ] = weapon;
-   
-    // Lak: The following hack has been moved to PM_BeginWeaponChange, but I'm going to
-    // redundantly leave it here as well just in case there's a case I'm forgetting
-    // because I don't want to face the gameplay consequences such an error would have
-
-    // force this here to prevent flamer effect from continuing 
-    ent->client->ps.generic1 = WPM_NOTFIRING;
-
-    ent->client->ps.weapon = ent->client->ps.persistant[ PERS_NEWWEAPON ];
+    ent->client->ps.torsoAnim = ( ( ent->client->ps.torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | TORSO_RAISE;
+    ent->client->ps.weaponTime = 250;
+    ent->client->ps.weaponstate = WEAPON_READY;
   }
+
+  ent->client->ps.pm_flags |= PMF_WEAPON_SWITCH;
+
+  if( weapon == WP_NONE
+    || !BG_InventoryContainsWeapon( weapon, ent->client->ps.stats ))
+  {
+    //switch to the first non blaster weapon
+    for( i = WP_NONE + 1; i < WP_NUM_WEAPONS; i++ )
+    {
+      if( i == WP_BLASTER )
+        continue;
+
+      if( BG_InventoryContainsWeapon( i, ent->client->ps.stats ) )
+      {
+        ent->client->ps.persistant[ PERS_NEWWEAPON ] = i;
+        break;
+      }
+    }
+
+    //only got the blaster to switch to
+    if( i == WP_NUM_WEAPONS )
+      ent->client->ps.persistant[ PERS_NEWWEAPON ] = WP_BLASTER;
+  }
+  else
+    ent->client->ps.persistant[ PERS_NEWWEAPON ] = weapon;
+
+  // Lak: The following hack has been moved to PM_BeginWeaponChange, but I'm going to
+  // redundantly leave it here as well just in case there's a case I'm forgetting
+  // because I don't want to face the gameplay consequences such an error would have
+
+  // force this here to prevent flamer effect from continuing
+  ent->client->ps.generic1 = WPM_NOTFIRING;
+
+  ent->client->ps.weapon = ent->client->ps.persistant[ PERS_NEWWEAPON ];
 }
 
 /*

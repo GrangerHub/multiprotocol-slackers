@@ -2610,6 +2610,10 @@ static void PM_BeginWeaponChange( int weapon )
   if( pm->ps->weapon == WP_LUCIFER_CANNON )
     pm->ps->stats[ STAT_MISC ] = 0;
 
+  // cancel a reload
+  pm->ps->pm_flags &= ~PMF_WEAPON_RELOAD;
+  if( pm->ps->weaponstate == WEAPON_RELOADING )
+    pm->ps->weaponTime = 0;
 
   // force this here to prevent flamer effect from continuing, among other issues
   pm->ps->generic1 = WPM_NOTFIRING;
@@ -2828,7 +2832,8 @@ static void PM_Weapon( void )
   }
 
   // check for end of clip
-  if( ( !ammo || pm->ps->pm_flags & PMF_WEAPON_RELOAD ) && clips )
+  if( !BG_FindInfinteAmmoForWeapon( pm->ps->weapon ) &&
+      ( !ammo || pm->ps->pm_flags & PMF_WEAPON_RELOAD ) && clips )
   {
     pm->ps->pm_flags &= ~PMF_WEAPON_RELOAD;
 
