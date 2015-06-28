@@ -101,7 +101,7 @@ CLIENTBIN=tremulous
 endif
 
 ifndef BASEGAME
-BASEGAME=gpp
+BASEGAME=slacker
 endif
 
 ifndef BASEGAME_CFLAGS
