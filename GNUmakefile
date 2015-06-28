@@ -100,6 +100,10 @@ ifndef CLIENTBIN
 CLIENTBIN=tremulous
 endif
 
+ifndef BASEGAME
+BASEGAME=gpp
+endif
+
 ifndef BASEGAME_CFLAGS
 BASEGAME_CFLAGS=
 endif
@@ -130,8 +134,8 @@ endif
 
 #############################################################################
 
-BD=$(BUILD_DIR)
-BR=$(BUILD_DIR)
+BD=$(BUILD_DIR) # /debug-$(PLATFORM)-$(ARCH)
+BR=$(BUILD_DIR) # /release-$(PLATFORM)-$(ARCH)
 CDIR=$(MOUNT_DIR)/client
 SDIR=$(MOUNT_DIR)/server
 CMDIR=$(MOUNT_DIR)/qcommon
@@ -606,17 +610,17 @@ endif
 ifneq ($(BUILD_GAME_SO),0)
   ifeq ($(BUILD_ONLY_GAME),1)
     TARGETS += \
-      $(B)/game$(SHLIBNAME)
+      $(B)/out/$(BASEGAME)/game$(SHLIBNAME)
   else
     ifeq ($(BUILD_ONLY_CGUI),1)
       TARGETS += \
-        $(B)/cgame$(SHLIBNAME) \
-        $(B)/ui$(SHLIBNAME)
+        $(B)/out/$(BASEGAME)/cgame$(SHLIBNAME) \
+        $(B)/out/$(BASEGAME)/ui$(SHLIBNAME)
     else
       TARGETS += \
-        $(B)/cgame$(SHLIBNAME) \
-        $(B)/game$(SHLIBNAME) \
-        $(B)/ui$(SHLIBNAME)
+        $(B)/out/$(BASEGAME)/cgame$(SHLIBNAME) \
+        $(B)/out/$(BASEGAME)/game$(SHLIBNAME) \
+        $(B)/out/$(BASEGAME)/ui$(SHLIBNAME)
     endif
   endif
 endif
@@ -624,17 +628,17 @@ endif
 ifneq ($(BUILD_GAME_QVM),0)
   ifeq ($(BUILD_ONLY_GAME),1)
     TARGETS += \
-      $(B)/vm/game.qvm
+      $(B)/out/$(BASEGAME)/vm/game.qvm
   else
     ifeq ($(BUILD_ONLY_CGUI),1)
       TARGETS += \
-        $(B)/vm/cgame.qvm \
-        $(B)/vm/ui.qvm
+        $(B)/out/$(BASEGAME)/vm/cgame.qvm \
+        $(B)/out/$(BASEGAME)/vm/ui.qvm
     else
       TARGETS += \
-        $(B)/vm/cgame.qvm \
-        $(B)/vm/game.qvm \
-        $(B)/vm/ui.qvm
+        $(B)/out/$(BASEGAME)/vm/cgame.qvm \
+        $(B)/out/$(BASEGAME)/vm/game.qvm \
+        $(B)/out/$(BASEGAME)/vm/ui.qvm
     endif
   endif
 endif
@@ -642,8 +646,8 @@ endif
 ifneq ($(BUILD_GAME_QVM_11),0)
   ifneq ($(BUILD_ONLY_GAME),1)
     TARGETS += \
-      $(B)/11/vm/cgame.qvm \
-      $(B)/11/vm/ui.qvm
+      $(B)/out/$(BASEGAME)_11/vm/cgame.qvm \
+      $(B)/out/$(BASEGAME)_11/vm/ui.qvm
   endif
 endif
 
@@ -782,11 +786,14 @@ makedirs:
 	@if [ ! -d $(B)/game ];then $(MKDIR) $(B)/game;fi
 	@if [ ! -d $(B)/ui ];then $(MKDIR) $(B)/ui;fi
 	@if [ ! -d $(B)/qcommon ];then $(MKDIR) $(B)/qcommon;fi
-	@if [ ! -d $(B)/vm ];then $(MKDIR) $(B)/vm;fi
 	@if [ ! -d $(B)/11 ];then $(MKDIR) $(B)/11;fi
 	@if [ ! -d $(B)/11/cgame ];then $(MKDIR) $(B)/11/cgame;fi
 	@if [ ! -d $(B)/11/ui ];then $(MKDIR) $(B)/11/ui;fi
-	@if [ ! -d $(B)/11/vm ];then $(MKDIR) $(B)/11/vm;fi
+	@if [ ! -d $(B)/out ];then $(MKDIR) $(B)/out;fi
+	@if [ ! -d $(B)/out/$(BASEGAME) ];then $(MKDIR) $(B)/out/$(BASEGAME);fi
+	@if [ ! -d $(B)/out/$(BASEGAME)/vm ];then $(MKDIR) $(B)/out/$(BASEGAME)/vm;fi
+	@if [ ! -d $(B)/out/$(BASEGAME)_11 ];then $(MKDIR) $(B)/out/$(BASEGAME)_11;fi
+	@if [ ! -d $(B)/out/$(BASEGAME)_11/vm ];then $(MKDIR) $(B)/out/$(BASEGAME)_11/vm;fi
 	@if [ ! -d $(B)/tools ];then $(MKDIR) $(B)/tools;fi
 	@if [ ! -d $(B)/tools/asm ];then $(MKDIR) $(B)/tools/asm;fi
 	@if [ ! -d $(B)/tools/etc ];then $(MKDIR) $(B)/tools/etc;fi
@@ -1035,15 +1042,15 @@ CGOBJ = $(CGOBJ_) $(B)/cgame/cg_syscalls.o
 CGVMOBJ = $(CGOBJ_:%.o=%.asm) $(B)/cgame/bg_lib.asm
 CGVMOBJ11 = $(CGOBJ11_:%.o=%.asm) $(B)/cgame/bg_lib.asm
 
-$(B)/cgame$(SHLIBNAME): $(CGOBJ)
+$(B)/out/$(BASEGAME)/cgame$(SHLIBNAME): $(CGOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(CGOBJ)
 
-$(B)/vm/cgame.qvm: $(CGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
+$(B)/out/$(BASEGAME)/vm/cgame.qvm: $(CGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(CGVMOBJ) $(CGDIR)/cg_syscalls.asm
 
-$(B)/11/vm/cgame.qvm: $(CGVMOBJ11) $(CGDIR)/cg_syscalls_11.asm $(Q3ASM)
+$(B)/out/$(BASEGAME)_11/vm/cgame.qvm: $(CGVMOBJ11) $(CGDIR)/cg_syscalls_11.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(CGVMOBJ11) $(CGDIR)/cg_syscalls_11.asm
 
@@ -1086,11 +1093,11 @@ GOBJ_ = \
 GOBJ = $(GOBJ_) $(B)/game/g_syscalls.o
 GVMOBJ = $(GOBJ_:%.o=%.asm) $(B)/game/bg_lib.asm
 
-$(B)/game$(SHLIBNAME): $(GOBJ)
+$(B)/out/$(BASEGAME)/game$(SHLIBNAME): $(GOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(GOBJ)
 
-$(B)/vm/game.qvm: $(GVMOBJ) $(GDIR)/g_syscalls.asm $(Q3ASM)
+$(B)/out/$(BASEGAME)/vm/game.qvm: $(GVMOBJ) $(GDIR)/g_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(GVMOBJ) $(GDIR)/g_syscalls.asm
 
@@ -1126,15 +1133,15 @@ UIOBJ = $(UIOBJ_) $(B)/ui/ui_syscalls.o
 UIVMOBJ = $(UIOBJ_:%.o=%.asm) $(B)/ui/bg_lib.asm
 UIVMOBJ11 = $(UIOBJ11_:%.o=%.asm) $(B)/ui/bg_lib.asm
 
-$(B)/ui$(SHLIBNAME): $(UIOBJ)
+$(B)/out/$(BASEGAME)/ui$(SHLIBNAME): $(UIOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(UIOBJ)
 
-$(B)/vm/ui.qvm: $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm $(Q3ASM)
+$(B)/out/$(BASEGAME)/vm/ui.qvm: $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm
 
-$(B)/11/vm/ui.qvm: $(UIVMOBJ11) $(UIDIR)/ui_syscalls_11.asm $(Q3ASM)
+$(B)/out/$(BASEGAME)_11/vm/ui.qvm: $(UIVMOBJ11) $(UIDIR)/ui_syscalls_11.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(UIVMOBJ11) $(UIDIR)/ui_syscalls_11.asm
 
