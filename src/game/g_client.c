@@ -1608,6 +1608,10 @@ void ClientBegin( int clientNum )
   {
     trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname ) );
 
+    // auto denybuild
+    if( G_admin_permission( ent, ADMF_NO_BUILD ) )
+      client->pers.denyBuild = qtrue;
+
     // auto mute flag
     if( G_admin_permission( ent, ADMF_NO_CHAT ) )
       client->pers.muted = qtrue;

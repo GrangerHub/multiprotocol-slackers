@@ -2304,6 +2304,7 @@ static AdminFlagListEntry_t adminFlagList[] =
   { ADMF_TEAMCHANGEFREE,       "keeps credits on team switch" },
   { ADMF_TEAMCHAT_CMD,         "can run commands from team chat" },
   { ADMF_UNACCOUNTABLE,        "does not need to specify reason for kick/ban" },
+  { ADMF_NO_BUILD,             "can not build" },
   { ADMF_NO_CHAT,              "can not talk" },
   { ADMF_NO_VOTE,              "can not call votes" }
 };
