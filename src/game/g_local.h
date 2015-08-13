@@ -1192,7 +1192,7 @@ void G_WriteSessionData( void );
 //
 // g_maprotation.c
 //
-#define MAX_MAP_ROTATIONS       16
+#define MAX_MAP_ROTATIONS       64
 #define MAX_MAP_ROTATION_MAPS   64
 #define MAX_MAP_COMMANDS        16
 #define MAX_MAP_ROTATION_CONDS  8
