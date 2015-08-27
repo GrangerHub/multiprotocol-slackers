@@ -263,7 +263,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
 
     {"restart", G_admin_restart, "restart",
       "restart the current map (optionally using named layout or keeping/switching teams)",
-      "(^5layout^7) (^5keepteams|switchteams|keepteamslock|switchteamslock^7)"
+      "(^5layout^7) (^5keepteams|switchteams|keepteamslock|switchteamslock|ktl|stl^7)"
     },
 
     {"revert", G_admin_revert, "revert",
@@ -5864,7 +5864,7 @@ qboolean G_admin_restart( gentity_t *ent, int skiparg )
     trap_Cvar_VariableStringBuffer( "mapname", map, sizeof( map ) );
     G_SayArgv( skiparg + 1, layout, sizeof( layout ) );
 
-    if( Q_stricmp( layout, "keepteams" ) && Q_stricmp( layout, "keepteamslock" ) && Q_stricmp( layout, "switchteams" ) && Q_stricmp( layout, "switchteamslock" ) )
+    if( Q_stricmp( layout, "keepteams" ) && Q_stricmp( layout, "keepteamslock" ) && Q_stricmp( layout, "ktl" ) && Q_stricmp( layout, "switchteams" ) && Q_stricmp( layout, "switchteamslock" ) && Q_stricmp( layout, "stl" ) )
     {
       if( !Q_stricmp( layout, "*BUILTIN*" ) ||
         trap_FS_FOpenFile( va( "layouts/%s/%s.dat", map, layout ),
@@ -5891,7 +5891,7 @@ qboolean G_admin_restart( gentity_t *ent, int skiparg )
   }
   
   
-  if( !Q_stricmp( teampref, "keepteams" ) || !Q_stricmp( teampref, "keepteamslock" ) )
+  if( !Q_stricmp( teampref, "keepteams" ) || !Q_stricmp( teampref, "keepteamslock" ) || !Q_stricmp( teampref, "ktl" ) )
   {
     for( i = 0; i < g_maxclients.integer; i++ )
     {
@@ -5905,7 +5905,7 @@ qboolean G_admin_restart( gentity_t *ent, int skiparg )
       cl->sess.restartTeam = cl->pers.teamSelection;
     }
   } 
-  else if(!Q_stricmp( teampref, "switchteams" ) ||  !Q_stricmp( teampref, "switchteamslock" ))
+  else if(!Q_stricmp( teampref, "switchteams" ) ||  !Q_stricmp( teampref, "switchteamslock" ) || !Q_stricmp( teampref, "stl" ) )
   {
     for( i = 0; i < g_maxclients.integer; i++ )
     {
