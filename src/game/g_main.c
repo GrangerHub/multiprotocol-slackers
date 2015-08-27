@@ -234,6 +234,9 @@ vmCvar_t  g_aimbotAdvertBan;
 vmCvar_t  g_aimbotAdvertBanTime;
 vmCvar_t  g_aimbotAdvertBanReason;
 
+vmCvar_t  g_scrimMode;
+vmCvar_t  g_scrimMinPubLvl;
+
 static cvarTable_t   gameCvarTable[ ] =
 {
   // don't override the cheat state set by the system
@@ -443,7 +446,10 @@ static cvarTable_t   gameCvarTable[ ] =
 
   { &g_aimbotAdvertBan, "g_aimbotAdvertBan", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_aimbotAdvertBanTime, "g_aimbotAdvertBanTime", "0", CVAR_ARCHIVE, 0, qfalse  },
-  { &g_aimbotAdvertBanReason, "g_aimbotAdvertBanReason", "AUTOBAN: AIMBOT", CVAR_ARCHIVE, 0, qfalse  }
+  { &g_aimbotAdvertBanReason, "g_aimbotAdvertBanReason", "AUTOBAN: AIMBOT", CVAR_ARCHIVE, 0, qfalse  },
+
+  { &g_scrimMode, "g_scrimMode", "0", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_scrimMinPubLvl, "g_scrimMinPubLvl", "5", CVAR_ARCHIVE, 0, qfalse  }
 };
 
 static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[ 0 ] );
@@ -2996,6 +3002,13 @@ void G_RunFrame( int levelTime )
       G_Printf( "%4i: %s\n", i, g_entities[ i ].classname );
 
     trap_Cvar_Set( "g_listEntity", "0" );
+  }
+
+  if ( g_scrimMode.integer && level.numConnectedClients < 2 &&
+       level.time - level.startTime >= 5000 )
+  {
+    trap_Cvar_Set( "g_scrimMode", "0" );
+    AP( "print \"^7Scrim mode automatically ^5disabled^7\n\"" );
   }
 }
 

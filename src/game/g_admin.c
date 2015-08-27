@@ -277,6 +277,11 @@ g_admin_cmd_t g_admin_cmds[ ] =
        ""
     },
 
+    {"scrim", G_admin_scrim, "scrim",
+       "enables/disables scrim mode",
+       "^3Scrim mode ^7turns votes and public chat off for non-admins and blocks PMs"
+    },
+
     {"seen", G_admin_seen, "seen",
       "find the last time a player was on the server",
       "[^3name|admin#^7]"
@@ -2006,6 +2011,56 @@ static int G_admin_find_admin_slot( gentity_t *ent, char *namearg, char *command
     Q_strncpyz( nick, g_admin_admins[ id ]->name, nick_len );
 
   return id;
+}
+
+qboolean G_admin_scrim( gentity_t *ent, int skiparg )
+{
+  char scrimSwitch[ MAX_STRING_CHARS ];
+
+  if( G_SayArgc() < 2 + skiparg )
+  {
+    ADMP( "^3!scrim: ^7usage: !scrim [^5on^7|^1off^7]\n" );
+    return qfalse;
+  }
+
+  G_SayArgv( 1 + skiparg, scrimSwitch, sizeof( scrimSwitch ) );
+
+  if( !Q_stricmp(scrimSwitch, "on" ) )
+  {
+    if( g_scrimMode.integer )
+    {
+      ADMP( "^3!scrim: ^7Scrim mode is already ^5enabled^7\n" );
+      return qfalse;
+    }
+
+    if( level.numConnectedClients < 2 )
+    {
+      ADMP( "^3!scrim: ^7Scrim mode requires at least 2 players\n" );
+      return qfalse;
+    }
+
+    trap_Cvar_Set( "g_scrimMode", "1" );
+    AP( va( "print \"^3!scrim: ^7Scrim mode was ^5enabled ^7by %s^7\n\"",
+        ( ent ) ? G_admin_adminPrintName( ent ) : "console" ) );
+
+  } else if( !Q_stricmp(scrimSwitch, "off" ) )
+  {
+    if( !g_scrimMode.integer )
+    {
+      ADMP( "^3!scrim: ^7Scrim mode is already ^1disabled^7\n" );
+      return qfalse;
+    }
+
+    trap_Cvar_Set( "g_scrimMode", "0" );
+    AP( va( "print \"^3!scrim: ^7Scrim mode was ^5disabled ^7by %s^7\n\"", 
+        ( ent ) ? G_admin_adminPrintName( ent ) : "console" ) );
+
+  } else {
+    ADMP( va( "^3!scrim: ^7invalid argument \"%s\"\n", scrimSwitch ) );
+    return qfalse;
+  }
+
+  return qtrue;
 }
 
 qboolean G_admin_setlevel( gentity_t *ent, int skiparg )

@@ -1482,6 +1482,9 @@ extern  vmCvar_t  g_aimbotAdvertBan;
 extern  vmCvar_t  g_aimbotAdvertBanTime;
 extern  vmCvar_t  g_aimbotAdvertBanReason;
 
+extern  vmCvar_t  g_scrimMode;
+extern  vmCvar_t  g_scrimMinPubLvl;
+
 void      trap_Printf( const char *fmt );
 void      trap_Error( const char *fmt );
 int       trap_Milliseconds( void );

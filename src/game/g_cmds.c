@@ -769,6 +769,12 @@ void Cmd_Team_f( gentity_t *ent )
     return;
   }
   
+  if( g_scrimMode.integer )
+  {
+    trap_SendServerCommand( ent-g_entities, "print \"Scrim mode is ^1on^7, joining teams has been disabled\n\"" );
+    return;
+  }
+
   if( oldteam == PTE_ALIENS )
     aliens--;
   else if( oldteam == PTE_HUMANS )
@@ -1173,6 +1179,12 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
 
   if( target )
   {
+    if( target->client && target->client->pers.teamSelection != PTE_NONE && G_admin_level(ent) < g_scrimMinPubLvl.integer && g_scrimMode.integer)
+    {
+      trap_SendServerCommand( ent-g_entities,va ( "print \"Scrim mode is ^1on^7, can't message that target.\n\"") );
+      return;
+    }
+
     G_SayTo( ent, target, mode, color, name, text, prefix );
     return;
   }
@@ -1182,6 +1194,12 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
   // Ugly hax: if adminsayfilter is off, do the SAY first to prevent text from going out of order
   if( !g_adminSayFilter.integer )
   {
+    if( mode != SAY_TEAM && ent && ent->client && ent->client->pers.teamSelection == PTE_NONE && G_admin_level(ent) < g_scrimMinPubLvl.integer && g_scrimMode.integer)
+    {
+      trap_SendServerCommand( ent-g_entities,va ( "print \"Scrim mode is ^1on^7, public chat is disabled.\n\"") );
+      return;
+    }
+
     // send it to all the apropriate clients
     for( j = 0; j < level.maxclients; j++ )
     {
@@ -1201,6 +1219,12 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
   // if it's on, do it here, where it won't happen if it was an admin command
   if( g_adminSayFilter.integer )
   {
+    if( mode != SAY_TEAM && ent && ent->client && ent->client->pers.teamSelection == PTE_NONE && G_admin_level(ent) < g_scrimMinPubLvl.integer && g_scrimMode.integer)
+    {
+      trap_SendServerCommand( ent-g_entities,va ( "print \"Scrim mode is ^1on^7, public chat is disabled.\n\"") );
+      return;
+    }
+
     // send it to all the apropriate clients
     for( j = 0; j < level.maxclients; j++ )
     {
@@ -1476,6 +1500,12 @@ void Cmd_CallVote_f( gentity_t *ent )
   if( ent->client->sess.invisible == qtrue )
   {
     trap_SendServerCommand( ent-g_entities, "print \"You cannot call votes while invisible\n\"" );
+    return;
+  }
+
+  if( g_scrimMode.integer && G_admin_level(ent) < g_scrimMinPubLvl.integer )
+  {
+    trap_SendServerCommand( ent-g_entities, "print \"Voting is disallowed while scrim mode is ^1on^7\n\"" );
     return;
   }
 
@@ -2138,6 +2168,12 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
     numVoters = level.numAlienClients;
   else if(team==PTE_HUMANS)
     numVoters = level.numHumanClients;
+
+  if( g_scrimMode.integer && G_admin_level(ent) < g_scrimMinPubLvl.integer )
+  {
+    trap_SendServerCommand( ent-g_entities, "print \"Voting is disallowed while scrim mode is ^1on^7\n\"" );
+    return;
+  }
 
   if( !g_allowVote.integer )
   {
@@ -5353,12 +5389,14 @@ void G_PrivateMessage( gentity_t *ent )
 {
   int pids[ MAX_CLIENTS ];
   int ignoreids[ MAX_CLIENTS ];
+  int scrimids[ MAX_CLIENTS ];
   char name[ MAX_NAME_LENGTH ];
   char cmd[ 12 ];
   char str[ MAX_STRING_CHARS ];
   char *msg;
   char color;
   int pcount, matches, ignored = 0;
+  int scrimming = 0;
   int i;
   int skipargs = 0;
   qboolean teamonly = qfalse;
@@ -5406,6 +5444,12 @@ void G_PrivateMessage( gentity_t *ent )
 
       if( teamonly && !OnSameTeam( ent, tmpent ) )
         continue;
+
+      if ( g_scrimMode.integer && !OnSameTeam( ent, tmpent ) )
+      {
+        scrimids[ scrimming++ ] = pids[ i ];
+        continue;
+      }
       
       // Ignore sending to invisible players
       if( tmpent->client->sess.invisible == qtrue && !G_admin_permission( ent, "invisible" ) )
@@ -5414,7 +5458,7 @@ void G_PrivateMessage( gentity_t *ent )
       // Ignore sending to non-invisible-capable players while invisible
       if( ent->client->sess.invisible == qtrue && !G_admin_permission( tmpent, "invisible" ) )
         continue;
-      
+
       if( BG_ClientListTest( &tmpent->client->sess.ignoreList,
         ent-g_entities ) )
       {
@@ -5495,6 +5539,20 @@ void G_PrivateMessage( gentity_t *ent )
     for( i=0; i < ignored; i++ )
     {
       tmpent = &g_entities[ ignoreids[ i ] ];
+      if( i > 0 )
+        Q_strcat( str, sizeof( str ), "^7, " );
+      Q_strcat( str, sizeof( str ), tmpent->client->pers.netname );
+    }
+    ADMP( va( "%s\n", str ) );
+  }
+
+  if( scrimming )
+  {
+    Q_strncpyz( str, va( "^%ccan't send to %i player%s because scrim mode is ^1on^%c: ^7",
+      color, scrimming, ( scrimming == 1 ) ? "" : "s", color ), sizeof( str ) );
+    for( i = 0; i < scrimming; i++ )
+    {
+      tmpent = &g_entities[ scrimids[ i ] ];
       if( i > 0 )
         Q_strcat( str, sizeof( str ), "^7, " );
       Q_strcat( str, sizeof( str ), tmpent->client->pers.netname );
