@@ -46,7 +46,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
       " the specified amount",
       "[^3ban#^7] (^5duration^7) (^5reason^7)"
     },
-    
+
     {"adminlog", G_admin_adminlog, "adminlog",
       "list recent admin activity",
       "(^5start id#|name|!command|-skip#^7) (^5search skip#^7)"
@@ -66,7 +66,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "restore a player's ability to use a weapon or class",
       "[^3name|slot#^7] [^3class|weapon|all^7]"
     },
-    
+
     {"allready", G_admin_allready, "allready",
       "makes everyone ready in intermission",
       ""
@@ -91,7 +91,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "cancel a vote taking place",
       ""
     },
-    
+
     {"cp", G_admin_cp, "cp",
       "display a CP message to users, optionally specifying team(s) to send to",
       "(-AHS) [^3message^7]"
@@ -148,37 +148,37 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "display the contents of server info files",
       "(^5subject^7)"
     },
-    
+
     {"invisible", G_admin_invisible, "invisible",
       "hides a player so they cannot be seen in playerlists",
       ""
     },
-    
+
     {"kick", G_admin_kick, "kick",
       "kick a player with an optional reason",
       "[^3name|slot#^7] (^5reason^7)"
     },
-    
+
     {"L0", G_admin_L0, "l0",
       "Sets a level 1 to level 0",
       "[^3name|slot#^7]"
     },
-    
+
     {"L1", G_admin_L1, "l1",
       "Sets a level 0 to level 1",
       "[^3name|slot#^7]"
     },
-    
+
     {"layoutsave", G_admin_layoutsave, "layoutsave",
       "save a map layout",
       "[^3mapname^7]"
     },
-    
+
     {"listadmins", G_admin_listadmins, "listadmins",
       "display a list of all server admins and their levels",
       "(^5name|start admin#^7) (^5minimum level to display^7)"
     },
-    
+
     {"listlayouts", G_admin_listlayouts, "listlayouts",
       "display a list of all available layouts for a map",
       "(^5mapname^7)"
@@ -188,17 +188,17 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "display a list of players, their client numbers and their levels",
       ""
     },
-    
+
     {"listmaps", G_admin_listmaps, "listmaps",
       "display a list of available maps on the server",
       "(^5map name^7)"
     },
-    
+
     {"lock", G_admin_lock, "lock",
       "lock a team to prevent anyone from joining it",
       "[^3a|h^7]"
     },
-    
+
     {"map", G_admin_map, "map",
       "load a map (and optionally force layout)",
       "[^3mapname^7] (^5layout^7)"
@@ -213,7 +213,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "mute a player",
       "[^3name|slot#^7] (Duration)"
     },
-    
+
     {"namelog", G_admin_namelog, "namelog",
       "display a list of names used by recently connected players",
       "(^5name^7)"
@@ -233,7 +233,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "pass a vote currently taking place",
       ""
     },
-    
+
     {"pause", G_admin_pause, "pause",
       "prevent a player from interacting with the game."
       "  * will pause all players, using no argument will pause game clock",
@@ -250,7 +250,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "reloads the admin config file and refreshes permission flags",
       ""
     },
-    
+
     {"register", G_admin_register, "register",
       "Registers your name to protect it from being used by others or updates your admin name to your current name.",
       ""
@@ -332,12 +332,12 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "unbans a player specified by the slot as seen in showbans",
       "[^3ban#^7]"
     },
-    
+
     {"undesignate", G_admin_designate, "designate",
       "revoke designated builder privileges",
       "[^3name|slot#^7]"
     },
-    
+
     {"unflag", G_admin_flag, "flag",
       "clears an admin flag from a player. "
       "console can use this command on admin levels by prefacing a '*' to the admin level value.",
@@ -348,7 +348,7 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "unlock a locked team",
       "[^3a|h^7]"
     },
-    
+
     {"unmute", G_admin_mute, "mute",
       "unmute a muted player",
       "[^3name|slot#^7]"
@@ -493,13 +493,13 @@ qboolean G_admin_name_check( gentity_t *ent, char *name, char *err, int len )
       return qfalse;
     }
   }
-   
+
   if( Q_isdigit( name2[ 0 ] ) || name2[ 0 ] == '-' )
   {
     Q_strncpyz( err, "Names cannot begin with a number or with a dash. Please choose another.", len );
     return qfalse;
   }
-  
+
   for( i = 0; name2[ i ] !='\0'; i++)
   {
     if( Q_isalpha( name2[ i ] ) )
@@ -514,7 +514,7 @@ qboolean G_admin_name_check( gentity_t *ent, char *name, char *err, int len )
       }
     }
   }
-  
+
   if( alphaCount == 0 ) 
   {
     Q_strncpyz( err, va( "The name '%s^7' does not include at least one letter. Please choose another.", name ), len );
@@ -664,7 +664,7 @@ void admin_writeconfig( void )
         continue;
       }
     }
-    
+
     trap_FS_Write( "[admin]\n", 8, f );
     trap_FS_Write( "name    = ", 10, f );
     admin_writeconfig_string( g_admin_admins[ i ]->name, f );
@@ -685,7 +685,6 @@ void admin_writeconfig( void )
     if( g_admin_bans[ i ]->expires != 0 &&
          ( g_admin_bans[ i ]->expires - t ) < 1 )
       continue;
-
     trap_FS_Write( "[ban]\n", 6, f );
     trap_FS_Write( "name    = ", 10, f );
     admin_writeconfig_string( g_admin_bans[ i ]->name, f );
@@ -888,7 +887,7 @@ void G_admin_set_adminname( gentity_t *ent )
       break;
     }
   }
- 
+
   if( found )
   {
      Q_strncpyz( ent->client->pers.adminName, g_admin_admins[ i ]->name, sizeof( ent->client->pers.adminName ) );
@@ -927,7 +926,7 @@ char* G_admin_adminPrintName( gentity_t *ent )
     out = "";
     return out;
   }
-  
+
   if( G_admin_permission( ent, ADMF_ADMINSTEALTH ) )
   {
      out = ent->client->pers.adminName;
@@ -935,7 +934,7 @@ char* G_admin_adminPrintName( gentity_t *ent )
   else
   {
      out = ent->client->pers.netname;
-  }  
+  }
 
 
   return out;
@@ -1049,7 +1048,7 @@ static void admin_log( gentity_t *admin, char *cmd, int skiparg )
      trap_FS_Write( string, strlen( string ), f );
   }
   trap_FS_FCloseFile( f );
-  
+
   if ( !Q_stricmp( cmd, "attempted" ) )
   {
     Com_sprintf( string, sizeof( string ),
@@ -1060,7 +1059,7 @@ static void admin_log( gentity_t *admin, char *cmd, int skiparg )
                  G_SayConcatArgs( 1 + skiparg ) );
     G_AdminsPrintf("%s\n",string);
   }
-  
+
     G_LogPrintf("Admin Command: %s^7 (%s): %s %s\n",( admin ) ? admin->client->pers.netname : "console", ( admin ) ? admin->client->pers.adminName : "console", cmd, G_SayConcatArgs( 1 + skiparg ));
 }
 
@@ -1076,7 +1075,7 @@ static int admin_listadmins( gentity_t *ent, int start, char *search, int minlev
   gentity_t *vic;
   int l = 0;
   qboolean dup = qfalse;
-  
+
   ADMBP_begin();
 
   // print out all connected players regardless of level if name searching
@@ -1086,7 +1085,7 @@ static int admin_listadmins( gentity_t *ent, int start, char *search, int minlev
 
     if( vic->client && vic->client->pers.connected != CON_CONNECTED )
       continue;
-    
+
     l = vic->client->pers.adminLevel;
 
     G_SanitiseString( vic->client->pers.netname, name, sizeof( name ) );
@@ -1096,7 +1095,7 @@ static int admin_listadmins( gentity_t *ent, int start, char *search, int minlev
     for( j = 0; j < 8; j++ )
       guid_stub[ j ] = vic->client->pers.guid[ j + 24 ];
     guid_stub[ j ] = '\0';
-  
+
     lname[ 0 ] = '\0'; 
     Q_strncpyz( lname_fmt, "%s", sizeof( lname_fmt ) );
     for( j = 0; j < MAX_ADMIN_LEVELS && g_admin_levels[ j ]; j++ )
@@ -1137,7 +1136,7 @@ static int admin_listadmins( gentity_t *ent, int start, char *search, int minlev
        G_SanitiseString( g_admin_admins[ i ]->name, name, sizeof( name ) );
        if( !strstr( name, search ) )
          continue;
-      
+
        // verify we don't have the same guid/name pair in connected players
        // since we don't want to draw the same player twice
        dup = qfalse;
@@ -1160,7 +1159,7 @@ static int admin_listadmins( gentity_t *ent, int start, char *search, int minlev
      for( j = 0; j < 8; j++ )
        guid_stub[ j ] = g_admin_admins[ i ]->guid[ j + 24 ];
      guid_stub[ j ] = '\0';
-    
+
      lname[ 0 ] = '\0'; 
      Q_strncpyz( lname_fmt, "%s", sizeof( lname_fmt ) );
      for( j = 0; j < MAX_ADMIN_LEVELS && g_admin_levels[ j ]; j++ )
@@ -1225,27 +1224,27 @@ qboolean G_admin_ban_check( char *userinfo, char *reason, int rlen )
   int t;
   char notice[51];
   qboolean ignoreIP = qfalse;
-  
+
   trap_Cvar_VariableStringBuffer( "g_banNotice", notice, sizeof( notice ) );
- 
+
   *reason = '\0'; 
-  
+
   if( !*userinfo )
     return qfalse;
-  
+
   value = Info_ValueForKey( userinfo, "ip" );
   Q_strncpyz( ip, value, sizeof( ip ) );
   // strip port
   value = strchr( ip, ':' );
   if ( value )
     *value = '\0';
-  
+
   if( !*ip )
     return qfalse;
-  
+
   value = Info_ValueForKey( userinfo, "cl_guid" );
   Q_strncpyz( guid, value, sizeof( guid ) );
-  
+
   t = trap_RealTime( NULL );
   memset( IP, 0, sizeof( IP ));
   sscanf(ip, "%i.%i.%i.%i", &IP[4], &IP[3], &IP[2], &IP[1]);
@@ -1319,7 +1318,7 @@ qboolean G_admin_ban_check( char *userinfo, char *reason, int rlen )
             duration,
             g_admin_bans[ i ]->reason );
         }
-            
+
         Com_sprintf(
           reason,
           rlen,
@@ -1401,7 +1400,7 @@ qboolean G_admin_cmd_check( gentity_t *ent, qboolean say )
   {
     return qfalse;
   }
-  
+
        // Flood limit.  If they're talking too fast, determine that and return.
   if( g_floodMinTime.integer )
    if ( G_Flood_Limited( ent ) )
@@ -1852,7 +1851,7 @@ qboolean G_admin_readconfig( gentity_t *ent, int skiparg )
   else
   {
     char n[ MAX_NAME_LENGTH ] = {""};
- 
+
     // max printable name length for formatting 
     for( i = 0; i < MAX_ADMIN_LEVELS && g_admin_levels[ i ]; i++ )
     {
@@ -1876,7 +1875,7 @@ qboolean G_admin_time( gentity_t *ent, int skiparg )
   t = trap_RealTime( &qt );
   ADMP( va( "^3!time: ^7local time is %02i:%02i:%02i\n",
     qt.tm_hour, qt.tm_min, qt.tm_sec ) );
-    
+
   return qtrue;
 }
 
@@ -2123,7 +2122,7 @@ qboolean G_admin_setlevel( gentity_t *ent, int skiparg )
     g_admin_admins[ i ] = a;
   }
 
-  AP( va( 
+  AP( va(
     "print \"^3!setlevel: ^7%s^7 was given level %d admin rights by %s\n\"",
     adminname, l, ( ent ) ? G_admin_adminPrintName( ent ) : "console" ) );
   if( vic )
@@ -2131,7 +2130,7 @@ qboolean G_admin_setlevel( gentity_t *ent, int skiparg )
     vic->client->pers.adminLevel = l;
     G_admin_set_adminname( vic );
   }
-  
+
   if( !g_admin.string[ 0 ] )
     ADMP( "^3!setlevel: ^7WARNING g_admin not set, not saving admin record "
       "to a file\n" );
@@ -2610,7 +2609,7 @@ qboolean G_admin_kick( gentity_t *ent, int skiparg )
   int minargc;
   gentity_t *vic;
   char notice[51];
-  
+
   trap_Cvar_VariableStringBuffer( "g_banNotice", notice, sizeof( notice ) );
 
   minargc = 3 + skiparg;
@@ -2649,7 +2648,7 @@ qboolean G_admin_kick( gentity_t *ent, int skiparg )
   va( "disconnect \"You have been kicked.\n%s^7\nreason:\n%s\n%s\"",
     ( ent ) ? va( "admin:\n%s", G_admin_adminPrintName( ent ) ) : "admin\nconsole",
     ( *reason ) ? reason : "kicked by admin", notice ) );
-  
+
   trap_DropClient( pids[ 0 ], va( "kicked%s^7, reason: %s",
     ( ent ) ? va( " by %s", G_admin_adminPrintName( ent ) ) : " by console",
     ( *reason ) ? reason : "kicked by admin" ) );
@@ -2672,9 +2671,9 @@ qboolean G_admin_ban( gentity_t *ent, int skiparg )
   char s2[ MAX_NAME_LENGTH ];
   char guid_stub[ 9 ];
   char notice[51];
-  
+
   trap_Cvar_VariableStringBuffer( "g_banNotice", notice, sizeof( notice ) );
-  
+
   if( G_admin_permission( ent, ADMF_CAN_PERM_BAN ) &&
        G_admin_permission( ent, ADMF_UNACCOUNTABLE ) )
   {
@@ -2749,7 +2748,7 @@ qboolean G_admin_ban( gentity_t *ent, int skiparg )
       exactmatch = qtrue;
       break;
     }
-  } 
+  }
 
   for( i = 0;
        !exactmatch && i < MAX_ADMIN_NAMELOGS && g_admin_namelog[ i ];
@@ -2774,16 +2773,16 @@ qboolean G_admin_ban( gentity_t *ent, int skiparg )
       {
         if( logmatch != i )
           logmatches++;
-        logmatch = i; 
+        logmatch = i;
       }
     }
   }
-  
-  if( !logmatches ) 
+
+  if( !logmatches )
   {
     ADMP( "^3!ban: ^7no player found by that name, IP, or slot number\n" );
     return qfalse;
-  } 
+  }
   else if( logmatches > 1 )
   {
     ADMBP_begin();
@@ -2813,7 +2812,7 @@ qboolean G_admin_ban( gentity_t *ent, int skiparg )
     ADMBP_end();
     return qfalse;
   }
-  
+
   G_admin_duration( ( seconds ) ? seconds : -1,
     duration, sizeof( duration ) );
 
@@ -2850,7 +2849,7 @@ qboolean G_admin_ban( gentity_t *ent, int skiparg )
       ( *reason ) ? reason : "banned by admin" ) );
     return qtrue;
   }
-  
+
   trap_SendServerCommand( g_admin_namelog[ logmatch ]->slot,
     va( "disconnect \"You have been banned.\n"
       "admin:\n%s^7\nduration:\n%s\nreason:\n%s\n%s\"",
@@ -2993,7 +2992,7 @@ qboolean G_admin_subnetban( gentity_t *ent, int skiparg )
   char strmask[ 5 ];
   char exl[2];
   int k, IP[5];
-  
+
   if( G_SayArgc() < 3 + skiparg )
   {
     ADMP( "^3!subnetban: ^7usage: !subnetban [ban#] [mask]\n" );
@@ -3014,7 +3013,7 @@ qboolean G_admin_subnetban( gentity_t *ent, int skiparg )
 
   G_SayArgv( 2 + skiparg, strmask, sizeof( strmask ) );
   mask = atoi( strmask );
-  
+
   if( mask >= 0 && mask <= 32)
   {
     G_SayArgv( 3 + skiparg, exl, sizeof( exl ) );
@@ -3081,9 +3080,9 @@ qboolean G_admin_subnetban( gentity_t *ent, int skiparg )
   {
     Q_strncpyz( cIPRlow, "0.0.0.0", sizeof( cIPRlow ) );
     Q_strncpyz( cIPRhigh, "255.255.255.255", sizeof( cIPRhigh ) );
-    
+
   }
-  
+
   AP( va( "print \"^3!subnetban: ^7ban #%d for %s^7 has been updated by %s^7 "
     "%s (%s - %s)\n\"",
     bnum,
@@ -3729,7 +3728,7 @@ qboolean G_admin_map( gentity_t *ent, int skiparg )
 {
   char map[ MAX_QPATH ];
   char layout[ MAX_QPATH ] = { "" };
-  
+
   if( G_SayArgc( ) < 2 + skiparg )
   {
     ADMP( "^3!map: ^7usage: !map [map] (layout)\n" );
@@ -3864,7 +3863,7 @@ void G_admin_maplog_result( char *flag )
     // only one result allowed
     return;
   }
-  
+
   if ( level.surrenderTeam != PTE_NONE )
   {
     if( flag[ 0 ] == 'a' )
@@ -3964,7 +3963,7 @@ qboolean G_admin_maplog( gentity_t *ent, int skiparg )
          clock = ptr;
          ptr = colon + 1;
          *colon = '\0';
- 
+
          // right justification with -6%s doesnt work..
          if( clock[ 0 ] == '0' && clock[ 1 ] != ':' )
          {
@@ -3979,7 +3978,7 @@ qboolean G_admin_maplog( gentity_t *ent, int skiparg )
        result = "^3current map";
        clock = "  -:--";
      }
- 
+
      ADMBP( va( "%s%20s %-6s %s^7\n",
        ( count == 0 ) ? "^3" : "^7",
        ptr,
@@ -4575,18 +4574,18 @@ qboolean G_admin_listplayers( gentity_t *ent, int skiparg )
     if ( p->sess.invisible == qtrue )
       invisiblePlayers++;
   }
-  
+
   ADMBP_begin();
   ADMBP( va( "^3!listplayers^7: %i players connected:\n",
     level.numConnectedClients - invisiblePlayers ) );
   for( i = 0; i < level.maxclients; i++ )
   {
     p = &level.clients[ i ];
-    
+
     // Ignore invisible players
     if ( p->sess.invisible == qtrue )
       continue;
-    
+
     Q_strncpyz( t, "S", sizeof( t ) );
     Q_strncpyz( c, S_COLOR_YELLOW, sizeof( c ) );
     if( p->pers.teamSelection == PTE_HUMANS )
@@ -4952,7 +4951,7 @@ qboolean G_admin_listrotation( gentity_t *ent, int skiparg )
   {
     ADMP( va ("^5 Next map overriden by g_nextMap to: %s\n", g_nextMap.string ) );
   }
-  
+
   return qtrue;
 }
 
@@ -5049,7 +5048,7 @@ qboolean G_admin_showbans( gentity_t *ent, int skiparg )
     else if( start < 0 )
       start = found + start;
   }
-  
+
   if( start >= MAX_ADMIN_BANS || start < 0 )
     start = 0;
 
@@ -5090,7 +5089,7 @@ qboolean G_admin_showbans( gentity_t *ent, int skiparg )
       }
       if( strlen( n2 ) > max_banner )
         max_banner = strlen( n2 );
- 
+
       show_count++;
     }
   }
@@ -5719,7 +5718,7 @@ qboolean G_admin_register(gentity_t *ent, int skiparg ){
 
   if( level == 0 )
    level = 1;
-  
+
   if( !Q_stricmp( ent->client->pers.guid, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ) )
   {
     ADMP( va( "^3!register: ^7 You cannot register for name protection until you update your client. Please replace your client executable with the one at http://trem.tjw.org/backport/ and reconnect. Updating your client will also allow you to have faster map downloads.\n" ) );
@@ -5829,13 +5828,13 @@ qboolean G_admin_restart( gentity_t *ent, int skiparg )
       G_SayArgv( skiparg + 1, teampref, sizeof( teampref ) );    
     }
   }
-  
+
   if( G_SayArgc( ) > 2 + skiparg ) 
   {
     G_SayArgv( skiparg + 2, teampref, sizeof( teampref ) );      
   }
-  
-  
+
+
   if( !Q_stricmp( teampref, "keepteams" ) || !Q_stricmp( teampref, "keepteamslock" ) )
   {
     for( i = 0; i < g_maxclients.integer; i++ )
@@ -5849,7 +5848,7 @@ qboolean G_admin_restart( gentity_t *ent, int skiparg )
 
       cl->sess.restartTeam = cl->pers.teamSelection;
     }
-  } 
+  }
   else if(!Q_stricmp( teampref, "switchteams" ) ||  !Q_stricmp( teampref, "switchteamslock" ))
   {
     for( i = 0; i < g_maxclients.integer; i++ )
@@ -5865,21 +5864,21 @@ qboolean G_admin_restart( gentity_t *ent, int skiparg )
         cl->sess.restartTeam = PTE_HUMANS;
       else if(cl->pers.teamSelection == PTE_HUMANS )
         cl->sess.restartTeam = PTE_ALIENS;
-    }    
+    }
   }
-  
+
   if( !Q_stricmp( teampref, "switchteamslock" ) || !Q_stricmp( teampref, "keepteamslock" ) )
   {
     trap_Cvar_Set( "g_lockTeamsAtStart", "1" );
   }
 
   trap_SendConsoleCommand( EXEC_APPEND, "map_restart" );
-  
+
   if(teampref[ 0 ])
     strcpy(teampref,va( "^7(with teams option: '%s^7')", teampref ));
-  
+
   G_admin_maplog_result( "R" );
-  
+
   AP( va( "print \"^3!restart: ^7map restarted by %s %s %s\n\"",
           ( ent ) ? G_admin_adminPrintName( ent ) : "console",
           ( layout[ 0 ] ) ? va( "^7(forcing layout '%s^7')", layout ) : "",
@@ -5891,15 +5890,15 @@ qboolean G_admin_nobuild( gentity_t *ent, int skiparg )
 {
   char buffer[ MAX_STRING_CHARS ];
   int  i, tmp;
-  
+
   if( G_SayArgc() < 2 + skiparg )
   {
     ADMP( "^3!nobuild: ^7usage: !nobuild (^5enable / disable / log / remove / save^7)\n" );
     return qfalse;
   }
-  
+
   G_SayArgv( 1 + skiparg, buffer, sizeof( buffer ) );
-  
+
   if( !Q_stricmp( buffer, "enable" ) || !Q_stricmp( buffer, "Enable" ) )
   {
   	if( G_SayArgc() < 4 + skiparg )
@@ -5949,7 +5948,7 @@ qboolean G_admin_nobuild( gentity_t *ent, int skiparg )
 		return qfalse;
 	}
   }
-  
+
   if( !Q_stricmp( buffer, "log" ) || !Q_stricmp( buffer, "Log" ) )
   {
  	ADMBP_begin();
@@ -5969,7 +5968,7 @@ qboolean G_admin_nobuild( gentity_t *ent, int skiparg )
   	ADMBP_end();
 	return qtrue;
   }
-  
+
   if( !Q_stricmp( buffer, "remove" ) || !Q_stricmp( buffer, "Remove" ) )
   {
  	if( G_SayArgc() < 3 + skiparg )
@@ -6000,7 +5999,7 @@ qboolean G_admin_nobuild( gentity_t *ent, int skiparg )
 	ADMP( va( "^3!nobuild:^7 marker %i has been removed\n", tmp + 1 ) );
 	return qtrue;
   }
-  
+
   if( !Q_stricmp( buffer, "save" ) || !Q_stricmp( buffer, "Save" ) )
   {
   	int  i, tmp;
@@ -6156,7 +6155,7 @@ qboolean G_admin_unlock( gentity_t *ent, int skiparg )
     ADMP( va( "^3!unlock: ^7invalid team\"%c\"\n", teamName[0] ) );
     return qfalse;
   }
-  
+
   if( team == PTE_ALIENS )
   {
     if( !level.alienTeamLocked )
@@ -6181,7 +6180,7 @@ qboolean G_admin_unlock( gentity_t *ent, int skiparg )
     ( team == PTE_ALIENS ) ? "Alien" : "Human",
     ( ent ) ? G_admin_adminPrintName( ent ) : "console" ) );
   return qtrue;
-} 
+}
 
 qboolean G_admin_designate( gentity_t *ent, int skiparg )
 {
@@ -6285,7 +6284,7 @@ qboolean G_admin_warn( gentity_t *ent, int skiparg )
             ( ent ) ? G_admin_adminPrintName( ent ) : "console" ) );//console announcement
   return qtrue;
 }
- 
+
 qboolean G_admin_putmespec( gentity_t *ent, int skiparg )
 {
   if( !ent )
@@ -6299,10 +6298,10 @@ qboolean G_admin_putmespec( gentity_t *ent, int skiparg )
     ADMP("!specme: disabled when game is paused\n");
     return qfalse;
   }
-  
+
   if(ent->client->pers.teamSelection == PTE_NONE)
     return qfalse;
-  
+
     //guard against build timer exploit
   if( ent->client->pers.teamSelection != PTE_NONE && ent->client->sess.sessionTeam != TEAM_SPECTATOR && 
      ( ent->client->ps.stats[ STAT_PCLASS ] == PCL_ALIEN_BUILDER0 ||
@@ -6314,7 +6313,7 @@ qboolean G_admin_putmespec( gentity_t *ent, int skiparg )
     ADMP("!specme: You cannot leave your team until the build timer expires");
     return qfalse;
   }
-  
+
   G_ChangeTeam( ent, PTE_NONE );
   AP( va("print \"^3!specme: ^7%s^7 decided to join the spectators\n\"", ent->client->pers.netname ) );
   return qtrue;
@@ -6918,7 +6917,7 @@ qboolean G_admin_revert( gentity_t *ent, int skiparg )
   {
     ADMP( va( "^3!revert: ^7reverted %d buildlog events\n", matchlen ) );  
   }
-  
+
   return qtrue;
 }
 
@@ -7221,7 +7220,7 @@ qboolean G_admin_L1(gentity_t *ent, int skiparg ){
     ADMP( "^3!L1: ^7Sorry, but that person is already higher than level 0.\n" );
     return qfalse;
   }
- 
+
   trap_SendConsoleCommand( EXEC_APPEND,va( "!setlevel %d 1;", pids[ 0 ] ) );
   return qtrue;
 }
@@ -7233,7 +7232,7 @@ qboolean G_admin_invisible( gentity_t *ent, int skiparg )
     ADMP( "!invisible: console can not become invisible.\n" );
     return qfalse;
   }
-  
+
   if ( ent->client->sess.invisible != qtrue )
   {
     // Make the player invisible
