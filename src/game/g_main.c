@@ -289,7 +289,7 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_filterBan, "g_filterBan", "1", CVAR_ARCHIVE, 0, qfalse  },
 
   { &g_needpass, "g_needpass", "0", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse },
-  
+
   { &g_autoGhost, "g_autoGhost", "1", CVAR_SERVERINFO, 0, qfalse },
 
   { &g_dedicated, "dedicated", "0", 0, 0, qfalse  },
@@ -334,7 +334,7 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_mapRotationVote, "g_mapRotationVote", "15", CVAR_ARCHIVE, 0, qfalse },
   { &g_readyPercent, "g_readyPercent", "0", CVAR_ARCHIVE, 0, qfalse },
   { &g_designateVotes, "g_designateVotes", "0", CVAR_ARCHIVE, 0, qfalse },
-  
+
   { &g_listEntity, "g_listEntity", "0", 0, 0, qfalse },
   { &g_minCommandPeriod, "g_minCommandPeriod", "500", 0, 0, qfalse},
   { &g_minNameChangePeriod, "g_minNameChangePeriod", "5", 0, 0, qfalse},
@@ -359,9 +359,9 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_alienMaxStage, "g_alienMaxStage", DEFAULT_ALIEN_MAX_STAGE, 0, 0, qfalse  },
   { &g_alienStage2Threshold, "g_alienStage2Threshold", DEFAULT_ALIEN_STAGE2_THRESH, 0, 0, qfalse  },
   { &g_alienStage3Threshold, "g_alienStage3Threshold", DEFAULT_ALIEN_STAGE3_THRESH, 0, 0, qfalse  },
-  
+
   { &g_teamImbalanceWarnings, "g_teamImbalanceWarnings", "30", CVAR_ARCHIVE, 0, qfalse  },
-  
+
   { &g_unlagged, "g_unlagged", "1", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue  },
 
   { &g_disabledEquipment, "g_disabledEquipment", "", CVAR_ROM, 0, qfalse  },
@@ -405,7 +405,7 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_minDeconAffectsMark, "g_minDeconAffectsMark", "0", CVAR_ARCHIVE, 0, qfalse},
   { &g_forceAutoSelect, "g_forceAutoSelect", "0", CVAR_ARCHIVE, 0, qtrue }, 
   { &g_adminExpireTime, "g_adminExpireTime", "0", CVAR_ARCHIVE, 0, qfalse  },
-  
+
   { &g_privateMessages, "g_privateMessages", "1", CVAR_ARCHIVE, 0, qfalse  },
   { &g_fullIgnore, "g_fullIgnore", "1", CVAR_ARCHIVE, 0, qtrue  },
   { &g_decolourLogfiles, "g_decolourLogfiles", "0", CVAR_ARCHIVE, 0, qfalse  },
@@ -417,24 +417,24 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_publicSayadmins, "g_publicSayadmins", "1", CVAR_ARCHIVE, 0, qfalse  },    
   { &g_minLevelToSpecMM1, "g_minLevelToSpecMM1", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_antiSpawnBlock, "g_antiSpawnBlock", "0", CVAR_ARCHIVE, 0, qfalse  },
-  
+
   { &g_devmapKillerHP, "g_devmapKillerHP", "0", CVAR_ARCHIVE, 0, qtrue  },
   { &g_killerHP, "g_killerHP", "0", CVAR_ARCHIVE, 0, qtrue  },
-  
+
   { &g_tag, "g_tag", "main", CVAR_INIT, 0, qfalse },
-  
+
   { &g_dretchPunt, "g_dretchPunt", "1", CVAR_ARCHIVE, 0, qfalse  },
-  
+
   { &g_msg, "g_msg", "", CVAR_ARCHIVE, 0, qfalse  },
   { &g_msgTime, "g_msgTime", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_welcomeMsg, "g_welcomeMsg", "", CVAR_ARCHIVE, 0, qfalse  },
   { &g_welcomeMsgTime, "g_welcomeMsgTime", "0", CVAR_ARCHIVE, 0, qfalse  },
-  
+
   { &g_rankings, "g_rankings", "0", 0, 0, qfalse },
   { &g_allowShare, "g_allowShare", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
   { &g_creditOverflow, "g_creditOverflow", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
   { &g_banNotice, "g_banNotice", "", CVAR_ARCHIVE, 0, qfalse  },
-  
+
   { &mod_jetpackFuel, "mod_jetpackFuel", "0", CVAR_ARCHIVE, 0, qtrue  },
   { &mod_jetpackConsume, "mod_jetpackConsume", "2", CVAR_ARCHIVE, 0, qfalse  },
   { &mod_jetpackRegen, "mod_jetpackRegen", "3", CVAR_ARCHIVE, 0, qfalse  },
@@ -692,7 +692,7 @@ void G_MapConfigs( const char *mapname )
 
   trap_SendConsoleCommand( EXEC_APPEND,
     va( "exec \"%s/default.cfg\"\n", g_mapConfigs.string ) );
-  
+
   trap_SendConsoleCommand( EXEC_APPEND,
     va( "exec \"%s/%s.cfg\"\n", g_mapConfigs.string, mapname ) );
 
@@ -813,7 +813,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart )
 
   // load up a custom building layout if there is one
   G_LayoutLoad( );
-  
+
   // load any nobuild markers that have been saved
   G_NobuildLoad( );
 
@@ -850,7 +850,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart )
   G_CountSpawns( );
 
   G_ResetPTRConnections( );
-  
+
   if(g_lockTeamsAtStart.integer)
   {
     level.alienTeamLocked=qtrue;
@@ -1365,7 +1365,7 @@ void G_CalculateBuildPoints( void )
        }
     }
   }
-  
+
   //set BP at each cycle
   if( g_suddenDeath.integer )
   {
@@ -1785,7 +1785,7 @@ void BeginIntermission( void )
     return;   // already active
 
   level.numTeamWarnings = 99;
-  
+
   level.intermissiontime = level.time;
 
   G_ClearVotes( );
@@ -1977,7 +1977,7 @@ void QDECL G_WarningsPrintf( char *flag, const char *fmt, ... )
        trap_SendServerCommand(tempent-g_entities,va( "print \"^6[Warnings]^7 %s\"", string) ); 
     }
   }
-  
+
   G_LogPrintf("%s",string);
 
 }
@@ -2148,7 +2148,7 @@ void G_SendGameStat( pTeam_t team )
     int ping;
 
     cl = &level.clients[ level.sortedClients[ i ] ];
-    
+
     // Ignore invisible players
     if ( cl->sess.invisible == qtrue )
       continue;
@@ -2516,7 +2516,7 @@ void CheckVote( void )
     voteYesPercent = (int)( 100 * ( level.voteYes ) / ( level.voteYes + level.voteNo ) );
   else
     voteYesPercent = 0; 
-  
+
   if( ( level.time - level.voteTime >= VOTE_TIME ) || 
       ( level.voteYes + level.voteNo == level.numConnectedClients ) )
   {
@@ -2836,7 +2836,7 @@ void G_RunFrame( int levelTime )
   // if we are waiting for the level to restart, do nothing
   if( level.restarted )
     return;
-  
+
   if( level.paused ) 
   {
     if( ( levelTime % 6000 ) == 0)
@@ -2853,7 +2853,7 @@ void G_RunFrame( int levelTime )
 
   CheckMsgTimer( );
   CheckCountdown( );
-  
+
   level.framenum++;
   level.previousTime = level.time;
   level.time = levelTime;
@@ -2998,4 +2998,3 @@ void G_RunFrame( int levelTime )
     trap_Cvar_Set( "g_listEntity", "0" );
   }
 }
-
