@@ -218,6 +218,7 @@ vmCvar_t  g_msg;
 vmCvar_t  g_msgTime;
 vmCvar_t  g_welcomeMsg;
 vmCvar_t  g_welcomeMsgTime;
+vmCvar_t  g_deconBanTime;
 
 
 vmCvar_t  mod_jetpackFuel;
@@ -432,6 +433,7 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_msgTime, "g_msgTime", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_welcomeMsg, "g_welcomeMsg", "", CVAR_ARCHIVE, 0, qfalse  },
   { &g_welcomeMsgTime, "g_welcomeMsgTime", "0", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_deconBanTime, "g_deconBanTime", "2h", CVAR_ARCHIVE, 0, qfalse  },
   
   { &g_rankings, "g_rankings", "0", 0, 0, qfalse },
   { &g_allowShare, "g_allowShare", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},

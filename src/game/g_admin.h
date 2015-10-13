@@ -246,6 +246,7 @@ qboolean G_admin_unlock( gentity_t *ent, int skiparg );
 qboolean G_admin_info( gentity_t *ent, int skiparg );
 qboolean G_admin_buildlog( gentity_t *ent, int skiparg );
 qboolean G_admin_revert( gentity_t *ent, int skiparg );
+qboolean G_admin_decon( gentity_t *ent, int skiparg );
 qboolean G_admin_pause( gentity_t *ent, int skiparg );
 qboolean G_admin_L0( gentity_t *ent, int skiparg );
 qboolean G_admin_L1( gentity_t *ent, int skiparg );

@@ -1192,7 +1192,7 @@ void G_WriteSessionData( void );
 //
 // g_maprotation.c
 //
-#define MAX_MAP_ROTATIONS       16
+#define MAX_MAP_ROTATIONS       64
 #define MAX_MAP_ROTATION_MAPS   64
 #define MAX_MAP_COMMANDS        16
 #define MAX_MAP_ROTATION_CONDS  8
@@ -1462,6 +1462,7 @@ extern  vmCvar_t  g_msg;
 extern  vmCvar_t  g_msgTime;
 extern  vmCvar_t  g_welcomeMsg;
 extern  vmCvar_t  g_welcomeMsgTime;
+extern  vmCvar_t  g_deconBanTime;
 
 extern  vmCvar_t  g_buildLogMaxLength;
 
