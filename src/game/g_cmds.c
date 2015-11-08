@@ -990,9 +990,13 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
 
     // specs with ADMF_SPEC_ALLCHAT flag can see team chat
   }
-  
+
   if( mode == SAY_ADMINS &&
      (!G_admin_permission( other, ADMF_ADMINCHAT ) || other->client->pers.ignoreAdminWarnings ) )
+     return;
+
+  if( mode == SAY_HADMINS &&
+     (!G_admin_permission( other, ADMF_HIGHADMINCHAT ) || other->client->pers.ignoreAdminWarnings ) )
      return;
 
   if( BG_ClientListTest( &other->client->sess.ignoreList, ent-g_entities ) )
@@ -1151,8 +1155,26 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
           color = COLOR_MAGENTA;
         }
         break;
-  }
-  
+
+        case SAY_HADMINS:
+        if( G_admin_permission( ent, ADMF_HIGHADMINCHAT ) )
+        {
+          G_LogPrintf( "say_hadmins: ^5[^6HIGH ADMIN^5]^7%s^7: %s^7\n", ( ent ) ? ent->client->pers.netname : "console", chatText );
+          Com_sprintf( name, sizeof( name ), "%s[ADMIN]%s%c%c"EC": ", prefix,
+                    ( ent ) ? ent->client->pers.netname : "console", Q_COLOR_ESCAPE, COLOR_WHITE );
+          color = COLOR_CYAN;
+        }
+        else
+        {
+          G_LogPrintf( "say_hadmins: [PLAYER]%s^7: %s^7\n", ent->client->pers.netname, chatText );
+          Com_sprintf( name, sizeof( name ), "%s[PLAYER]%s%c%c"EC": ", prefix,
+            ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+          color = COLOR_CYAN;
+        }
+        break;
+}
+
+
   if( mode!=SAY_TEAM && ent && ent->client && ent->client->pers.teamSelection == PTE_NONE && G_admin_level(ent)<g_minLevelToSpecMM1.integer )
   {
     trap_SendServerCommand( ent-g_entities,va( "print \"Sorry, but your admin level may only use teamchat while spectating.\n\"") ); 
@@ -1290,6 +1312,8 @@ static void Cmd_Say_f( gentity_t *ent )
     mode = SAY_TEAM;
   if( Q_stricmpn( args, "say_admins ", 11 ) == 0 || Q_stricmpn( args, "a ", 2 ) == 0)
     mode = SAY_ADMINS;
+  if( Q_stricmpn( args, "say_hadmins ", 12 ) == 0 || Q_stricmpn( args, "ha ", 3 ) == 0)
+    mode = SAY_HADMINS;
 
   // support parsing /m out of say text since some people have a hard
   // time figuring out what the console is.
@@ -1301,9 +1325,8 @@ static void Cmd_Say_f( gentity_t *ent )
     G_PrivateMessage( ent );
     return;
   }
-  
-   
-   if( !Q_stricmpn( args, "say /a ", 7) ||
+
+  if( !Q_stricmpn( args, "say /a ", 7) ||
        !Q_stricmpn( args, "say_team /a ", 12) ||
        !Q_stricmpn( args, "say /say_admins ", 16) ||
        !Q_stricmpn( args, "say_team /say_admins ", 21) )
@@ -1311,7 +1334,16 @@ static void Cmd_Say_f( gentity_t *ent )
        mode = SAY_ADMINS;
        skipargs=1;
    }
-   
+
+   if( !Q_stricmpn( args, "say /ha ", 8) ||
+       !Q_stricmpn( args, "say_team /ha ", 13) ||
+       !Q_stricmpn( args, "say /say_hadmins ", 17) ||
+       !Q_stricmpn( args, "say_team /say_hadmins ", 22) )
+   {
+       mode = SAY_HADMINS;
+       skipargs=1;
+   }
+
    if( mode == SAY_ADMINS)  
    if(!G_admin_permission( ent, ADMF_ADMINCHAT ) )
    {
@@ -1325,7 +1357,14 @@ static void Cmd_Say_f( gentity_t *ent )
        ADMP( "Your message has been sent to any available admins and to the server logs.\n" );
      }
    }
-   
+
+   if( mode == SAY_HADMINS)
+   if(!G_admin_permission( ent, ADMF_HIGHADMINCHAT ) )
+   {
+     {
+       ADMP( "You don't have permissions to see/use this channel.\n" );
+     }
+   }
 
   if(!Q_stricmpn( args, "say /me ", 8 ) )
   {
@@ -5013,6 +5052,7 @@ commands_t cmds[ ] = {
   { "say", CMD_MESSAGE|CMD_INTERMISSION, Cmd_Say_f },
   { "say_team", CMD_MESSAGE|CMD_INTERMISSION, Cmd_Say_f },
   { "say_admins", CMD_MESSAGE|CMD_INTERMISSION, Cmd_Say_f },
+  { "say_hadmins", CMD_MESSAGE|CMD_INTERMISSION, Cmd_Say_f },
   { "a", CMD_MESSAGE|CMD_INTERMISSION, Cmd_Say_f },
   { "m", CMD_MESSAGE|CMD_INTERMISSION, G_PrivateMessage },
   { "mt", CMD_MESSAGE|CMD_INTERMISSION, G_PrivateMessage },

@@ -736,6 +736,11 @@ qboolean  ConsoleCommand( void )
       G_Say( NULL, NULL, SAY_ADMINS, ConcatArgs( 1 )  );
       return qtrue;
     }
+    else if( !Q_stricmp( cmd, "ha" ) || !Q_stricmp( cmd, "say_hadmins" ))
+    {
+      G_Say( NULL, NULL, SAY_HADMINS, ConcatArgs( 1 )  );
+      return qtrue;
+    }
 
     G_Printf( "unknown command: %s\n", cmd );
     return qtrue;

@@ -1336,6 +1336,7 @@ typedef enum {
 #define SAY_TELL	2
 #define SAY_ACTION      3
 #define SAY_ACTION_T    4
-#define SAY_ADMINS    5
+#define SAY_ADMINS      5
+#define SAY_HADMINS     6
 
 #endif	// __Q_SHARED_H
