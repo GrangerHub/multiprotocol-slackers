@@ -1160,14 +1160,14 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
         if( G_admin_permission( ent, ADMF_HIGHADMINCHAT ) ) //Differentiate between inter-high-admin chatter and lower-admin-high-admin-admin alerts and user-admin alerts
         {
           G_LogPrintf( "say_hadmins: ^5[^1HIGH ADMIN^5]^7%s^7: %s^7\n", ( ent ) ? ent->client->pers.netname : "console", chatText );
-          Com_sprintf( name, sizeof( name ), "%s^5[^1HIGH ADMIN^5]^1%s%c%c"EC": ", prefix,
+          Com_sprintf( name, sizeof( name ), "%s^5[^1HIGH ADMIN^5]^7%s%c%c"EC": ", prefix,
                     ( ent ) ? ent->client->pers.netname : "console", Q_COLOR_ESCAPE, COLOR_WHITE );
           color = COLOR_RED;
         }
         else if( G_admin_permission( ent, ADMF_ADMINCHAT ) ) 
         {
          G_LogPrintf( "say_haadmins: ^1[^6LOWER ADMIN^1]%s^7: %s^7\n", ( ent ) ? ent->client->pers.netname : "console", chatText );
-         Com_sprintf( name, sizeof( name ), "%s[^6LOWER ADMIN^1]%s%c%c"EC": ", prefix,
+         Com_sprintf( name, sizeof( name ), "%s[^6LOWER ADMIN^1]^7%s%c%c"EC": ", prefix,
                     ( ent ) ? ent->client->pers.netname : "console", Q_COLOR_ESCAPE, COLOR_WHITE );
          color = COLOR_RED;
         }
