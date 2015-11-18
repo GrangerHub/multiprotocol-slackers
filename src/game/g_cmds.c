@@ -1166,8 +1166,8 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
         }
         else if( G_admin_permission( ent, ADMF_ADMINCHAT ) ) 
         {
-         G_LogPrintf( "say_haadmins: ^1[^6LOWER ADMIN^1]%s^7: %s^7\n", ( ent ) ? ent->client->pers.netname : "console", chatText );
-         Com_sprintf( name, sizeof( name ), "%s[^6LOWER ADMIN^1]^7%s%c%c"EC": ", prefix,
+         G_LogPrintf( "say_haadmins: ^1[^6LOWER ADMIN^1]^7%s^7: %s^7\n", ( ent ) ? ent->client->pers.netname : "console", chatText );
+         Com_sprintf( name, sizeof( name ), "%s[^6LOWER ADMIN^7]%s%c%c"EC": ", prefix,
                     ( ent ) ? ent->client->pers.netname : "console", Q_COLOR_ESCAPE, COLOR_WHITE );
          color = COLOR_RED;
         }
