@@ -2465,7 +2465,6 @@ static void CG_DrawCrosshair( void )
   } 
 
   if( ( cg.snap->ps.persistant[ PERS_TEAM ] == TEAM_SPECTATOR ) ||
-      ( cg.snap->ps.stats[ STAT_STATE ] & SS_INFESTING ) ||
       ( cg.snap->ps.stats[ STAT_STATE ] & SS_HOVELING ) )
     return;
 
