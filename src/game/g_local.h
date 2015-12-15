@@ -423,6 +423,8 @@ typedef struct
 
   int                 lastTeamStatus;
 
+  int                 teamVote;              // team vote state
+
   int                 lastFloodTime;         // level.time of last flood-limited command
   int                 floodDemerits;         // number of flood demerits accumulated
 
