@@ -636,7 +636,7 @@ void G_LeaveTeam( gentity_t *self )
     }
     else
     {
-      level.teamVoteNo[ cs_offset ]--;
+      level.teamVoteoNo[ cs_offset ]--;
       trap_SetConfigstring( CS_TEAMVOTE_NO + cs_offset, va( "%i", level.teamVoteNo[ cs_offset ] ) );
     }
     self->client->ps.eFlags &= ~EF_TEAMVOTED;
