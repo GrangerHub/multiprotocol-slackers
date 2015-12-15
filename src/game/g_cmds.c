@@ -2452,7 +2452,7 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
   }
   else if( !Q_stricmp( arg1, "admitdefeat" ) )
   {
-    if( ( level.time - level.startTime ) <= 180000 )
+    if( level.startTime <= 180000 )
     {
       trap_SendServerCommand( ent-g_entities,
         "print \"callteamvote: You cannot admitdefeat in the first 3 minutes of the match.\n\"" );
