@@ -627,7 +627,7 @@ void G_LeaveTeam( gentity_t *self )
   self->suicideTime = 0;
 
   // Remove team vote
-  if( ( self->client->ps.eFlags & EF_TEAMVOTED ) && ( team != PTE_NONE ) )
+  if( ( sef->client->ps.eFlags & EF_TEAMVOTED ) && ( team != PTE_NONE ) )
   {
     if( self->client->pers.teamVote & ( 1 << cs_offset ) )
     {
