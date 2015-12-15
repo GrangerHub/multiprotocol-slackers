@@ -605,13 +605,9 @@ void G_LeaveTeam( gentity_t *self )
   pTeam_t   team = self->client->pers.teamSelection;
   gentity_t *ent;
   int       i;
-  int cs_offset = 0;
 
   if( team == PTE_ALIENS )
-  {
-    cs_offset = 1;
     G_RemoveFromSpawnQueue( &level.alienSpawnQueue, self->client->ps.clientNum );
-  }
   else if( team == PTE_HUMANS )
     G_RemoveFromSpawnQueue( &level.humanSpawnQueue, self->client->ps.clientNum );
   else
@@ -625,22 +621,6 @@ void G_LeaveTeam( gentity_t *self )
   
   // Cancel pending suicides
   self->suicideTime = 0;
-
-  // Remove team vote
-  if( sef->client->ps.eFlags & EF_TEAMVOTED )
-  {
-    if( self->client->pers.teamVote & ( 1 << cs_offset ) )
-    {
-      level.teamVoteYes[ cs_offset ]--;
-      trap_SetConfigstring( CS_TEAMVOTE_YES + cs_offset, va( "%i", level.teamVoteYes[ cs_offset ] ) );
-    }
-    else
-    {
-      level.teamVoteoNo[ cs_offset ]--;
-      trap_SetConfigstring( CS_TEAMVOTE_NO + cs_offset, va( "%i", level.teamVoteNo[ cs_offset ] ) );
-    }
-    self->client->ps.eFlags &= ~EF_TEAMVOTED;
-  }
 
   // stop any following clients
   G_StopFromFollowing( self );
@@ -2598,13 +2578,11 @@ void Cmd_TeamVote_f( gentity_t *ent )
   if( msg[ 0 ] == 'y' || msg[ 1 ] == 'Y' || msg[ 1 ] == '1' )
   {
     level.teamVoteYes[ cs_offset ]++;
-    ent->client->pers.teamVote |= ( 1 << cs_offset );
     trap_SetConfigstring( CS_TEAMVOTE_YES + cs_offset, va( "%i", level.teamVoteYes[ cs_offset ] ) );
   }
   else
   {
     level.teamVoteNo[ cs_offset ]++;
-    ent->client->pers.teamVote &= ~( 1 << cs_offset);
     trap_SetConfigstring( CS_TEAMVOTE_NO + cs_offset, va( "%i", level.teamVoteNo[ cs_offset ] ) );
   }
 
