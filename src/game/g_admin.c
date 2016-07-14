@@ -8477,7 +8477,8 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
       ( ent ) ? G_admin_adminPrintName( ent ) : "console",
       duration,
       ( *reason ) ? reason : "Unspecified" ) );
-	  
+	AP( va( "Player %s - Player globals: %s - gtype: %s", vic->client->pers.netname, g_admin_namelog[ logmatch ]->globals, gtype ) );
+	
     return qtrue;
 }
 
