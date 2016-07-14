@@ -10567,7 +10567,7 @@ t = trap_RealTime( NULL );
   }
 }
 
-+qboolean G_admin_scrim(gentity_t *ent, int skiparg )
+qboolean G_admin_scrim(gentity_t *ent, int skiparg )
 {
   char state[4], *minlevel;
   int tmp = 0;
