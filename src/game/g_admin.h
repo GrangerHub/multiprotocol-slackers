@@ -356,7 +356,6 @@ qboolean G_admin_rpurge( gentity_t *ent, int skiparg );
 qboolean G_admin_rnote( gentity_t *ent, int skiparg );
 void G_admin_global_update( int entry, int banned );
 qboolean G_admin_scrim( gentity_t *ent, int skiparg );
-static int adminNumFlags= sizeof( adminFlagList ) / sizeof( adminFlagList[ 0 ] );
 
 void G_admin_print( gentity_t *ent, char *m );
 void G_admin_buffer_print( gentity_t *ent, char *m );

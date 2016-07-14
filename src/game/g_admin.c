@@ -2831,6 +2831,8 @@ static AdminFlagListEntry_t adminFlagList[] =
   { ADMF_FULLRLIST,			   "can see full report list - this goes with reportmanage levels" }
 };
 
+static int adminNumFlags= sizeof( adminFlagList ) / sizeof( adminFlagList[ 0 ] );
+
 qboolean G_admin_flaglist( gentity_t *ent, int skiparg )
 {
   qboolean shown[ MAX_LISTCOMMANDS ];
