@@ -236,7 +236,7 @@ vmCvar_t  g_aimbotAdvertBanTime;
 vmCvar_t  g_aimbotAdvertBanReason;
 
 vmCvar_t  g_maxReports;
-vmCvar_t  g_maxUnregReports
+vmCvar_t  g_maxUnregReports;
 vmCvar_t  g_scrimMode;
 
 
@@ -453,10 +453,10 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_aimbotAdvertBanReason, "g_aimbotAdvertBanReason", "AUTOBAN: AIMBOT", CVAR_ARCHIVE, 0, qfalse  },
   
   { &g_maxReports, "g_maxReports", "3", CVAR_ARCHIVE, 0, qfalse  },
-  { &g_maxUnregReports, "g_maxUnregReports", "1", CVAR_ARCHIVE, 0, qfalse  }
-  { &g_scrimMode, "g_scrimMode", "0", CVAR_ARCHIVE, 0, qfalse },
+  { &g_maxUnregReports, "g_maxUnregReports", "1", CVAR_ARCHIVE, 0, qfalse  },
+  { &g_scrimMode, "g_scrimMode", "0", CVAR_ARCHIVE, 0, qfalse }
 
-};
+}
 
 static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[ 0 ] );
 

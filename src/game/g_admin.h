@@ -197,7 +197,8 @@ typedef struct g_admin_adminlog
   qboolean  success;
 }
 g_admin_adminlog_t;
-+typedef struct g_admin_global
+
+typedef struct g_admin_global
 {
   char name[ MAX_NAME_LENGTH ];
   char guid[ 33 ];
