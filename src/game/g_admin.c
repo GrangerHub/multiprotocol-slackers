@@ -1573,8 +1573,9 @@ qboolean G_admin_ban_check( char *userinfo, char *reason, int rlen )
           );
         G_LogPrintf("Banned player tried to connect from IP %s\n", ip);
         return qtrue;
-      }
-    }
+		}
+	  }
+	}
     if( *guid && !Q_stricmp( g_admin_bans[ i ]->guid, guid ) )
     {
       char duration[ 32 ];
