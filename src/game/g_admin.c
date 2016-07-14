@@ -1324,8 +1324,7 @@ static int admin_listadmins( gentity_t *ent, int start, char *search, int minlev
       {
         G_DecolorString( g_admin_levels[ j ]->name, lname );
         Com_sprintf( lname_fmt, sizeof( lname_fmt ), "%%%is",
-          ( admin_level_maxname + strlen( g_admin_levels[ j ]->name )
-            - strlen( lname ) ) );
+          ( admin_level_maxname + strlen( g_admin_levels[ j ]->name )- strlen( lname ) ) );
         Com_sprintf( lname, sizeof( lname ), lname_fmt,
            g_admin_levels[ j ]->name );
         break;
