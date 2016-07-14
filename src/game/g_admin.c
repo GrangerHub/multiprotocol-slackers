@@ -8477,7 +8477,6 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
       ( ent ) ? G_admin_adminPrintName( ent ) : "console",
       duration,
       ( *reason ) ? reason : "Unspecified" ) );
-	AP( va( "Player %s - Player globals: %s - gtype: %s", vic->client->pers.netname, g_admin_namelog[ logmatch ]->globals, gtype ) );
 	
     return qtrue;
 }
@@ -10552,7 +10551,7 @@ t = trap_RealTime( NULL );
 			continue;
 		}
 		client->pers.globals = g_admin_globals[ entry ]->gtype;
-		if( g_admin_globals[ i ]->expires != 0 )
+		if( g_admin_globals[ entry ]->expires != 0 )
 		{
 			client->pers.globalexpires = ( g_admin_globals[ entry ]->expires - t );
 		}
