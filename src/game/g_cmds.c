@@ -815,9 +815,10 @@ void Cmd_Team_f( gentity_t *ent )
   }
   else if( (strstr( globals, "S")) && ( ent->client->pers.globalexpires > level.time ) )
   {
-	  trap_SendServerCommand( ent-g_entities, "print \"You are globally forcespecced\n\"" );
+	  trap_SendServerCommand( ent - g_entities, "print \"You are globally forcespecced\n\"" );
 	  return;
-  }
+  } else if ( ent->client->pers.specExpires > level.time )
+  {
   trap_SendServerCommand( ent-g_entities, va( "print \"You can't join a team yet. Expires in %d seconds.\n\"",
                           ( ent->client->pers.specExpires - level.time ) / 1000 ) );
   return;
