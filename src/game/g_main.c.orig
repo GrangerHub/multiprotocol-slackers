@@ -235,11 +235,6 @@ vmCvar_t  g_aimbotAdvertBan;
 vmCvar_t  g_aimbotAdvertBanTime;
 vmCvar_t  g_aimbotAdvertBanReason;
 
-vmCvar_t  g_maxReports;
-vmCvar_t  g_maxUnregReports
-vmCvar_t  g_scrimMode;
-
-
 static cvarTable_t   gameCvarTable[ ] =
 {
   // don't override the cheat state set by the system
@@ -450,12 +445,7 @@ static cvarTable_t   gameCvarTable[ ] =
 
   { &g_aimbotAdvertBan, "g_aimbotAdvertBan", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_aimbotAdvertBanTime, "g_aimbotAdvertBanTime", "0", CVAR_ARCHIVE, 0, qfalse  },
-  { &g_aimbotAdvertBanReason, "g_aimbotAdvertBanReason", "AUTOBAN: AIMBOT", CVAR_ARCHIVE, 0, qfalse  },
-  
-  { &g_maxReports, "g_maxReports", "3", CVAR_ARCHIVE, 0, qfalse  },
-  { &g_maxUnregReports, "g_maxUnregReports", "1", CVAR_ARCHIVE, 0, qfalse  }
-  { &g_scrimMode, "g_scrimMode", "0", CVAR_ARCHIVE, 0, qfalse },
-
+  { &g_aimbotAdvertBanReason, "g_aimbotAdvertBanReason", "AUTOBAN: AIMBOT", CVAR_ARCHIVE, 0, qfalse  }
 };
 
 static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[ 0 ] );
@@ -1953,9 +1943,9 @@ void QDECL G_AdminsPrintf( const char *fmt, ... )
   {
     tempent = &g_entities[ j ];
     if( G_admin_permission( tempent, ADMF_ADMINCHAT ) &&
-        !tempent->client->pers.ignoreAdminWarnings && !tempent->client->pers.ignoresnotifs ) 
+        !tempent->client->pers.ignoreAdminWarnings ) 
     {
-       trap_SendServerCommand(tempent-g_entities,va( "print \"^5[Admin Notif]^7 %s\"", string) ); 
+       trap_SendServerCommand(tempent-g_entities,va( "print \"^6[Admins]^7 %s\"", string) ); 
     }
   }
   

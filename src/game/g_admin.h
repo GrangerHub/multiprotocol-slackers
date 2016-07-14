@@ -44,6 +44,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_ADMIN_CMD_LEN 20
 #define MAX_ADMIN_BAN_REASON 50
 #define MAX_ADMIN_BANSUSPEND_DAYS 14
+#define MAX_ADMIN_GLOBALS 1024
+#define MAX_ADMIN_GLOBALS_REASON 50
+#define MAX_ADMIN_REPORTS 1024
+#define MAX_ADMIN_REPORTS_REASON 50
+#define MAX_ADMIN_ARCHIVES 1024
+#define MAX_ADMIN_ARCHIVES_REASON 50
 
 /*
  * IMMUNITY - cannot be vote kicked, vote muted
@@ -102,6 +108,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define MAX_ADMIN_LISTITEMS 20
 #define MAX_ADMIN_SHOWBANS 10
+#define MAX_ADMIN_SHOWREPORTS 5
+#define MAX_ADMIN_SHOWGLOBALS 10
 #define MAX_ADMIN_MAPLOG_LENGTH 5
 
 // important note: QVM does not seem to allow a single char to be a
@@ -145,6 +153,7 @@ typedef struct g_admin_ban
   int suspend;
   char banner[ MAX_NAME_LENGTH ];
   int  bannerlevel;
+  int  stfu;
 }
 g_admin_ban_t;
 
@@ -167,6 +176,9 @@ typedef struct g_admin_namelog
   qboolean  muted;
   int       muteExpires;
   qboolean  denyBuild;
+  qboolean  denyVote;
+  int  ignoresnotifs;
+  qboolean  possibleEvader;
   int       denyHumanWeapons;
   int       denyAlienClasses;
   int       specExpires;
@@ -185,8 +197,62 @@ typedef struct g_admin_adminlog
   qboolean  success;
 }
 g_admin_adminlog_t;
++typedef struct g_admin_global
+{
+  char name[ MAX_NAME_LENGTH ];
+  char guid[ 33 ];
+  char ip[ 20 ];
+  char gtype[ 5 ];
+  char reason[ MAX_ADMIN_GLOBALS_REASON ];
+  char made[ 18 ]; // big enough for strftime() %c
+  int expires;
+  char banner[ MAX_NAME_LENGTH ];
+  int bannerlevel;
+}
+g_admin_global_t;
+
+typedef struct g_admin_report
+{
+  char name[ 128 ];
+  char guid[ 33 ];
+  char ip[ 20 ];
+  char reason[ MAX_ADMIN_REPORTS_REASON ];
+  char map[ 50 ];
+  char time[ 48 ];
+  int players;
+  char admins[ 256 ];
+  char rep[ 70 ];
+  char repIP[ 20 ];
+  char repGUID[ 33 ];
+  int level;
+  char note[ MAX_ADMIN_REPORTS_REASON ];
+  int expires;
+  int closed;
+}
+g_admin_report_t;
+
+typedef struct g_admin_archive
+{
+  char name[ 128 ];
+  char guid[ 33 ];
+  char ip[ 20 ];
+  char reason[ MAX_ADMIN_REPORTS_REASON ];
+  char map[ 50 ];
+  char time[ 48 ];
+  int players;
+  char admins[ 256 ];
+  char rep[ 70 ];
+  char repIP[ 20 ];
+  char repGUID[ 33 ];
+  int level;
+  char note[ MAX_ADMIN_REPORTS_REASON ];
+  int expires;
+}
+g_admin_archive_t;
 
 qboolean G_admin_ban_check( char *userinfo, char *reason, int rlen );
+void G_admin_global_check( char *userinfo );
+void G_admin_report_check( char *userinfo );
 qboolean G_admin_cmd_check( gentity_t *ent, qboolean say );
 qboolean G_admin_readconfig( gentity_t *ent, int skiparg );
 qboolean G_admin_permission( gentity_t *ent, const char *flag );
@@ -259,6 +325,26 @@ qboolean G_admin_cp( gentity_t *ent, int skiparg );
 qboolean G_admin_slap( gentity_t *ent, int skiparg );
 qboolean G_admin_drop( gentity_t *ent, int skiparg );
 qboolean G_admin_invisible( gentity_t *ent, int skiparg );
+
+qboolean G_admin_global( gentity_t *ent, int skiparg );
+qboolean G_admin_gsub( gentity_t *ent, int skiparg );
+qboolean G_admin_grem( gentity_t *ent, int skiparg );
+qboolean G_admin_glist( gentity_t *ent, int skiparg );
+qboolean G_admin_gedit( gentity_t *ent, int skiparg );
+qboolean G_admin_gtype( gentity_t *ent, int skiparg );
+qboolean G_admin_anotifs( gentity_t *ent, int skiparg );
+qboolean G_admin_denyvote( gentity_t *ent, int skiparg );
+qboolean G_admin_stfuban( gentity_t *ent, int skiparg );
+qboolean G_admin_report( gentity_t *ent, int skiparg );
+qboolean G_admin_rlist( gentity_t *ent, int skiparg );
+qboolean G_admin_rban( gentity_t *ent, int skiparg );
+qboolean G_admin_rglobal( gentity_t *ent, int skiparg );
+qboolean G_admin_rarclist( gentity_t *ent, int skiparg );
+qboolean G_admin_rclose( gentity_t *ent, int skiparg );
+qboolean G_admin_rpurge( gentity_t *ent, int skiparg );
+qboolean G_admin_rnote( gentity_t *ent, int skiparg );
+void G_admin_global_update( int entry, int banned );
+qboolean G_admin_scrim( gentity_t *ent, int skiparg );
 
 void G_admin_print( gentity_t *ent, char *m );
 void G_admin_buffer_print( gentity_t *ent, char *m );

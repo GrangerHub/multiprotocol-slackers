@@ -757,6 +757,8 @@ void Cmd_Team_f( gentity_t *ent )
   qboolean force = G_admin_permission(ent, ADMF_FORCETEAMCHANGE);
   int     aliens = level.numAlienClients;
   int     humans = level.numHumanClients;
+  char *globals;
+  globals = ent->client->pers.globals;
 
   // stop team join spam
   if( level.time - ent->client->pers.teamChangeTime < 1000 )
@@ -811,8 +813,11 @@ void Cmd_Team_f( gentity_t *ent )
       g_maxGameClients.integer ) );
     return;
   }
-  else if ( ent->client->pers.specExpires > level.time )
+  else if( (strstr( globals, "S")) && ( ent->client->pers.globalexpires > level.time ) )
   {
+	  trap_SendServerCommand( ent-g_entities, "print \"You are globally forcespecced\n\"" );
+	  return;
+  }
   trap_SendServerCommand( ent-g_entities, va( "print \"You can't join a team yet. Expires in %d seconds.\n\"",
                           ( ent->client->pers.specExpires - level.time ) / 1000 ) );
   return;
@@ -1514,6 +1519,8 @@ void Cmd_CallVote_f( gentity_t *ent )
   char targetname[ MAX_NAME_LENGTH] = "";
   char reason[ MAX_STRING_CHARS ] = "";
   char *ptr = NULL;
+  char *globals;
+  globals = ent->client->pers.globals;
 
   arg1plus = G_SayConcatArgs( 1 );
   arg2plus = G_SayConcatArgs( 2 );
@@ -1540,10 +1547,20 @@ void Cmd_CallVote_f( gentity_t *ent )
     }
 
   //see if they can vote
-  if( G_admin_permission( ent, ADMF_NO_VOTE ) )
+  if( G_admin_permission( ent, ADMF_NO_VOTE ) || ent->client->pers.denyVote )
   {
     trap_SendServerCommand( ent-g_entities, "print \"You have no voting rights\n\"" );
     return;
+  }
+  if( strstr( globals, "V") && ( ent->client->pers.globalexpires > level.time ) )
+  {
+	trap_SendServerCommand( ent-g_entities, "print \"You are globally denyvoted\n\"" );
+	return;
+  }
+  if( (strstr(globals, "M")) && ( ent->client->pers.globalexpires > level.time ) )
+  {
+  trap_SendServerCommand( ent - g_entities, "print \"You are globally muted and can't call votes\n\"" );
+	return;
   }
 
   if( g_voteMinTime.integer
@@ -2171,6 +2188,8 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
   char *arg2plus;
   char *ptr = NULL;
   int numVoters = 0;
+  char *globals;
+  globals = ent->client->pers.globals;
 
   arg1plus = G_SayConcatArgs( 1 );
   arg2plus = G_SayConcatArgs( 2 );
@@ -2198,10 +2217,20 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
   }
 
   //see if they can vote
-  if( G_admin_permission( ent, ADMF_NO_VOTE ) )
+  if( G_admin_permission( ent, ADMF_NO_VOTE ) || ent->client->pers.denyVote )
   {
     trap_SendServerCommand( ent-g_entities, "print \"You have no voting rights\n\"" );
     return;
+  }
+  if( (strstr(globals, "V") ) && ( ent->client->pers.globalexpires > level.time ) )
+  {
+	trap_SendServerCommand( ent-g_entities, "print \"You are globally denyvoted\n\"" );
+	return;
+  }
+  if( (strstr(globals, "M") ) && ( ent->client->pers.globalexpires > level.time ) )
+  {
+    trap_SendServerCommand( ent - g_entities, "print \"You are globally muted and can't call teamvotes\n\"" );
+	return;
   }
 
   if( g_voteLimit.integer > 0
@@ -2505,7 +2534,7 @@ void Cmd_CallTeamVote_f( gentity_t *ent )
              ( ( !Q_stricmp( arg1, "kick" ) || !Q_stricmp( arg1, "denybuild" ) ) || 
              level.clients[ i ].pers.teamSelection == PTE_NONE ) )
     {
-      trap_SendServerCommand( i, va("print \"^6[Admins]^7 %s " S_COLOR_WHITE
+      trap_SendServerCommand( i, va("print \"^5[Admin Notif]^7 %s " S_COLOR_WHITE
             "called a team vote: %s^7 \n\"", ent->client->pers.netname, level.teamVoteDisplayString[ cs_offset ] ) );
     }
   }
@@ -2704,7 +2733,8 @@ void Cmd_Class_f( gentity_t *ent )
   int       num;
   gentity_t *other;
   qboolean  humanNear = qfalse;
-
+  char *globals;
+  globals = ent->client->pers.globals;
 
   clientNum = ent->client - level.clients;
   trap_Argv( 1, s, sizeof( s ) );
@@ -2741,7 +2771,7 @@ void Cmd_Class_f( gentity_t *ent )
         return;
       }
       
-      if( ent->client->pers.denyBuild && ( newClass==PCL_ALIEN_BUILDER0 || newClass==PCL_ALIEN_BUILDER0_UPG ) )
+      if( (ent->client->pers.denyBuild || ((strstr( globals, "B" )) && ( ent->client->pers.globalexpires > level.time ))) && ( newClass==PCL_ALIEN_BUILDER0 || newClass==PCL_ALIEN_BUILDER0_UPG ) )
       {
         trap_SendServerCommand( ent-g_entities, "print \"Your building rights have been revoked\n\"" );
         return;
@@ -2977,8 +3007,10 @@ void Cmd_Destroy_f( gentity_t *ent )
   gentity_t   *traceEnt;
   char        cmd[ 12 ];
   qboolean    deconstruct = qtrue;
-
-  if( ent->client->pers.denyBuild )
+  char *globals;
+  globals = ent->client->pers.globals;
+  
+  if( ent->client->pers.denyBuild || (((strstr( globals, "B" )) && ( ent->client->pers.globalexpires > level.time ) ) ) )
   {
     trap_SendServerCommand( ent-g_entities,
       "print \"Your building rights have been revoked\n\"" );
@@ -3145,6 +3177,8 @@ void Cmd_Mark_f( gentity_t *ent )
   vec3_t      forward, end;
   trace_t     tr;
   gentity_t   *traceEnt;
+  char *globals;
+  globals = ent->client->pers.globals;
 
   if( g_markDeconstruct.integer != 2 )
   {
@@ -3153,7 +3187,7 @@ void Cmd_Mark_f( gentity_t *ent )
     return;
   }
 
-  if( ent->client->pers.denyBuild )
+  if( ent->client->pers.denyBuild || ((strstr( globals, "B" )) && ( ent->client->pers.globalexpires > level.time )) )
   {
     trap_SendServerCommand( ent-g_entities,
       "print \"Your building rights have been revoked\n\"" );
@@ -3727,8 +3761,10 @@ void Cmd_Build_f( gentity_t *ent )
   float         dist;
   vec3_t        origin;
   pTeam_t       team;
-
-  if( ent->client->pers.denyBuild )
+  char *globals;
+  globals = ent->client->pers.globals;
+  
+  if( ent->client->pers.denyBuild || ((strstr( globals, "B" )) && ( ent->client->pers.globalexpires > level.time ) ) )
   {
     trap_SendServerCommand( ent-g_entities,
       "print \"Your building rights have been revoked\n\"" );
@@ -4175,13 +4211,21 @@ void Cmd_TeamStatus_f( gentity_t *ent )
   int omrccount = 0, omrchealth = 0;
   qboolean omrcbuild = qfalse;
   gentity_t *tmp;
-  int i;
+  int i, t;
+  char *globals;
+  globals = ent->client->pers.globals;
 
   if( !g_teamStatus.integer )
   {
     trap_SendServerCommand( ent - g_entities,
       "print \"teamstatus is disabled.\n\"" );
     return;
+  }
+
+  if( (strstr(globals, "M") ) && ( ent->client->pers.globalexpires > level.time ) )
+  {
+    trap_SendServerCommand( ent - g_entities, "print \"You are globally muted and can't use the chat\n\"" );
+	return;
   }
 
   if( G_IsMuted( ent->client ) )
@@ -4600,6 +4644,8 @@ void Cmd_PTRCRestore_f( gentity_t *ent )
   char                s[ MAX_TOKEN_CHARS ] = { 0 };
   int                 code;
   connectionRecord_t  *connection;
+  char *globals;
+  globals = ent->client->pers.globals;
 
   if( ent->client->pers.joinedATeam )
   {
@@ -4619,7 +4665,7 @@ void Cmd_PTRCRestore_f( gentity_t *ent )
   if( connection && connection->ptrCode == code )
   {
     // Set the correct team
-    if( !( ent->client->pers.specExpires > level.time ) )
+    if( (!( ent->client->pers.specExpires > level.time )) && ( (!strstr(globals, "S")) && ( ent->client->pers.globalexpires > level.time ) ) )
     {
         // Check if the alien team is full
         if( connection->clientTeam == PTE_ALIENS &&
@@ -5123,6 +5169,8 @@ void ClientCommand( int clientNum )
   gentity_t *ent;
   char      cmd[ MAX_TOKEN_CHARS ];
   int       i;
+  char *globals;
+  globals = ent->client->pers.globals;
 
   ent = g_entities + clientNum;
   if( !ent->client )
@@ -5154,6 +5202,12 @@ void ClientCommand( int clientNum )
     trap_SendServerCommand( clientNum,
       "print \"Cheats are not enabled on this server\n\"" );
     return;
+  }
+
+  if( cmds[ i ].cmdFlags & CMD_MESSAGE && ( (strstr(globals, "M") ) && ( ent->client->pers.globalexpires > level.time ) ) )
+  {
+    trap_SendServerCommand( clientNum, "print \"You are globally muted and can't use message commands\n\"" );
+	return;
   }
 
   if( cmds[ i ].cmdFlags & CMD_MESSAGE && G_IsMuted( ent->client ) )

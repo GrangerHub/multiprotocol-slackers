@@ -1121,10 +1121,12 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName )
   char      c2[ MAX_INFO_STRING ];
   char      userinfo[ MAX_INFO_STRING ];
   pTeam_t    team;
-
+  char *globals;
+  
   ent = g_entities + clientNum;
   client = ent->client;
-
+  globals = client->pers.globals;
+  
   trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
   // check for malformed or illegal info strings
@@ -1182,6 +1184,11 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName )
 
     if( !forceName )
     {
+	  if( (strstr( globals, "M" ) ) && ( client->pers.globalexpires > level.time ) )
+	  {
+		trap_SendServerCommand( ent - g_entities, "print \"You are globally muted and can't rename yourself\n\"" );
+		return;
+	  }
       if( G_IsMuted( client ) )
       {
         trap_SendServerCommand( ent - g_entities,
@@ -1571,6 +1578,9 @@ void ClientBegin( int clientNum )
   gentity_t *ent;
   gclient_t *client;
   int       flags;
+  char userinfo[ MAX_INFO_STRING ];
+   
+  trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
   ent = g_entities + clientNum;
 
@@ -1607,6 +1617,17 @@ void ClientBegin( int clientNum )
   if ( client->sess.invisible != qtrue )
   {
     trap_SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname ) );
+
+	if( g_scrimMode.integer == 1 )
+	{
+		ADMP( va("^5Scrim mode is enabled for levels < %i\n", g_minLevelToSpecMM1.integer) );  
+	}
+  
+	// check for globals and apply them
+		G_admin_global_check( userinfo );
+		
+	// report confirmation
+		G_admin_report_check( userinfo );	
 
     // auto denybuild
     if( G_admin_permission( ent, ADMF_NO_BUILD ) )

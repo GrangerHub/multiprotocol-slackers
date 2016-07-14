@@ -440,10 +440,15 @@ typedef struct
   int                 muteExpires;           // level.time at which a player is unmuted
   qboolean            ignoreAdminWarnings;
   qboolean            denyBuild;
+  qboolean            possibleEvader;
+  qboolean            denyVote;
+  int			  	  ignoresnotifs;
   int                 specExpires;          // level.time at which a player can join a team again after being forced into spectator
   int                 denyHumanWeapons;
   int                 denyAlienClasses;
   int                 adminLevel;
+  char				  *globals;
+  int				  globalexpires;
   char                adminName[ MAX_NETNAME ];
   qboolean            designatedBuilder;
   qboolean            firstConnect;        // This is the first map since connect
@@ -1482,6 +1487,10 @@ extern  vmCvar_t  g_teamKillThreshold;
 extern  vmCvar_t  g_aimbotAdvertBan;
 extern  vmCvar_t  g_aimbotAdvertBanTime;
 extern  vmCvar_t  g_aimbotAdvertBanReason;
+
+extern  vmCvar_t  g_maxReports;
+extern  vmCvar_t  g_maxUnregReports;
+extern  vmCvar_t  g_scrimMode;
 
 void      trap_Printf( const char *fmt );
 void      trap_Error( const char *fmt );
