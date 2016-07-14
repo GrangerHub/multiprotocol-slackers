@@ -10547,13 +10547,13 @@ t = trap_RealTime( NULL );
 		if( banned == 1 )
 		{
 			g_admin_namelog[ i ]->banned = qtrue;
-			trap_SendServerCommand( pids[ 0 ], "disconnect \"You have been banned.\n\"" );
+			trap_DropClient( g_admin_namelog[ i ]->slot, "disconnect \"You have been banned.\n\"" );
 			continue;
 		}
 		client->pers.globals = g_admin_globals[ entry ]->gtype;
 		if( g_admin_globals[ i ]->expires != 0 )
 		{
-			client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t );
+			client->pers.globalexpires = ( g_admin_globals[ entry ]->expires - t );
 		}
 		else 
 		{
