@@ -2281,7 +2281,7 @@ qboolean G_admin_readconfig( gentity_t *ent, int skiparg )
 	  b->stfu = 0;
       ban_open = qtrue;
     }
-	+	else if( !Q_stricmp( t, "[global]" ) )
+	else if( !Q_stricmp( t, "[global]" ) )
     {
       if( gc >= MAX_ADMIN_GLOBALS )
         return qfalse;
@@ -2805,10 +2805,6 @@ const char *G_admin_user_flag( char *oldflags, char *flag, qboolean add, qboolea
   return NULL;
 }
 
-typedef struct {
-  char *flag;
-  char *description;
-} AdminFlagListEntry_t;
 static AdminFlagListEntry_t adminFlagList[] =
 {
   { ADMF_ACTIVITY,             "inactivity rules do not apply" },
@@ -2831,11 +2827,10 @@ static AdminFlagListEntry_t adminFlagList[] =
   { ADMF_UNACCOUNTABLE,        "does not need to specify reason for kick/ban" },
   { ADMF_NO_BUILD,             "can not build" },
   { ADMF_NO_CHAT,              "can not talk" },
-  { ADMF_NO_VOTE,              "can not call votes" }
+  { ADMF_NO_VOTE,              "can not call votes" },
+  { ADMF_FULLRLIST,			   "can see full report list - this goes with reportmanage levels" }
 };
-static int adminNumFlags= sizeof( adminFlagList ) / sizeof( adminFlagList[ 0 ] );
 
-#define MAX_LISTCOMMANDS 128
 qboolean G_admin_flaglist( gentity_t *ent, int skiparg )
 {
   qboolean shown[ MAX_LISTCOMMANDS ];
@@ -5092,7 +5087,6 @@ qboolean G_admin_listplayers( gentity_t *ent, int skiparg )
   char lname[ MAX_NAME_LENGTH ];
   char lname2[ MAX_NAME_LENGTH ];
   char guid_stub[ 9 ];
-  char muted[ 2 ], denied[ 2 ], dbuilder[ 2 ], misc[ 2 ];
   int l;
   char lname_fmt[ 5 ];
   char muted[ 2 ], denied[ 2 ], dbuilder[ 2 ], misc[ 2 ], evader[ 2 ];
@@ -7324,7 +7318,7 @@ qboolean G_admin_revert( gentity_t *ent, int skiparg )
           if( targ->s.modelindex != ptr->buildable )
             continue; 
           VectorSubtract( targ->s.pos.trBase, ptr->origin, dist );
-#define FIND_BUILDABLE_TOLERANCE 5
+
           if( VectorLength( dist ) > FIND_BUILDABLE_TOLERANCE )
             continue; // number is somewhat arbitrary, watch for false pos/neg
           // if we didn't continue then it's this one, unlink it but we can't

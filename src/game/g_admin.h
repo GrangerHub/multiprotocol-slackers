@@ -50,6 +50,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_ADMIN_REPORTS_REASON 50
 #define MAX_ADMIN_ARCHIVES 1024
 #define MAX_ADMIN_ARCHIVES_REASON 50
+#define FIND_BUILDABLE_TOLERANCE 5
 
 /*
  * IMMUNITY - cannot be vote kicked, vote muted
@@ -105,12 +106,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ADMF_NO_BUILD            ".NOBUILD"
 #define ADMF_NO_CHAT             ".NOCHAT"
 #define ADMF_NO_VOTE             ".NOVOTE"
+#define ADMF_FULLRLIST			 "FULLRLIST"
 
 #define MAX_ADMIN_LISTITEMS 20
 #define MAX_ADMIN_SHOWBANS 10
 #define MAX_ADMIN_SHOWREPORTS 5
 #define MAX_ADMIN_SHOWGLOBALS 10
 #define MAX_ADMIN_MAPLOG_LENGTH 5
+
+#define MAX_LISTCOMMANDS 128
+
 
 // important note: QVM does not seem to allow a single char to be a
 // member of a struct at init time.  flag has been converted to char*
@@ -197,6 +202,11 @@ typedef struct g_admin_adminlog
   qboolean  success;
 }
 g_admin_adminlog_t;
+
+typedef struct {
+  char *flag;
+  char *description;
+} AdminFlagListEntry_t;
 
 typedef struct g_admin_global
 {
@@ -346,6 +356,7 @@ qboolean G_admin_rpurge( gentity_t *ent, int skiparg );
 qboolean G_admin_rnote( gentity_t *ent, int skiparg );
 void G_admin_global_update( int entry, int banned );
 qboolean G_admin_scrim( gentity_t *ent, int skiparg );
+static int adminNumFlags= sizeof( adminFlagList ) / sizeof( adminFlagList[ 0 ] );
 
 void G_admin_print( gentity_t *ent, char *m );
 void G_admin_buffer_print( gentity_t *ent, char *m );
