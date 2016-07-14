@@ -456,7 +456,7 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_maxUnregReports, "g_maxUnregReports", "1", CVAR_ARCHIVE, 0, qfalse  },
   { &g_scrimMode, "g_scrimMode", "0", CVAR_ARCHIVE, 0, qfalse }
 
-}
+};
 
 static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[ 0 ] );
 
