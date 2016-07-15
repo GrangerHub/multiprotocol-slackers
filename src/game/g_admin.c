@@ -8162,7 +8162,7 @@ void G_admin_global_check( char *userinfo )
             i+1,
             Info_ValueForKey( userinfo, "name" ),
 			tmp );
-			ADMP( va( "^1Globals restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s\n ^1You are %s^7\n", g_admin_globals[ j ]->banner, g_admin_globals[ j ]->reason, duration, tmp ) );
+			ADMP( va( "^1Globals restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s\n ^1You are %s^7\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, tmp ) );
 	}	
   return;
 }
@@ -8399,7 +8399,8 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
 	//Replace M/S/B into something the plebians can read & apply the sanctions
 	
 	vic = &g_entities[ logmatch ];
-    AP( va( "%s", vic->client->pers.netname ) );
+    
+	/* for debugging:  AP( va( "%s", vic->client->pers.netname ) ); */
 	
 		if( (strstr( gtype, "M" )) != NULL || (strstr( gtype, "m" )) != NULL )
 		{
@@ -8469,7 +8470,10 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
   else
     admin_writeconfig();
   
-	vic->client->pers.globals = gtype;
+    if( g_admin_namelog[ logmatch]->slot > -1 )
+    {
+	  vic->client->pers.globals = gtype;
+    }
 	
 	/* print for debugging */
 	AP( va( "print \"%s - %s \n\"", vic->client->pers.globals, gtype ) );

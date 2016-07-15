@@ -1184,7 +1184,7 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName )
 
     if( !forceName )
     {
-	  if( (strstr( globals, "M" ) ) && ( client->pers.globalexpires > level.time ) )
+	  if( (strstr( globals, "M" ) || (strstr( globals, "m") ) ) && ( client->pers.globalexpires > level.time ) )
 	  {
 		trap_SendServerCommand( ent - g_entities, "print \"You are globally muted and can't rename yourself\n\"" );
 		return;
