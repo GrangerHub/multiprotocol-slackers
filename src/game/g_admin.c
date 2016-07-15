@@ -10574,8 +10574,12 @@ t = trap_RealTime( NULL );
 			}
 		}
 	
-		if( (*guid && (guid == g_admin_namelog[ i ]->guid)) || (glbIP == tmpIP) )
+  		if( (*guid && (guid == g_admin_globals[ i ]->guid)) || (glbIP == tmpIP) )
 		{		
+
+          AP( va( "print \"Player IP: %s - Glb IP: %s\n\"", tmpIP, glbIP ) );
+   	      AP( va( "print \"Player GUID: %s - Glb GUID: %s\n\"", guid, g_admin_globals[ i ]->guid ) );	
+
 			if( banned == 1 )
 			{
 				g_admin_namelog[ i ]->banned = qtrue;
