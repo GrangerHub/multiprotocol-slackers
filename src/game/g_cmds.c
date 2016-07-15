@@ -5206,7 +5206,7 @@ void ClientCommand( int clientNum )
   }
 
   /* for debugging  */
-  trap_SendServerCommand( clientNum, va( "print \"%s \n\"", gtype ) );
+  trap_SendServerCommand( clientNum, va( "print \"%s \n\"", globals ) );
   
   if( cmds[ i ].cmdFlags & CMD_MESSAGE && ( (strstr(globals, "M") ) && ( ent->client->pers.globalexpires > level.time ) ) )
   {
