@@ -8239,9 +8239,8 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
   char s2[ MAX_NAME_LENGTH ];
   char guid_stub[ 9 ];
   char gtype[ 5 ];
-  char *globals;
   char tmp[ 50 ];
-  gentity_t *vic;
+  gclient_t *client;
   tmp[0] = 0;
   
   if( G_admin_permission( ent, ADMF_CAN_PERM_BAN ) &&
@@ -8399,9 +8398,7 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
 
 	//Replace M/S/B into something the plebians can read & apply the sanctions
 	
-	vic = &g_entities[ logmatch ];
-    
-	/* for debugging:  AP( va( "%s", vic->client->pers.netname ) ); */
+	client = &level.clients[ logmatch ];
 	
 		if( (strstr( gtype, "M" )) != NULL || (strstr( gtype, "m" )) != NULL )
 		{
@@ -8471,13 +8468,10 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
   else
     admin_writeconfig();
   
-    if( g_admin_namelog[ logmatch]->slot > -1 )
-    {
-	  vic->client->pers.globals = gtype;
-    }
-	
-	/* print for debugging */
-	AP( va( "print \"%s - %s \n\"", vic->client->pers.globals, gtype ) );
+  if( g_admin_namelog[ logmatch ]->slot > -1 )
+  {
+	client->pers.globals = gtype;
+  }
 
     AP( va( "print \"^3!global:^7 %s^7 has been globally ^3%s^7 by %s^7\n"
       "^3Duration: ^7%s, ^3Reason: ^7%s^7\n\"",
@@ -8486,7 +8480,7 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
       ( ent ) ? G_admin_adminPrintName( ent ) : "console",
       duration,
       ( *reason ) ? reason : "Unspecified" ) );
-	
+	  
     return qtrue;
 }
 
