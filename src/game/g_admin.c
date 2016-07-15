@@ -8399,6 +8399,7 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
 	//Replace M/S/B into something the plebians can read & apply the sanctions
 	
 	vic = &g_entities[ logmatch ];
+    AP( va( "%s", vic->client->pers.netname ) );
 	
 		if( (strstr( gtype, "M" )) != NULL || (strstr( gtype, "m" )) != NULL )
 		{
@@ -9970,11 +9971,17 @@ qboolean G_admin_rglobal( gentity_t *ent, int skiparg )
       ( ent ) ? G_admin_adminPrintName( ent ) : "console",
       duration,
       ( *reason ) ? reason : "Unspecified" ) );
+    
+	for( i = 0; i < MAX_ADMIN_GLOBALS && g_admin_globals[ i ]; i++ )
+    {
+	  bnum = i;
+    }
 	  
 	G_admin_global_update( ( bnum - 1 ), 0 );
-	 
+
     return qtrue;
 }
+
 
 qboolean G_admin_rban( gentity_t *ent, int skiparg )
 {
@@ -10489,78 +10496,94 @@ qboolean G_admin_rnote( gentity_t *ent, int skiparg )
 
 void G_admin_global_update( int entry, int banned )
 {
-int i, k, t, IP[5], ipscanfcount, mask, pids[ MAX_CLIENTS ];
+int i, k, t, IP[5], ipscanfcount, mask;
 char guid[33];
 char ip[16];
 unsigned int tmpIP = 0, glbIP = 0;
 gclient_t *client;
 qboolean ignoreIP = qfalse;
 t = trap_RealTime( NULL );
-	
-  for( i = 0; i < level.maxclients; i++ )
-  {
-	client = &level.clients[ i ];
-	Q_strncpyz( ip, g_admin_namelog[ i ]->ip, sizeof(ip) );
-	Q_strncpyz( guid, g_admin_namelog[ i ]->guid, sizeof(guid) );
-	strchr( ip, ':' );
-	memset( IP, 0, sizeof( IP ));
-	sscanf(ip, "%i.%i.%i.%i", &IP[4], &IP[3], &IP[2], &IP[1]);
-
-	for(k = 4; k >= 1; k--)
+ 
+	for( i = 0; i < level.maxclients; i++ )
 	{
-		if(!IP[k]) continue;
-			tmpIP |= IP[k] << 8*(k-1);
-	}
-
-	if( !ignoreIP )
-	{
-		glbIP = 0;
-		mask = -1;
-
+		client = &level.clients[ i ];
+		Q_strncpyz( ip, g_admin_namelog[ i ]->ip, sizeof(ip) );
+		Q_strncpyz( guid, g_admin_namelog[ i ]->guid, sizeof(guid) );
+		strchr( ip, ':' );
 		memset( IP, 0, sizeof( IP ));
-		ipscanfcount = sscanf(g_admin_globals[ entry ]->ip, "%d.%d.%d.%d/%d", &IP[4], &IP[3], &IP[2], &IP[1], &IP[0]);
-
-		if( ipscanfcount == 4 )
-			mask = -1;
-		else if( ipscanfcount == 5 )
-			mask = IP[0];
-		else if( ipscanfcount > 0 && ipscanfcount < 4 )
-			mask = 8 * ipscanfcount;
-		else
-			continue;
+		sscanf(ip, "%i.%i.%i.%i", &IP[4], &IP[3], &IP[2], &IP[1]);
 
 		for(k = 4; k >= 1; k--)
 		{
 			if(!IP[k]) continue;
-			glbIP |= IP[k] << 8*(k-1);
+				tmpIP |= IP[k] << 8*(k-1);
+		}
+
+		if( !ignoreIP )
+		{
+			if( banned == 0 )
+			{
+				glbIP = 0;
+				mask = -1;
+
+				memset( IP, 0, sizeof( IP ));
+				ipscanfcount = sscanf(g_admin_globals[ entry ]->ip, "%d.%d.%d.%d/%d", &IP[4], &IP[3], &IP[2], &IP[1], &IP[0]);
+
+				if( ipscanfcount == 4 )
+					mask = -1;
+				else if( ipscanfcount == 5 )
+					mask = IP[0];
+				else if( ipscanfcount > 0 && ipscanfcount < 4 )
+					mask = 8 * ipscanfcount;
+				else
+					continue;
+
+				for(k = 4; k >= 1; k--)
+				{
+					if(!IP[k]) continue;
+					glbIP |= IP[k] << 8*(k-1);
+				}
+	
+				if(mask > 0 && mask <= 32) 
+				{
+					tmpIP &= ~((1 << (32-mask)) - 1);
+					glbIP &= ~((1 << (32-mask)) - 1);
+				}
+				
+			} else if( banned == 1 )
+			{	
+
+				ipscanfcount = sscanf(g_admin_reports[ entry ]->ip, "%d.%d.%d.%d", &IP[4], &IP[3], &IP[2], &IP[1]);
+		
+				for(k = 4; k >= 1; k--)
+				{
+					if(!IP[k]) continue;
+						glbIP |= IP[k] << 8*(k-1);
+				}
+			}
 		}
 	
-		if(mask > 0 && mask <= 32) 
-		{
-			tmpIP &= ~((1 << (32-mask)) - 1);
-			glbIP &= ~((1 << (32-mask)) - 1);
+		if( (*guid && (guid == g_admin_namelog[ i ]->guid)) || (glbIP == tmpIP) )
+		{		
+			if( banned == 1 )
+			{
+				g_admin_namelog[ i ]->banned = qtrue;
+				trap_DropClient( g_admin_namelog[ i ]->slot, "disconnect \"You have been banned.\n\"" );
+				continue;
+			}
+			client->pers.globals = g_admin_globals[ entry ]->gtype;
+			if( g_admin_globals[ entry ]->expires != 0 )
+			{
+				client->pers.globalexpires = ( g_admin_globals[ entry ]->expires - t );
+			}
+			else 
+			{
+				client->pers.globalexpires = 999999999;
+			}
 		}
 	}
 	
-	if( (*guid && (guid == g_admin_namelog[ i ]->guid)) || (glbIP == tmpIP) )
-	{		
-		if( banned == 1 )
-		{
-			g_admin_namelog[ i ]->banned = qtrue;
-			trap_DropClient( g_admin_namelog[ i ]->slot, "disconnect \"You have been banned.\n\"" );
-			continue;
-		}
-		client->pers.globals = g_admin_globals[ entry ]->gtype;
-		if( g_admin_globals[ entry ]->expires != 0 )
-		{
-			client->pers.globalexpires = ( g_admin_globals[ entry ]->expires - t );
-		}
-		else 
-		{
-			client->pers.globalexpires = 999999999;
-		}
-	}
-  }
+  return; 
 }
 
 qboolean G_admin_scrim(gentity_t *ent, int skiparg )
