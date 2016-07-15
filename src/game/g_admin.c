@@ -8239,6 +8239,7 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
   char s2[ MAX_NAME_LENGTH ];
   char guid_stub[ 9 ];
   char gtype[ 5 ];
+  char *globals;
   char tmp[ 50 ];
   gentity_t *vic;
   tmp[0] = 0;
@@ -10510,6 +10511,7 @@ unsigned int tmpIP = 0, glbIP = 0;
 gclient_t *client;
 qboolean ignoreIP = qfalse;
 t = trap_RealTime( NULL );
+
  
 	for( i = 0; i < level.maxclients; i++ )
 	{

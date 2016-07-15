@@ -5203,9 +5203,6 @@ void ClientCommand( int clientNum )
     return;
   }
 
-  /* for debugging  */
-  trap_SendServerCommand( clientNum, va( "print \"%s \n\"", globals ) );
-  
   if( cmds[ i ].cmdFlags & CMD_MESSAGE && ( (strstr(ent->client->pers.globals, "M") || strstr(ent->client->pers.globals, "m") ) && ( ent->client->pers.globalexpires > level.time ) ) )
   {
     trap_SendServerCommand( clientNum, "print \"You are globally muted and can't use message commands\n\"" );
