@@ -8471,6 +8471,9 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
   
 	vic->client->pers.globals = gtype;
 	
+	/* print for debugging */
+	AP( va( "print \"%s - %s \n\"", vic->client->pers.globals, gtype ) );
+
     AP( va( "print \"^3!global:^7 %s^7 has been globally ^3%s^7 by %s^7\n"
       "^3Duration: ^7%s, ^3Reason: ^7%s^7\n\"",
       g_admin_namelog[ logmatch ]->name[ 0 ],
