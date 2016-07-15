@@ -10578,10 +10578,12 @@ t = trap_RealTime( NULL );
 			if( g_admin_globals[ entry ]->expires != 0 )
 			{
 				client->pers.globalexpires = ( g_admin_globals[ entry ]->expires - t );
+				return;
 			}
 			else 
 			{
 				client->pers.globalexpires = 999999999;
+				return;
 			}
 		}
 	}
