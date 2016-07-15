@@ -9048,10 +9048,15 @@ qboolean G_admin_gtype( gentity_t *ent, int skiparg )
   if( g_admin.string[ 0 ] )
     admin_writeconfig();
 
+  //debug print
+  AP( va( "print \"gtype entry: %i\n\"", bnum - 1 ) );
+
   G_admin_global_update( ( bnum - 1 ), 0 );
 
+  
   return qtrue;
 }
+
 
 qboolean G_admin_grem( gentity_t *ent, int skiparg )
 {
@@ -10528,6 +10533,9 @@ t = trap_RealTime( NULL );
 			{
 				glbIP = 0;
 				mask = -1;
+				
+				//debug print
+				AP( va( "print \"Global_update entry: %i\n\"", entry ) );
 
 				memset( IP, 0, sizeof( IP ));
 				ipscanfcount = sscanf(g_admin_globals[ entry ]->ip, "%d.%d.%d.%d/%d", &IP[4], &IP[3], &IP[2], &IP[1], &IP[0]);
