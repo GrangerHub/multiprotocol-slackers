@@ -10536,7 +10536,7 @@ t = trap_RealTime( NULL );
 
                 memset( IP, 0, sizeof( IP ));
                 
-                guidtocheck = g_admin_globals[ entry ]->guid;
+                Q_strncpyz(  guidtocheck, g_admin_globals[ entry ]->guid, sizeof( guidtocheck ) );
                 ipscanfcount = sscanf(g_admin_globals[ entry ]->ip, "%d.%d.%d.%d/%d", &IP[4], &IP[3], &IP[2], &IP[1], &IP[0]);
 
                 if( ipscanfcount == 4 )
@@ -10563,7 +10563,8 @@ t = trap_RealTime( NULL );
             } else if( banned == 1 )
             {                   
         
-                guidtocheck = bans[ entry ]->guid;
+                
+                Q_strncpyz(  guidtocheck, g_admin_bans[ entry ]->guid, sizeof( guidtocheck ) );
                 ipscanfcount = sscanf(g_admin_reports[ entry ]->ip, "%d.%d.%d.%d", &IP[4], &IP[3], &IP[2], &IP[1]);
         
                 for(k = 4; k >= 1; k--)
