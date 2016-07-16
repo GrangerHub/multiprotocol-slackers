@@ -1737,7 +1737,7 @@ void G_admin_namelog_update( gclient_t *client, qboolean disconnect )
       && !Q_stricmp( client->pers.guid, g_admin_namelog[ i ]->guid ) )
     {
       for( j = 0; j < MAX_ADMIN_NAMELOG_NAMES
-        && g_admin_namelog[ i ]->name[ j ][ 0 ]; j++ )
+        && g_admin_namelog[ i ]->name[ j ]; j++ )
       {
         G_SanitiseString( g_admin_namelog[ i ]->name[ j ], n2, sizeof( n2 ) );
         if( !Q_stricmp( n1, n2 ) ) 
