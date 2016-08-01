@@ -1737,7 +1737,7 @@ void G_admin_namelog_update( gclient_t *client, qboolean disconnect )
       && !Q_stricmp( client->pers.guid, g_admin_namelog[ i ]->guid ) )
     {
       for( j = 0; j < MAX_ADMIN_NAMELOG_NAMES
-        && g_admin_namelog[ i ]->name[ j ][ 0 ]; j++ )
+        && g_admin_namelog[ i ]->name[ j ][0]; j++ )
       {
         G_SanitiseString( g_admin_namelog[ i ]->name[ j ], n2, sizeof( n2 ) );
         if( !Q_stricmp( n1, n2 ) ) 
@@ -2038,7 +2038,7 @@ qboolean G_admin_readconfig( gentity_t *ent, int skiparg )
                 COM_GetCurrentParseLine() ) );
       }
     }
-   else if( global_open )
+    else if( global_open )
     {
       if( !Q_stricmp( t, "name" ) )
       {
@@ -8153,9 +8153,9 @@ void G_admin_global_check( char *userinfo )
             return;
         }
         
-        client->pers.globals = g_admin_globals[ j ]->gtype;
+        client->pers.globals = g_admin_globals[ i ]->gtype;
         
-        G_admin_duration( ( g_admin_globals[ j ]->expires - t ),
+        G_admin_duration( ( g_admin_globals[ i ]->expires - t ),
         duration, sizeof( duration ) );
           G_AdminsPrintf(
             "Global #%i applied to %s^7. Sanctions: %s\n",
