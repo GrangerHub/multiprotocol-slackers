@@ -7983,19 +7983,20 @@ void G_admin_global_check( char *userinfo )
   char guid[ 33 ];
   char ip[ 16 ];
   char *value;
-  int i, j = 0;
+  int i, t, j = 0, gcount = 0;
   unsigned int userIP = 0, intIP = 0, tempIP, iIP = 0, tIP;
   int IP[5], k, mask, ipscanfcount;
-  int t;
   int globaled;
   char *reason;
   char duration[ 32 ];
   char *gtype = '\0';
   char tmp[ 50 ];
+  char gIDs[ 30 ];
   gclient_t *client;
   gentity_t *ent;
   qboolean ignoreIP = qfalse;
   tmp[0] = 0;
+  gIDs[0] = 0;
   
   for( i = 0; i < level.maxclients; i++ ) 
   {
@@ -8083,21 +8084,35 @@ void G_admin_global_check( char *userinfo )
       globaled = 1;
         if( g_admin_globals[ i ]->expires != 0 )
         {
-            client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t );
+            client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t ) + level.time;
         }
         else 
         {
             client->pers.globalexpires = 999999999;
         }
-      gtype = g_admin_globals[ i ]->gtype;
-      break;
+		
+      strcat( gtype, g_admin_globals[ i ]->gtype );
+	  
+		if( gIDs[0] == 0 )
+		{
+			strcat( gIDs, va( "#%i", i+1 ) );
+		} else {
+			strcat( gIDs, va( ", #%i", i+1 ) );
+		}
       }
     } else if( *guid && !Q_stricmp( g_admin_globals[ i ]->guid, guid ) )
     {
       globaled = 1;
-      client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t );
-      gtype = g_admin_globals[ i ]->gtype;
-      break;
+	  
+      client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t ) + level.time;
+      strcat( gtype, g_admin_globals[ i ]->gtype );
+	  
+	  if( gIDs[0] == 0 )
+	  {
+		strcat( gIDs, va( "#%i", i+1 ) );
+	  } else {
+		strcat( gIDs, va( ", #%i", i+1 ) );
+	  }
     }
     
     if( (tIP == iIP) && globaled != 1 )
@@ -8111,7 +8126,8 @@ void G_admin_global_check( char *userinfo )
     {
         if( (strstr( gtype, "M" )) != NULL || (strstr( gtype, "m" )) != NULL )
         {
-            strcat( tmp, "muted" );         
+            strcat( tmp, "muted" );  
+			strcat( client->pers.globals, "m" );       
             g_admin_namelog[ j ]->muted = qfalse;
     
             if( strlen(gtype) > 2 )
@@ -8123,6 +8139,7 @@ void G_admin_global_check( char *userinfo )
         if( (strstr( gtype, "S" )) != NULL || (strstr( gtype, "s" )) != NULL )
         {
             strcat( tmp, "forcespeced" );
+			strcat( client->pers.globals, "s" );
             g_admin_namelog[ j ]->specExpires = 0;
         
             if( strlen(gtype) > 2 )
@@ -8134,6 +8151,7 @@ void G_admin_global_check( char *userinfo )
         if( (strstr( gtype, "B" )) != NULL || (strstr( gtype, "b" )) != NULL )
         {
             strcat( tmp, "denybuilt" );
+			strcat( client->pers.globals, "b" );
             g_admin_namelog[ j ]->denyBuild = qfalse;
     
             if( strlen(gtype) > 2 )
@@ -8145,6 +8163,7 @@ void G_admin_global_check( char *userinfo )
         if( (strstr( gtype, "V" )) != NULL || (strstr( gtype, "v" )) != NULL )
         {
             strcat( tmp, "denyvoted" );
+			strcat( client->pers.globals, "v" );
             g_admin_namelog[ j ]->denyVote = qfalse;
         }
     
@@ -8153,13 +8172,11 @@ void G_admin_global_check( char *userinfo )
             return;
         }
         
-        client->pers.globals = g_admin_globals[ i ]->gtype;
-        
         G_admin_duration( ( g_admin_globals[ i ]->expires - t ),
         duration, sizeof( duration ) );
           G_AdminsPrintf(
-            "Global #%i applied to %s^7. Sanctions: %s\n",
-            i+1,
+            "Global(s) %s applied to %s^7. Sanctions: %s\n",
+            gIDs,
             Info_ValueForKey( userinfo, "name" ),
             tmp );
             ADMP( va( "^1Globals restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s\n ^1You are %s^7\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, tmp ) );
@@ -8233,7 +8250,7 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
   int minargc;
   char duration[ 32 ];
   int logmatch = -1, logmatches = 0;
-  int i, j;
+  int i, j, t;
   qboolean exactmatch = qfalse;
   char n2[ MAX_NAME_LENGTH ];
   char s2[ MAX_NAME_LENGTH ];
@@ -8242,6 +8259,9 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
   char tmp[ 50 ];
   gclient_t *client;
   tmp[0] = 0;
+  qtime_t qt;
+
+  t = trap_RealTime( &qt );
   
   if( G_admin_permission( ent, ADMF_CAN_PERM_BAN ) &&
        G_admin_permission( ent, ADMF_UNACCOUNTABLE ) )
@@ -8471,6 +8491,7 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
   if( g_admin_namelog[ logmatch ]->slot > -1 )
   {
     client->pers.globals = gtype;
+	client->pers.globalExpires = ( seconds - t ) + level.time;
   }
 
     AP( va( "print \"^3!global:^7 %s^7 has been globally ^3%s^7 by %s^7\n"
@@ -9532,7 +9553,7 @@ qboolean G_admin_report( gentity_t *ent, int skiparg )
     vic = &g_entities[ i ];
         if( G_admin_level( vic ) >= 3 )
         {    
-            strcat( admins, va( "%s ", g_admin_admins[ i ]->name ) );
+            strcat( admins, va( "%s ", g_admin_namelog[ i ]->name ) );
         }
     }
     
@@ -10586,7 +10607,7 @@ t = trap_RealTime( NULL );
             client->pers.globals = g_admin_globals[ entry ]->gtype;
             if( g_admin_globals[ entry ]->expires != 0 && (g_admin_globals[ entry ]->expires - t) > 1 )
             {
-                client->pers.globalexpires = ( g_admin_globals[ entry ]->expires - t );
+                client->pers.globalexpires = ( g_admin_globals[ entry ]->expires - t ) + level.time;
             }
             else 
             {
