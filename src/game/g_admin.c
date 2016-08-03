@@ -8258,8 +8258,8 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
   char gtype[ 5 ];
   char tmp[ 50 ];
   gclient_t *client;
-  tmp[0] = 0;
   qtime_t qt;
+  tmp[0] = 0;
 
   t = trap_RealTime( &qt );
   
