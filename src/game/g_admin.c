@@ -8491,7 +8491,7 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
   if( g_admin_namelog[ logmatch ]->slot > -1 )
   {
     client->pers.globals = gtype;
-	client->pers.globalExpires = ( seconds - t ) + level.time;
+	client->pers.globalexpires = ( seconds - t ) + level.time;
   }
 
     AP( va( "print \"^3!global:^7 %s^7 has been globally ^3%s^7 by %s^7\n"
