@@ -861,7 +861,7 @@ void admin_writeconfig( void )
     trap_FS_Write( "banner  = ", 10, f );
     admin_writeconfig_string( g_admin_globals[ i ]->banner, f );
     trap_FS_Write( "blevel  = ", 10, f );
-    admin_writeconfig_int( g_admin_bans[ i ]->bannerlevel, f );
+    admin_writeconfig_int( g_admin_globals[ i ]->bannerlevel, f );
     trap_FS_Write( "\n", 1, f );
   }
   for( i = 0; i < MAX_ADMIN_REPORTS && g_admin_reports[ i ]; i++ )
