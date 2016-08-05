@@ -8165,15 +8165,15 @@ void G_admin_global_check( char *userinfo )
       {
         continue;
       }
-        
-      ADMP( va( "^1Global restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s ^1You are %s^7\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, tmp ) );
+            
+    G_admin_duration( ( g_admin_globals[ i ]->expires - t ),
+	  duration, sizeof( duration ) );
+    ADMP( va( "^1Global restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s ^1You are %s^7\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, tmp ) );
     }
   }
   
   if(globaled == 1)
   {
-    G_admin_duration( ( g_admin_globals[ i ]->expires - t ),
-    duration, sizeof( duration ) );
     G_AdminsPrintf(
     "Global(s) %s applied to %s^7. Sanctions: %s\n",
     gIDs,
