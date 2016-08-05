@@ -8162,7 +8162,7 @@ void G_admin_global_check( char *userinfo )
     
   if( tmp[0] == '\0' )
     {
-       continue;
+       return;
     }
 		
   if(globaled == 1)
