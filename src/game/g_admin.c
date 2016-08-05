@@ -8166,7 +8166,7 @@ void G_admin_global_check( char *userinfo )
         continue;
       }
         
-      ADMP( va( "^1Global restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^1You are %s^7\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, tmp ) );
+      ADMP( va( "^1Global restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s ^1You are %s^7\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, tmp ) );
     }
   }
   
