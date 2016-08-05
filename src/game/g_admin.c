@@ -8095,11 +8095,11 @@ void G_admin_global_check( char *userinfo )
 	
 	if( globaled == 1 )
 	{
-		if( g_admin_globals[ i ]->expires != 0 && (g_admin_globals[ i ]->expires - t) > 1 )
+		if( g_admin_globals[ i ]->expires == 0 )
         {
-            client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t );
-        } else {
             client->pers.globalexpires = 999999999;
+        } else {
+            client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t );
         }
 		
       strcat( gtype, g_admin_globals[ i ]->gtype );
