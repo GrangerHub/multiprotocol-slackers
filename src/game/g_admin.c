@@ -7983,7 +7983,7 @@ void G_admin_global_check( char *userinfo )
   char guid[ 33 ];
   char ip[ 16 ];
   char *value;
-  int i, t, j = 0, gcount = 0;
+  int i, t, j = 0;
   unsigned int userIP = 0, intIP = 0, tempIP, iIP = 0, tIP;
   int IP[5], k, mask, ipscanfcount;
   int globaled;
@@ -8000,11 +8000,11 @@ void G_admin_global_check( char *userinfo )
   
   for( i = 0; i < level.maxclients; i++ ) 
   {
-    client = &level.clients[ i ];
-    ent = &g_entities[ i ];
     j = i;
-        if( !Q_stricmp( client->pers.netname, Info_ValueForKey( userinfo, "name" ) ) )
+        if( !Q_stricmp( g_admin_namelog[ i ]->netname, Info_ValueForKey( userinfo, "name" ) ) )
         {
+			client = &level.clients[ g_admin_namelog[ i ]->slot ];
+			ent = &g_entities[ g_admin_namelog[ i ]->slot ];
             break;
         }
   }
@@ -8111,11 +8111,11 @@ void G_admin_global_check( char *userinfo )
 			strcat( gIDs, va( ", #%i", i+1 ) );
 		}
 
-	    G_admin_duration( ( g_admin_globals[ i ]->expires - t ),
-		    duration, sizeof( duration ) );
-        ADMP( va( "^1Global restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s ^1- ^7%s\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, g_admin_globals[ i ]->gtype ) );
-	    //debug print
-	    ADMP( va( "^3User IP: ^7%d ^3Global IP: ^7%d \n^3User GUID: ^7%s ^3Global GUID: ^7%s \n", intIP, tempIP, guid, g_admin_globals[ i ]->guid ) );
+    G_admin_duration( ( g_admin_globals[ i ]->expires - t ),
+	  duration, sizeof( duration ) );
+    ADMP( va( "^1Global restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s ^1- ^7%s\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, g_admin_globals[ i ]->gtype ) );
+	//debug print
+	ADMP( va( "^3User IP: ^7%d ^3Global IP: ^7%d \n^3User GUID: ^7%s ^3Global GUID: ^7%s \n", tempIP, intIP, guid, g_admin_globals[ i ]->guid ) );
 	}
   }
 		
@@ -8124,7 +8124,8 @@ void G_admin_global_check( char *userinfo )
     strcat( tmp, "muted" );  
 	strcat( client->pers.globals, "m" );       
     g_admin_namelog[ j ]->muted = qfalse;
-    
+	//debug print
+    ADMP( va( "%s", client->pers.netname ) );
     if( strlen(gtype) > 2 )
     {
       strcat( tmp, "/" );
