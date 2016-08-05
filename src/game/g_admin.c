@@ -8082,9 +8082,9 @@ void G_admin_global_check( char *userinfo )
       if( intIP == tempIP || mask == 0 )
       {
       globaled = 1;
-        if( g_admin_globals[ i ]->expires != 0 )
+        if( g_admin_globals[ i ]->expires != 0 && (g_admin_globals[ i ]->expires - t) > 1 )
         {
-            client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t ) + level.time;
+            client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t );
         }
         else 
         {
@@ -8104,7 +8104,7 @@ void G_admin_global_check( char *userinfo )
     {
       globaled = 1;
 	  
-      client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t ) + level.time;
+      client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t );
       strcat( gtype, g_admin_globals[ i ]->gtype );
 	  
 	  if( gIDs[0] == 0 )
@@ -8179,6 +8179,7 @@ void G_admin_global_check( char *userinfo )
             gIDs,
             Info_ValueForKey( userinfo, "name" ),
             tmp );
+			//This needs to be changed..later
             ADMP( va( "^1Globals restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s\n ^1You are %s^7\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, tmp ) );
     }   
   return;
@@ -8491,7 +8492,7 @@ qboolean G_admin_global( gentity_t *ent, int skiparg )
   if( g_admin_namelog[ logmatch ]->slot > -1 )
   {
     client->pers.globals = gtype;
-	client->pers.globalexpires = ( seconds - t ) + level.time;
+	client->pers.globalexpires = ( seconds - t );
   }
 
     AP( va( "print \"^3!global:^7 %s^7 has been globally ^3%s^7 by %s^7\n"
@@ -10607,7 +10608,7 @@ t = trap_RealTime( NULL );
             client->pers.globals = g_admin_globals[ entry ]->gtype;
             if( g_admin_globals[ entry ]->expires != 0 && (g_admin_globals[ entry ]->expires - t) > 1 )
             {
-                client->pers.globalexpires = ( g_admin_globals[ entry ]->expires - t ) + level.time;
+                client->pers.globalexpires = ( g_admin_globals[ entry ]->expires - t );
             }
             else 
             {
