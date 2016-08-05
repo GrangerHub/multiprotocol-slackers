@@ -8003,11 +8003,10 @@ void G_admin_global_check( char *userinfo )
     client = &level.clients[ i ];
     ent = &g_entities[ i ];
     j = i;
-    
-    if( !Q_stricmp( client->pers.netname, Info_ValueForKey( userinfo, "name" ) ) )
-    {
-      break;
-    }
+        if( !Q_stricmp( client->pers.netname, Info_ValueForKey( userinfo, "name" ) ) )
+        {
+            break;
+        }
   }
     
   *reason = '\0'; 
@@ -8067,7 +8066,7 @@ void G_admin_global_check( char *userinfo )
         intIP |= IP[k] << 8*(k-1);
       }
 
-      iIP = intIP;
+    iIP = intIP;
     
       if(mask > 0 && mask <= 32) 
       {
@@ -8075,111 +8074,106 @@ void G_admin_global_check( char *userinfo )
         intIP &= ~((1 << (32-mask)) - 1);
       }
     
-      tIP = userIP;
+    tIP = userIP;
     
-      tIP &= ~((1 << 24) - 1);
-      iIP &= ~((1 << 24) - 1);
+    tIP &= ~((1 << 24) - 1);
+    iIP &= ~((1 << 24) - 1);
     
       if( intIP == tempIP || mask == 0 )
       {
-        globaled = 1;
+      globaled = 1;
       }
-    }
-    else if( *guid && !Q_stricmp( g_admin_globals[ i ]->guid, guid ) )
+    } else if( *guid && !Q_stricmp( g_admin_globals[ i ]->guid, guid ) )
     {
       globaled = 1;
     }
     
     if( (tIP == iIP) && globaled != 1 )
     {
-      client->pers.possibleEvader = qtrue;
+        client->pers.possibleEvader = qtrue;
     }
-    
-    if( globaled == 1 )
-    {
-      if( g_admin_globals[ i ]->expires != 0 && (g_admin_globals[ i ]->expires - t) > 1 )
-      {
-        client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t );
-      } 
-      else 
-      {
-        client->pers.globalexpires = 999999999;
-      }
-        
+	
+	if( globaled == 1 )
+	{
+		if( g_admin_globals[ i ]->expires != 0 && (g_admin_globals[ i ]->expires - t) > 1 )
+        {
+            client->pers.globalexpires = ( g_admin_globals[ i ]->expires - t );
+        } else {
+            client->pers.globalexpires = 999999999;
+        }
+		
       strcat( gtype, g_admin_globals[ i ]->gtype );
-      
-      if( gIDs[0] == 0 )
-      {
-        strcat( gIDs, va( "#%i", i+1 ) );
-      } 
-      else 
-      {
-        strcat( gIDs, va( ", #%i", i+1 ) );
-      }
-        
-      //Translation & message
-      if( (strstr( gtype, "M" )) != NULL || (strstr( gtype, "m" )) != NULL )
-      {
-        strcat( tmp, "muted" );  
-        strcat( client->pers.globals, "m" );       
-        g_admin_namelog[ j ]->muted = qfalse;
-    
-        if( strlen(gtype) > 2 )
-        {
-          strcat( tmp, "/" );
-        }
-      }
-    
-      if( (strstr( gtype, "S" )) != NULL || (strstr( gtype, "s" )) != NULL )
-      {
-        strcat( tmp, "forcespeced" );
-        strcat( client->pers.globals, "s" );
-        g_admin_namelog[ j ]->specExpires = 0;
-        
-        if( strlen(gtype) > 2 )
-        {
-          strcat( tmp, "/" );
-        }
-      }
-    
-      if( (strstr( gtype, "B" )) != NULL || (strstr( gtype, "b" )) != NULL )
-      {
-        strcat( tmp, "denybuilt" );
-        strcat( client->pers.globals, "b" );
-        g_admin_namelog[ j ]->denyBuild = qfalse;
-    
-        if( strlen(gtype) > 2 )
-        {
-          strcat( tmp, "/" );
-        }
-      }
-    
-      if( (strstr( gtype, "V" )) != NULL || (strstr( gtype, "v" )) != NULL )
-      {
-        strcat( tmp, "denyvoted" );
-        strcat( client->pers.globals, "v" );
-        g_admin_namelog[ j ]->denyVote = qfalse;
-      }
-    
-      if( tmp[0] == '\0' )
-      {
-        continue;
-      }
-            
+	  
+		if( gIDs[0] == 0 )
+		{
+			strcat( gIDs, va( "#%i", i+1 ) );
+		} else {
+			strcat( gIDs, va( ", #%i", i+1 ) );
+		}
+
     G_admin_duration( ( g_admin_globals[ i ]->expires - t ),
 	  duration, sizeof( duration ) );
-    ADMP( va( "^1Global restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s ^1You are %s^7\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, tmp ) );
+    ADMP( va( "^1Global restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s ^1- ^7%s\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, g_admin_globals[ i ]->gtype ) );
+	}
+  }
+		
+  if( (strstr( gtype, "M" )) != NULL || (strstr( gtype, "m" )) != NULL )
+  {
+    strcat( tmp, "muted" );  
+	strcat( client->pers.globals, "m" );       
+    g_admin_namelog[ j ]->muted = qfalse;
+    
+    if( strlen(gtype) > 2 )
+    {
+      strcat( tmp, "/" );
     }
   }
-  
+    
+  if( (strstr( gtype, "S" )) != NULL || (strstr( gtype, "s" )) != NULL )
+  {
+    strcat( tmp, "forcespeced" );
+	strcat( client->pers.globals, "s" );
+	g_admin_namelog[ j ]->specExpires = 0;
+        
+	if( strlen(gtype) > 2 )
+	{
+      strcat( tmp, "/" );
+    }
+  }
+    
+  if( (strstr( gtype, "B" )) != NULL || (strstr( gtype, "b" )) != NULL )
+  {
+    strcat( tmp, "denybuilt" );
+	strcat( client->pers.globals, "b" );
+	g_admin_namelog[ j ]->denyBuild = qfalse;
+    
+	if( strlen(gtype) > 2 )
+	{
+	  strcat( tmp, "/" );
+	}
+  }
+    
+  if( (strstr( gtype, "V" )) != NULL || (strstr( gtype, "v" )) != NULL )
+  {
+	strcat( tmp, "denyvoted" );
+	strcat( client->pers.globals, "v" );
+	g_admin_namelog[ j ]->denyVote = qfalse;
+  }
+    
+  if( tmp[0] == '\0' )
+    {
+       continue;
+    }
+		
   if(globaled == 1)
   {
-    G_AdminsPrintf(
-    "Global(s) %s applied to %s^7. Sanctions: %s\n",
-    gIDs,
-    Info_ValueForKey( userinfo, "name" ),
-    tmp );
+          G_AdminsPrintf(
+            "Global(s) %s applied to %s^7. Sanctions: %s\n",
+            gIDs,
+            Info_ValueForKey( userinfo, "name" ),
+            tmp );
   }
+	
   return;
 }
 
