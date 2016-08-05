@@ -8111,9 +8111,11 @@ void G_admin_global_check( char *userinfo )
 			strcat( gIDs, va( ", #%i", i+1 ) );
 		}
 
-    G_admin_duration( ( g_admin_globals[ i ]->expires - t ),
-	  duration, sizeof( duration ) );
-    ADMP( va( "^1Global restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s ^1- ^7%s\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, g_admin_globals[ i ]->gtype ) );
+	    G_admin_duration( ( g_admin_globals[ i ]->expires - t ),
+		    duration, sizeof( duration ) );
+        ADMP( va( "^1Global restored. Admin: ^7%s ^1Reason: ^7%s ^1Duration: ^7%s ^1- ^7%s\n", g_admin_globals[ i ]->banner, g_admin_globals[ i ]->reason, duration, g_admin_globals[ i ]->gtype ) );
+	    //debug print
+	    ADMP( va( "^3User IP: ^7%d ^3Global IP: ^7%d \n^3User GUID: ^7%s ^3Global GUID: ^7%s \n", intIP, tempIP, guid, g_admin_globals[ i ]->guid ) );
 	}
   }
 		
