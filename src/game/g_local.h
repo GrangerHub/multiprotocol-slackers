@@ -254,9 +254,9 @@ struct gentity_s
   int               suicideTime;                    // when the client will suicide
 
   int               lastDamageTime;
-  
+
   int               bdnumb;     // buildlog entry ID
-  
+
   // For nobuild!
   noBuild_t	    noBuild;
 };
@@ -557,7 +557,7 @@ struct gclient_s
   unlagged_t          unlaggedBackup;
   unlagged_t          unlaggedCalc;
   int                 unlaggedTime;
-  
+
   int               tkcredits[ MAX_CLIENTS ];
 
 };
@@ -801,17 +801,17 @@ typedef struct
   buildHistory_t    *buildHistory;
   int               lastBuildID;
   int               lastTeamUnbalancedTime;
-  int               numTeamWarnings;  
+  int               numTeamWarnings;
   int               lastMsgTime;
   int               mapRotationVoteTime;
-  
+
   statsCounters_level alienStatsCounters;
   statsCounters_level humanStatsCounters;
-  
+
   qboolean	    noBuilding;
   float		    nbArea;
   float		    nbHeight;
-  
+
   nbMarkers_t	    nbMarkers[ MAX_GENTITIES ];
 } level_locals_t;
 
@@ -866,7 +866,7 @@ void      G_PrivateMessage( gentity_t *ent );
 char      *G_statsString( statsCounters_t *sc, pTeam_t *pt );
 void      Cmd_Share_f( gentity_t *ent );
 void      Cmd_Donate_f( gentity_t *ent );
-void      Cmd_TeamVote_f( gentity_t *ent ); 
+void      Cmd_TeamVote_f( gentity_t *ent );
 void      Cmd_Builder_f( gentity_t *ent );
 void      G_WordWrap( char *buffer, int maxwidth );
 void      G_CP( gentity_t *ent );
@@ -1372,6 +1372,7 @@ extern  vmCvar_t  pmove_msec;
 extern  vmCvar_t  g_rankings;
 extern  vmCvar_t  g_allowShare;
 extern  vmCvar_t  g_creditOverflow;
+extern  vmCvar_t  g_timedFreeCredits;
 extern  vmCvar_t  g_enableDust;
 extern  vmCvar_t  g_enableBreath;
 extern  vmCvar_t  g_singlePlayer;
