@@ -5008,7 +5008,8 @@ static void Cmd_Ignore_f( gentity_t *ent )
        if( level.clients[ i ].pers.connected == CON_CONNECTED &&
             ent->client != level.clients + i &&
             level.clients[ i ].pers.teamSelection ==
-            ent->client->pers.teamSelection ) {
+            ent->client->pers.teamSelection  &&
+            level.clients[ i ].pers.credit < max  ) {
          new_credits = level.clients[ i ].pers.credit + portion;
          amounts[ i ] = portion;
          totals[ i ] += portion;
