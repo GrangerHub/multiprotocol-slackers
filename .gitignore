@@ -5,3 +5,4 @@ bld/
 *.exe
 *.o
 *.so
+.tags
