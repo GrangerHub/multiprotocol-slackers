@@ -450,6 +450,222 @@ static void CG_ForceModelChange( void )
   }
 }
 
+/*
+===============
+CG_SetPVars
+
+Set the p_* cvars
+===============
+*/
+static void CG_SetPVars( void )
+{
+  playerState_t *ps;
+
+  if( !cg.snap )
+    return;
+
+  ps = &cg.snap->ps;
+
+  trap_Cvar_Set( "player_hp", va( "%d", ps->stats[ STAT_HEALTH ] ) );
+  trap_Cvar_Set( "player_maxhp", va( "%d", ps->stats[ STAT_MAX_HEALTH ] ) );
+  switch( ps->stats[ STAT_PTEAM ] )
+  {
+    case PTE_NONE:
+    trap_Cvar_Set( "player_team",  "spectator" );
+    trap_Cvar_Set( "player_stage", "0" );
+    trap_Cvar_Set( "player_spawns","0");
+    trap_Cvar_Set( "player_kns",   "0" );
+    trap_Cvar_Set( "player_bp",    "0" );
+    trap_Cvar_Set( "player_maxbp", "0" );
+    break;
+
+    case PTE_ALIENS:
+    trap_Cvar_Set( "player_team",  "alien" );
+    trap_Cvar_Set( "player_stage", va( "%d", cgs.alienStage+1 ) );
+    trap_Cvar_Set( "player_spawns",va( "%d", cgs.numAlienSpawns ));
+    trap_Cvar_Set( "player_kns",   va( "%d",((cgs.alienStage==2)?0:abs(cgs.alienNextStageThreshold-cgs.alienKills))));
+    trap_Cvar_Set( "player_stage", va( "%d", cgs.alienStage+1 ) );
+    trap_Cvar_Set( "player_bp",    va( "%d", cgs.alienBuildPoints ));
+    trap_Cvar_Set( "player_maxbp", va( "%d", cgs.alienBuildPointsTotal ));
+    break;
+
+    case PTE_HUMANS:
+    trap_Cvar_Set( "player_team",  "human" );
+    trap_Cvar_Set( "player_stage", va( "%d", cgs.humanStage+1 ) );
+    trap_Cvar_Set( "player_spawns",va( "%d", cgs.numHumanSpawns ));
+    trap_Cvar_Set( "player_kns",   va( "%d",((cgs.humanStage==2)?0:abs(cgs.humanNextStageThreshold-cgs.humanKills))));
+    trap_Cvar_Set( "player_bp",    va( "%d", cgs.humanBuildPoints ));
+    trap_Cvar_Set( "player_maxbp", va( "%d", cgs.humanBuildPointsTotal ));
+    break;
+  }
+
+  trap_Cvar_Set( "player_credits", va( "%d", ps->persistant[ PERS_CREDIT ] ) );
+  trap_Cvar_Set( "player_score",   va( "%d", ps->persistant[ PERS_SCORE ] ) );
+  trap_Cvar_Set( "player_deaths",  va( "%d", ps->persistant[ PERS_KILLED ] ) );
+
+  if ( CG_LastAttacker( ) != -1 )
+  {
+    trap_Cvar_Set( "player_attacker", cgs.clientinfo[ CG_LastAttacker( ) ].name );
+    trap_Cvar_Set( "player_attacker_hp", va( "%d", cgs.clientinfo[ CG_LastAttacker( ) ].health));
+  }
+  else
+  {
+    trap_Cvar_Set( "player_attacker", "" );
+    trap_Cvar_Set( "player_attacker_hp", "" );
+  }
+
+
+  if ( CG_CrosshairPlayer( ) != -1 )
+  {
+    trap_Cvar_Set( "player_crosshair", cgs.clientinfo[ CG_CrosshairPlayer( ) ].name );
+    //XXX hax required
+    //trap_Cvar_Set( "player_crosshair_credits", va("%d",cgs.clientinfo[CG_CrosshairPlayer( )].credits));
+  }
+  else
+  {
+    trap_Cvar_Set( "player_crosshair", "" );
+    //trap_Cvar_Set( "player_crosshair_credits", "" );
+  }
+
+  // stages
+  trap_Cvar_Set( "alien_stage", va( "%d", cgs.alienStage+1 ) );
+  trap_Cvar_Set( "human_stage", va( "%d", cgs.humanStage+1 ) );
+
+  // alien kills to next stage 
+  if( cgs.alienStage == 2 )
+    trap_Cvar_Set( "alien_kns", va( "%d", 0 ) );
+  else
+    trap_Cvar_Set( "alien_kns", va( "%d", abs(cgs.alienNextStageThreshold - cgs.alienKills)) );
+
+  // human kills to next stage 
+  if( cgs.humanStage == 2 )
+    trap_Cvar_Set( "human_kns", va( "%d", 0 ) );
+  else
+    trap_Cvar_Set( "human_kns", va( "%d", abs(cgs.humanNextStageThreshold - cgs.humanKills)) );
+
+  // General score information 
+  trap_Cvar_Set( "alien_score", va( "%d", cgs.alienKills ) );
+  trap_Cvar_Set( "human_score", va( "%d", cgs.humanKills ) );
+
+  trap_Cvar_Set( "game_points", va( "%d", ( cgs.humanKills + cgs.alienKills )));
+
+  trap_Cvar_Set( "alien_spawns", va( "%d", cgs.numAlienSpawns ));
+  trap_Cvar_Set( "human_spawns", va( "%d", cgs.numHumanSpawns ));
+
+  // class type
+  switch ( ps->stats[ STAT_PCLASS ] )
+    {
+    case PCL_ALIEN_BUILDER0:
+    trap_Cvar_Set( "player_class", "Granger" );
+    break;
+
+    case PCL_ALIEN_BUILDER0_UPG:
+    trap_Cvar_Set( "player_class", "Advanced Granger" );
+    break;
+
+    case PCL_ALIEN_LEVEL0:
+    trap_Cvar_Set( "player_class", "Dretch" );
+    break;
+
+    case PCL_ALIEN_LEVEL1:
+    trap_Cvar_Set( "player_class", "Basilisk" );
+    break;
+
+    case PCL_ALIEN_LEVEL1_UPG:
+    trap_Cvar_Set( "player_class", "Advanced Basilisk" );
+    break;
+
+    case PCL_ALIEN_LEVEL2:
+    trap_Cvar_Set( "player_class", "Marauder" );
+    break;
+
+    case PCL_ALIEN_LEVEL2_UPG:
+    trap_Cvar_Set( "player_class", "Advanced Marauder" );
+    break;
+
+    case PCL_ALIEN_LEVEL3:
+    trap_Cvar_Set( "player_class", "Dragoon" );
+    break;
+
+    case PCL_ALIEN_LEVEL3_UPG:
+    trap_Cvar_Set( "player_class", "Advanced Dragoon" );
+    break;
+
+    case PCL_ALIEN_LEVEL4:
+    trap_Cvar_Set( "player_class", "Tyrant" );
+    break;
+
+    case PCL_HUMAN:
+    trap_Cvar_Set( "player_class", "Human" );
+    break;
+
+    case PCL_HUMAN_BSUIT:
+    trap_Cvar_Set( "player_class", "Battlesuit" );
+    break;
+
+    default:
+    trap_Cvar_Set( "player_class", "Unknown" );
+    }
+
+  // weapons
+  switch ( ps->weapon )
+    {
+    case WP_HBUILD:
+    trap_Cvar_Set( "player_weapon", "Construction Kit" );
+    break;
+
+    case WP_HBUILD2:
+    trap_Cvar_Set( "player_weapon", "Advanced Construction Kit" );
+    break;
+
+    case WP_BLASTER:
+    trap_Cvar_Set( "player_weapon", "Blaster" );
+    break;
+
+    case WP_MACHINEGUN:
+    trap_Cvar_Set( "player_weapon", "Machine Gun" );
+    break;
+
+    case WP_PAIN_SAW:
+    trap_Cvar_Set( "player_weapon", "Painsaw" );
+    break;
+
+    case WP_SHOTGUN:
+    trap_Cvar_Set( "player_weapon", "Shotgun" );
+    break;
+
+    case WP_LAS_GUN:
+    trap_Cvar_Set( "player_weapon", "Laser Gun" );
+    break;
+
+    case WP_MASS_DRIVER:
+    trap_Cvar_Set( "player_weapon", "Mass Driver" );
+    break;
+
+    case WP_CHAINGUN:
+    trap_Cvar_Set( "player_weapon", "Chain Gun" );
+    break;
+
+    case WP_PULSE_RIFLE:
+    trap_Cvar_Set( "player_weapon", "Pulse Rifle" );
+    break;
+
+    case WP_FLAMER:
+    trap_Cvar_Set( "player_weapon", "Flame Thrower" );
+    break;
+
+    case WP_LUCIFER_CANNON:
+    trap_Cvar_Set( "player_weapon", "Lucifier cannon" );
+    break;
+
+    case WP_GRENADE:
+    trap_Cvar_Set( "player_weapon", "Grenade" );
+    break;
+
+    default:
+    trap_Cvar_Set( "player_weapon", "Unknown" );
+    }
+}
 
 /*
 =================
@@ -460,6 +676,8 @@ void CG_UpdateCvars( void )
 {
   int         i;
   cvarTable_t *cv;
+
+  CG_SetPVars();
 
   for( i = 0, cv = cvarTable; i < cvarTableSize; i++, cv++ )
     trap_Cvar_Update( cv->vmCvar );
