@@ -473,7 +473,7 @@ static void CG_SetPVars( void )
     case PTE_NONE:
     trap_Cvar_Set( "player_team",  "spectator" );
     trap_Cvar_Set( "player_stage", "0" );
-    trap_Cvar_Set( "player_spawns","0");
+    trap_Cvar_Set( "player_spawns","0" );
     trap_Cvar_Set( "player_kns",   "0" );
     trap_Cvar_Set( "player_bp",    "0" );
     trap_Cvar_Set( "player_maxbp", "0" );
@@ -547,52 +547,57 @@ static void CG_SetPVars( void )
   trap_Cvar_Set( "alien_score", va( "%d", cgs.alienKills ) );
   trap_Cvar_Set( "human_score", va( "%d", cgs.humanKills ) );
 
-  trap_Cvar_Set( "game_points", va( "%d", ( cgs.humanKills + cgs.alienKills )));
-
-  trap_Cvar_Set( "alien_spawns", va( "%d", cgs.numAlienSpawns ));
-  trap_Cvar_Set( "human_spawns", va( "%d", cgs.numHumanSpawns ));
-
   // class type
   switch ( ps->stats[ STAT_PCLASS ] )
-    {
+  {
     case PCL_ALIEN_BUILDER0:
     trap_Cvar_Set( "player_class", "Granger" );
+    trap_Cvar_Set( "player_weapon", "Granger" );
     break;
 
     case PCL_ALIEN_BUILDER0_UPG:
     trap_Cvar_Set( "player_class", "Advanced Granger" );
+    trap_Cvar_Set( "player_weapon", "Advanced Granger" );
     break;
 
     case PCL_ALIEN_LEVEL0:
     trap_Cvar_Set( "player_class", "Dretch" );
+    trap_Cvar_Set( "player_weapon", "Dretch" );
     break;
 
     case PCL_ALIEN_LEVEL1:
     trap_Cvar_Set( "player_class", "Basilisk" );
+    trap_Cvar_Set( "player_weapon", "Basilisk" );
     break;
 
     case PCL_ALIEN_LEVEL1_UPG:
     trap_Cvar_Set( "player_class", "Advanced Basilisk" );
+    trap_Cvar_Set( "player_weapon", "Advanced Basilisk" );
     break;
 
     case PCL_ALIEN_LEVEL2:
     trap_Cvar_Set( "player_class", "Marauder" );
+    trap_Cvar_Set( "player_weapon", "Marauder" );
     break;
 
     case PCL_ALIEN_LEVEL2_UPG:
     trap_Cvar_Set( "player_class", "Advanced Marauder" );
+    trap_Cvar_Set( "player_weapon", "Advanced Maruder" );
     break;
 
     case PCL_ALIEN_LEVEL3:
     trap_Cvar_Set( "player_class", "Dragoon" );
+    trap_Cvar_Set( "player_weapon", "Dragoon" );
     break;
 
     case PCL_ALIEN_LEVEL3_UPG:
     trap_Cvar_Set( "player_class", "Advanced Dragoon" );
+    trap_Cvar_Set( "player_weapon", "Advanced Dragoon" );
     break;
 
     case PCL_ALIEN_LEVEL4:
     trap_Cvar_Set( "player_class", "Tyrant" );
+    trap_Cvar_Set( "player_weapon", "Tyrant" );
     break;
 
     case PCL_HUMAN:
@@ -605,11 +610,11 @@ static void CG_SetPVars( void )
 
     default:
     trap_Cvar_Set( "player_class", "Unknown" );
-    }
+  }
 
   // weapons
   switch ( ps->weapon )
-    {
+  {
     case WP_HBUILD:
     trap_Cvar_Set( "player_weapon", "Construction Kit" );
     break;
@@ -664,7 +669,7 @@ static void CG_SetPVars( void )
 
     default:
     trap_Cvar_Set( "player_weapon", "Unknown" );
-    }
+  }
 }
 
 /*
