@@ -3588,7 +3588,7 @@ qboolean G_admin_adminlog( gentity_t *ent, int skiparg )
         id = 1;
       for( i = 0; i < MAX_ADMIN_ADMINLOGS; i++ )
       {
-        if( g_admin_adminlog[ i ]->id == id )
+        if( g_admin_adminlog[i] && g_admin_adminlog[ i ]->id == id )
         {
           index = i;
           break;

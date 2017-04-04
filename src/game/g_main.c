@@ -1307,8 +1307,8 @@ void G_CalculateBuildPoints( void )
   // reset if SD was on, but now it's off
   if(!g_suddenDeath.integer && level.suddenDeath) 
   {
-    level.suddenDeath=qfalse;
-    level.suddenDeathWarning=0;
+    level.suddenDeath = qfalse;
+    level.suddenDeathWarning = 0;
     level.suddenDeathBeginTime = -1;
     if((level.time - level.startTime) < (g_suddenDeathTime.integer * 60000 ) )
       level.suddenDeathBeginTime = g_suddenDeathTime.integer * 60000;

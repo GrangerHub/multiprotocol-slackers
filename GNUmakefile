@@ -120,6 +120,10 @@ ifndef MOUNT_DIR
 MOUNT_DIR=src
 endif
 
+ifndef ASSETS_DIR
+ASSETS_DIR=assets
+endif
+
 ifndef BUILD_DIR
 BUILD_DIR=bld
 endif
@@ -151,17 +155,14 @@ Q3LCCSRCDIR=$(MOUNT_DIR)/tools/lcc/src
 TEMPDIR=/tmp
 
 # Add git version info
-ifneq ($(USE_GIT),0)
-  USE_GIT=
-  ifeq ($(wildcard .git),.git)
-    GIT_REV=$(shell git show -s --pretty=format:%h-%ad --date=short)
-    ifneq ($(GIT_REV),)
-      VERSION:=$(VERSION)_GIT_$(GIT_REV)
-      USE_GIT=1
-    endif
+USE_GIT=
+ifeq ($(wildcard .git),.git)
+  GIT_REV=$(shell git describe --tag)
+  ifneq ($(GIT_REV),)
+    VERSION:=$(GIT_REV)
+    USE_GIT=1
   endif
 endif
-
 
 #############################################################################
 # SETUP AND BUILD -- LINUX
@@ -633,12 +634,14 @@ ifneq ($(BUILD_GAME_QVM),0)
     ifeq ($(BUILD_ONLY_CGUI),1)
       TARGETS += \
         $(B)/out/$(BASEGAME)/vm/cgame.qvm \
-        $(B)/out/$(BASEGAME)/vm/ui.qvm
+        $(B)/out/$(BASEGAME)/vm/ui.qvm \
+        $(B)/out/$(BASEGAME)/vms-$(VERSION).pk3
     else
       TARGETS += \
         $(B)/out/$(BASEGAME)/vm/cgame.qvm \
         $(B)/out/$(BASEGAME)/vm/game.qvm \
-        $(B)/out/$(BASEGAME)/vm/ui.qvm
+        $(B)/out/$(BASEGAME)/vm/ui.qvm \
+        $(B)/out/$(BASEGAME)/vms-$(VERSION).pk3
     endif
   endif
 endif
@@ -647,7 +650,8 @@ ifneq ($(BUILD_GAME_QVM_11),0)
   ifneq ($(BUILD_ONLY_GAME),1)
     TARGETS += \
       $(B)/out/$(BASEGAME)_11/vm/cgame.qvm \
-      $(B)/out/$(BASEGAME)_11/vm/ui.qvm
+      $(B)/out/$(BASEGAME)_11/vm/ui.qvm \
+      $(B)/out/$(BASEGAME)_11/vms-$(VERSION).pk3
   endif
 endif
 
@@ -1146,6 +1150,23 @@ $(B)/out/$(BASEGAME)_11/vm/ui.qvm: $(UIVMOBJ11) $(UIDIR)/ui_syscalls_11.asm $(Q3
 	$(Q)$(Q3ASM) -o $@ $(UIVMOBJ11) $(UIDIR)/ui_syscalls_11.asm
 
 
+#############################################################################
+## QVM Package
+#############################################################################
+
+$(B)/out/$(BASEGAME)/vms-$(VERSION).pk3: $(B)/out/$(BASEGAME)/vm/ui.qvm $(B)/out/$(BASEGAME)/vm/cgame.qvm $(B)/out/$(BASEGAME)/vm/game.qvm
+	@(cd $(B)/out/$(BASEGAME) && zip -r vms-$(VERSION).pk3 vm/)
+
+$(B)/out/$(BASEGAME)_11/vms-$(VERSION).pk3: $(B)/out/$(BASEGAME)_11/vm/ui.qvm $(B)/out/$(BASEGAME)_11/vm/cgame.qvm 
+	@(cd $(B)/out/$(BASEGAME)_11 && zip -r vms-$(VERSION).pk3 vm/)
+
+#############################################################################
+## Assets Package
+#############################################################################
+
+$(B)/out/$(BASEGAME)/data-$(VERSION).pk3: $(ASSETS_DIR)/ui/main.menu
+	@(cd $(ASSETS_DIR) && zip -r data-$(VERSION).pk3 *)
+	@mv $(ASSETS_DIR)/data-$(VERSION).pk3 $(B)/out/$(BASEGAME)
 
 #############################################################################
 ## GAME MODULE RULES
