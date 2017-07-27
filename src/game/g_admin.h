@@ -171,6 +171,8 @@ typedef struct g_admin_namelog
   int       denyAlienClasses;
   int       specExpires;
   int       voteCount;
+  int       teamChangeTime;
+  qboolean  joinedATeam;
 }
 g_admin_namelog_t;
 

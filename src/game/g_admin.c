@@ -1551,6 +1551,9 @@ void G_admin_namelog_update( gclient_t *client, qboolean disconnect )
           client->pers.voteCount = g_admin_namelog[ i ]->voteCount;
           g_admin_namelog[ i ]->voteCount = 0;
         }
+        //for team switch spam
+        client->pers.teamChangeTime = g_admin_namelog[ i ]->teamChangeTime;
+        client->pers.joinedATeam = g_admin_namelog[ i ]->joinedATeam;
       }
       else
       {
@@ -1584,6 +1587,9 @@ void G_admin_namelog_update( gclient_t *client, qboolean disconnect )
         {
           g_admin_namelog[ i ]->voteCount = client->pers.voteCount;
         }
+        //for team switch spam
+        g_admin_namelog[ i ]->teamChangeTime = client->pers.teamChangeTime;
+        g_admin_namelog[ i ]->joinedATeam = client->pers.joinedATeam;
       }
 
       return;

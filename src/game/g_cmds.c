@@ -663,11 +663,14 @@ void G_ChangeTeam( gentity_t *ent, pTeam_t newTeam )
   G_LeaveTeam( ent );
   ent->client->pers.teamSelection = newTeam;
 
-  // G_LeaveTeam() calls G_StopFollowing() which sets spec mode to free. 
-  // Undo that in this case, or else people can freespec while in the spawn queue on their new team
   if( newTeam != PTE_NONE )
   {
+    // G_LeaveTeam() calls G_StopFollowing() which sets spec mode to free. 
+    // Undo that in this case, or else people can freespec while in the spawn queue on their new team
     ent->client->sess.spectatorState = SPECTATOR_LOCKED;
+
+    // don't count joining spectators as the first time a team was joined
+    ent->client->pers.joinedATeam = qtrue;
   }
   
   
@@ -735,7 +738,6 @@ void G_ChangeTeam( gentity_t *ent, pTeam_t newTeam )
   ent->client->pers.classSelection = PCL_NONE;
   ClientSpawn( ent, NULL, NULL, NULL );
 
-  ent->client->pers.joinedATeam = qtrue;
   ent->client->pers.teamChangeTime = level.time;
 
   //update ClientInfo
@@ -761,6 +763,7 @@ void Cmd_Team_f( gentity_t *ent )
   // stop team join spam
   if( level.time - ent->client->pers.teamChangeTime < 1000 )
     return;
+
   // Prevent invisible players from joining a team
   if ( ent->client->sess.invisible == qtrue )
   {
@@ -793,10 +796,24 @@ void Cmd_Team_f( gentity_t *ent )
     return;
   }
 
-  if( Q_stricmpn( s, "spec", 4 ) ){
-    if(G_admin_level(ent)<g_minLevelToJoinTeam.integer){
+  if( Q_stricmpn( s, "spec", 4 ) )
+  {
+    if(G_admin_level(ent)<g_minLevelToJoinTeam.integer)
+    {
         trap_SendServerCommand( ent-g_entities,"print \"Sorry, but your admin level is only permitted to spectate.\n\"" ); 
         return;
+    }
+
+    // stop switching teams for gameplay exploit reasons by enforcing a long
+    // wait before they can come back
+    if( !force && !g_cheats.integer &&
+        ent->client->pers.joinedATeam &&
+        level.time - ent->client->pers.teamChangeTime < 20000 )
+    {
+      trap_SendServerCommand( ent-g_entities,
+        va( "print \"You must wait another %d seconds before changing teams again\n\"",
+          (int) ( ( 30000 - ( level.time - ent->client->pers.teamChangeTime ) ) / 1000.f ) ) );
+      return;
     }
   }
   
