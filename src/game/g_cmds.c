@@ -808,11 +808,11 @@ void Cmd_Team_f( gentity_t *ent )
     // wait before they can come back
     if( !force && !g_cheats.integer &&
         ent->client->pers.joinedATeam &&
-        level.time - ent->client->pers.teamChangeTime < 20000 )
+        level.time - ent->client->pers.teamChangeTime < g_teamChangeDelay.integer )
     {
       trap_SendServerCommand( ent-g_entities,
         va( "print \"You must wait another %d seconds before changing teams again\n\"",
-          (int) ( ( 30000 - ( level.time - ent->client->pers.teamChangeTime ) ) / 1000.f ) ) );
+          (int) ( ( g_teamChangeDelay.integer - ( level.time - ent->client->pers.teamChangeTime ) ) / 1000.f ) ) );
       return;
     }
   }

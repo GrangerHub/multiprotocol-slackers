@@ -1410,6 +1410,7 @@ extern  vmCvar_t  g_actionPrefix;
 extern  vmCvar_t  g_floodMaxDemerits;
 extern  vmCvar_t  g_floodMinTime;
 extern  vmCvar_t  g_spamTime;
+extern  vmCvar_t  g_teamChangeDelay;
 
 extern  vmCvar_t  g_shove;
 
