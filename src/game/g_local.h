@@ -410,7 +410,8 @@ typedef struct
   pTeam_t             teamSelection;      // player team (copied to ps.stats[ STAT_PTEAM ])
 
   int                 teamChangeTime;     // level.time of last team change
-  qboolean            joinedATeam;        // used to tell when a PTR code is valid
+  qboolean            joinedATeamPTR;     // used to tell when a PTR code is valid
+  qboolean            joinedATeam;        // used for team switch spam protection
   connectionRecord_t  *connection;
 
   int                 nameChangeTime;

@@ -1501,7 +1501,7 @@ void ClientThink_real( gentity_t *ent )
     return;
   }
 
-  if( client->pers.teamSelection != PTE_NONE && client->pers.joinedATeam )
+  if( client->pers.teamSelection != PTE_NONE && client->pers.joinedATeamPTR )
     G_UpdatePTRConnection( client );
 
   // spectators don't do much
@@ -2029,5 +2029,3 @@ void ClientEndFrame( gentity_t *ent )
 
   SendPendingPredictableEvents( &ent->client->ps );
 }
-
-

@@ -738,6 +738,7 @@ void G_ChangeTeam( gentity_t *ent, pTeam_t newTeam )
   ent->client->pers.classSelection = PCL_NONE;
   ClientSpawn( ent, NULL, NULL, NULL );
 
+  ent->client->pers.joinedATeamPTR = qtrue;
   ent->client->pers.teamChangeTime = level.time;
 
   //update ClientInfo
@@ -4618,7 +4619,7 @@ void Cmd_PTRCRestore_f( gentity_t *ent )
   int                 code;
   connectionRecord_t  *connection;
 
-  if( ent->client->pers.joinedATeam )
+  if( ent->client->pers.joinedATeamPTR )
   {
     trap_SendServerCommand( ent - g_entities,
       "print \"You cannot use a PTR code after joining a team\n\"" );
