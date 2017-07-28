@@ -103,7 +103,7 @@ static void CG_Obituary( entityState_t *ent )
       message = "saw the light";
       break;
     case MOD_TRIGGER_HURT:
-      message = "was in the wrong place";
+      message = "was in the wrong place at the wrong time";
       break;
     case MOD_HSPAWN:
       message = "should have run further";
@@ -1031,4 +1031,3 @@ void CG_CheckEvents( centity_t *cent )
   if( oldEvent != EV_NONE )
     cent->currentState.event = oldEvent;
 }
-
