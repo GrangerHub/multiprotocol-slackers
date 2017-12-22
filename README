@@ -17,3 +17,13 @@ Or if you choose, you may e-mail the maintainer, Jeff Kent, directly:
 
     jeff@jkent.net
 
+
+notes
+=====
+
+When running multiprotocol tremded, you'll need to copy both the vms-1.1.0 and
+vms-gpp1 paks your `basepath/gamename`.
+
+Add the following command line switch to serve both correctly
+
+`+set fs_pk3PrefixPairs "&vms-1.1.0|vms-gpp1&"` 
