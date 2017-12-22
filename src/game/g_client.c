@@ -938,7 +938,7 @@ static void ClientCleanName( const char *in, char *out, int outSize, qboolean sp
       continue;
 
     // don't allow nonprinting characters or (dead) console keys
-    if( ch < ' ' || ch > '}' || ch == '`' )
+    if( ch < ' ' || ch > '}' || ch == '`' || ch == '%' )
       continue;
 
     // check colors

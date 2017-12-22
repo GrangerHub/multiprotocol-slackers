@@ -4,17 +4,12 @@
 # GNU Make required
 #
 
-COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
-
-COMPILE_ARCH=$(shell uname -m | sed -e s/i.86/x86/)
+COMPILE_PLATFORM=$(shell uname | sed -e 's/_.*//' | tr '[:upper:]' '[:lower:]' | sed -e 's/\//_/g')
+COMPILE_ARCH=$(shell uname -m | sed -e 's/i.86/x86/' | sed -e 's/^arm.*/arm/')
 
 ifeq ($(COMPILE_PLATFORM),sunos)
   # Solaris uname and GNU uname differ
-  COMPILE_ARCH=$(shell uname -p | sed -e s/i.86/x86/)
-endif
-ifeq ($(COMPILE_PLATFORM),darwin)
-  # Apple does some things a little differently...
-  COMPILE_ARCH=$(shell uname -p | sed -e s/i.86/x86/)
+  COMPILE_ARCH=$(shell uname -p | sed -e 's/i.86/x86/')
 endif
 
 ifndef BUILD_GAME_SO
@@ -264,13 +259,13 @@ ifeq ($(PLATFORM),darwin)
     BASE_CFLAGS += -arch ppc64 -faltivec
   endif
   ifeq ($(ARCH),x86)
-    OPTIMIZEVM += -march=prescott -mfpmath=sse
+    OPTIMIZEVM += -mfpmath=387+sse
     # x86 vm will crash without -mstackrealign since MMX instructions will be
     # used no matter what and they corrupt the frame pointer in VM calls
     BASE_CFLAGS += -arch i386 -m32 -mstackrealign
   endif
   ifeq ($(ARCH),x86_64)
-    OPTIMIZEVM += -arch x86_64 -mfpmath=sse
+    OPTIMIZEVM += -arch x86_64 -mfpmath=sse -msse2
   endif
 
   # When compiling on OSX for OSX, we're not cross compiling as far as the
@@ -280,14 +275,15 @@ ifeq ($(PLATFORM),darwin)
     CROSS_COMPILING=0
   endif
 
+
   ifeq ($(CROSS_COMPILING),1)
-    ifeq ($(ARCH),ppc)
-      CC=powerpc-apple-darwin10-gcc
-      RANLIB=powerpc-apple-darwin10-ranlib
+    ifeq ($(ARCH),x86_64)
+      CC=x86_64-apple-darwin13-cc
+      RANLIB=x86_64-apple-darwin13-ranlib
     else
       ifeq ($(ARCH),x86)
-        CC=i686-apple-darwin10-gcc
-        RANLIB=i686-apple-darwin10-ranlib
+        CC=i386-apple-darwin13-cc
+        RANLIB=i386-apple-darwin13-ranlib
       else
         $(error Architecture $(ARCH) is not supported when cross compiling)
       endif

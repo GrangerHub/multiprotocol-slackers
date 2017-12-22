@@ -105,7 +105,7 @@ char *basepath( char *fname )
 /* memmove is defined here because some vendors don't provide it at
    all and others do a terrible job (like calling malloc) */
 // -- ouch, that hurts -- ln
-#ifndef MACOS_X   /* always use the system memmove() on Mac OS X. --ryan. */
+#ifndef __APPLE__   /* always use the system memmove() on Mac OS X. --ryan. */
 #ifdef memmove
 #undef memmove
 #endif

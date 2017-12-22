@@ -223,11 +223,6 @@ typedef struct {
 #define _3DFX_DRIVER_NAME	"3dfxvgl"
 #define OPENGL_DRIVER_NAME	"opengl32"
 
-#elif defined(MACOS_X)
-
-#define _3DFX_DRIVER_NAME	"libMesaVoodooGL.dylib"
-#define OPENGL_DRIVER_NAME	"/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib"
-
 #else
 
 #define _3DFX_DRIVER_NAME	"libMesaVoodooGL.so"
